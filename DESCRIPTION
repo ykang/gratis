@@ -1,6 +1,6 @@
 Package: tsgeneration
 Type: Package
-Title: Generate time series based on mixture autoregressive models
+Title: Efficient generation of time series with diverse and controllable characteristics.
 Version: 0.1
 Date: 2018-08-02
 Author: Yanfei Kang, Feng Li and Rob J Hyndman
@@ -8,6 +8,8 @@ Maintainer: Yanfei Kang <yanfeikang@buaa.edu.cn>
 Description: tsgeneration generates time series based on mixture autoregressive models.
 LazyLoad: yes
 Repository: CRAN
+URL: https://github.com/ykang/tsgeneration
+BugReports: BugReports: https://github.com/robjhyndman/tsfeatures/issues/
 Depends: R (>= 3.4.2)
 Imports: polynom, mvtnorm, forecast, dplyr, stats, tibble, utils, purrr, magrittr, shiny, GA, ggplot2, foreach, methods
 Suggests: fGarch

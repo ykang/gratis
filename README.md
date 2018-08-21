@@ -25,13 +25,32 @@ Usage
 require("tsgeneration")
 ```
 
+### Generate diverse time series
 
-### Web Application
+``` r
+x <- generate_ts(n.ts = 2, freq = 12, nComp = 2, n = 120)
+x$N1$pars
+plot(x$N1$x)
+```
+
+### Simulate mutiple seasonal time series
+
+``` r
+x <- simulate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2)
+plot(x)
+```
+
+### Web application
 
 You could run the time series generation procedure in a web application
 ``` r
-tsgeneration:::run.tsgeneration.app()
+run_tsgeneration_app()
 ```
+
+See also
+--------
+
+- R package ['tsfeatures'](https://github.com/robjhyndman/tsfeatures)
 
 
 References
