@@ -7,13 +7,19 @@ diverse and controllable characteristics.
 Installation
 ------------
 
-You can install the **development** version from [GitHub
-Repository](https://github.com/ykang/tsgeneration) with:
+The package requires the [`tsfeatures`](https://github.com/robjhyndman/tsfeatures) package
+to be installed.
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("ykang/tsgeneration")
+devtools::install_github("robjhyndman/tsfeatures")
+```
 
+You can install the **development** version of `tsgeneration` package from [GitHub
+Repository](https://github.com/ykang/tsgeneration) with:
+
+``` r
+devtools::install_github("ykang/tsgeneration")
 ```
 
 Usage

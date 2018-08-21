@@ -2,6 +2,7 @@
 
 export(arinf)
 export(fitness)
+export(ga_ts)
 export(generate_ts)
 export(nsdiffs1)
 export(pi_coefficients)
