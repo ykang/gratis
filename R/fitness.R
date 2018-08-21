@@ -28,21 +28,22 @@ pars2list <- function(pars, seasonal, nComp){
 }
 
 
-#' Title
+#' Fitness function for time series generation.
 #'
-#' @param pars 
-#' @param features 
-#' @param seasonal 
-#' @param n 
-#' @param freq 
-#' @param target 
-#' @param nComp 
-#' @param selected.features 
+#' @param pars Parameters
+#' @param features Time series features.
+#' @param seasonal Seasonal effects.
+#' @param n Length of time series
+#' @param freq Frequence of time series
+#' @param target Target time series features
+#' @param nComp No. of components used in mixture models.
+#' @param selected.features Selected features.
 #'
-#' @return
+#' @return NA
 #' @export
 #'
 #' @examples
+#' # Not Run
 fitness <- function(pars, features, seasonal, n = 120, freq=12, target, nComp, selected.features) {
   pars <- pars2list(pars, seasonal, nComp)
   if (seasonal < 2){
@@ -51,7 +52,7 @@ fitness <- function(pars, features, seasonal, n = 120, freq=12, target, nComp, s
       return(list(value = -100, x = x))
     }
     return(list(value = -sqrt(sum((tsfeatures(x, features = features) %>% select(selected.features) - target)^2))/sqrt(sum(target^2)),
-                x = x))  
+                x = x))
   }else{
     x.list <- as.list(rep(0, length(freq)))
     for (i in seq(freq)){
@@ -61,15 +62,15 @@ fitness <- function(pars, features, seasonal, n = 120, freq=12, target, nComp, s
     names(x.list) <- paste0('Season', seq(freq))
     res <- as_tibble(scale(x.list %>% bind_cols())[,]) %>% mutate(Season2 = Season2/pars$ms.scale)
     x <- res %>%
-      mutate(x = rowSums(.[seq(freq)])) %>% 
+      mutate(x = rowSums(.[seq(freq)])) %>%
       dplyr::select(x) %>% unlist() %>% as.numeric() %>% msts(seasonal.periods = freq)
     if (is.na(max(abs(x))) | max(abs(x)) > 1e5) {
       return(list(value = -100, x = x))
     }
-    return(list(value = -sqrt(sum((tsfeatures::tsfeatures(x, features = features) %>% 
+    return(list(value = -sqrt(sum((tsfeatures::tsfeatures(x, features = features) %>%
                                      select(selected.features) - target)^2))/sqrt(sum(target^2)),
                 x = x))
-    
+
   }
 }
 
@@ -83,7 +84,7 @@ pars2x <- function(pars, seasonal, freq, nComp, n) {
       sigmas.list[[i]] = rep(i, n + freq * 10)
     }
     weights <- pars$weights
-    x <- rmixnorm.ts(
+    x <- rmixnorm_ts(
       n = n + freq * 10,
       means.ar.par.list = means.ar.par.list,
       sigmas.list = sigmas.list,
@@ -109,7 +110,7 @@ pars2x <- function(pars, seasonal, freq, nComp, n) {
       sigmas.list[[i]] = rep(i, n + freq * 10)
     }
     weights <- pars$weights
-    x <- rmixnorm.ts(
+    x <- rmixnorm_ts(
       n = n + freq * 10,
       means.ar.par.list = means.ar.par.list,
       sigmas.list = sigmas.list,

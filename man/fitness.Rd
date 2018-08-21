@@ -2,28 +2,34 @@
 % Please edit documentation in R/fitness.R
 \name{fitness}
 \alias{fitness}
-\title{Title}
+\title{Fitness function for time series generation.}
 \usage{
 fitness(pars, features, seasonal, n = 120, freq = 12, target, nComp,
   selected.features)
 }
 \arguments{
-\item{pars}{}
+\item{pars}{Parameters}
 
-\item{features}{}
+\item{features}{Time series features.}
 
-\item{seasonal}{}
+\item{seasonal}{Seasonal effects.}
 
-\item{n}{}
+\item{n}{Length of time series}
 
-\item{freq}{}
+\item{freq}{Frequence of time series}
 
-\item{target}{}
+\item{target}{Target time series features}
 
-\item{nComp}{}
+\item{nComp}{No. of components used in mixture models.}
 
-\item{selected.features}{}
+\item{selected.features}{Selected features.}
+}
+\value{
+NA
 }
 \description{
-Title
+Fitness function for time series generation.
+}
+\examples{
+# Not Run
 }

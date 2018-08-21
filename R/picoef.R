@@ -15,6 +15,7 @@
 #' @export
 #'
 #' @examples
+#' # Not Run
 pi_coefficients <- function(ar=0, d=0L, ma=0, sar=0, D=0L, sma=0, m=1L, tol=1e-07)
 {
   # non-seasonal AR
@@ -72,6 +73,7 @@ pi_coefficients <- function(ar=0, d=0L, ma=0, sar=0, D=0L, sma=0, m=1L, tol=1e-0
 #' @export
 #'
 #' @examples
+#' # Not Run
 arinf <- function(object)
 {
   if(!("Arima" %in% class(object)))
@@ -83,6 +85,3 @@ arinf <- function(object)
 # library(forecast)
 # USAccDeaths %>% auto.arima %>% arinf %>% plot
 # lynx %>% auto.arima %>% arinf %>% plot
-
-
-

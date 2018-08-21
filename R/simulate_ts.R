@@ -1,20 +1,20 @@
-#' Simulate time series from random parameter spaces of the mixture autoregressive (MAR) models.
+#' Generate time series from random parameter spaces of the mixture autoregressive (MAR) models.
 #'
-#' Simulate time series from random parameter spaces of the mixture autoregressive (MAR) models.
-#' @param n.ts number of time series to be simulated. 
+#' Generate time series from random parameter spaces of the mixture autoregressive (MAR) models.
+#' @param n.ts number of time series to be simulated.
 #' @param freq seasonal period of the time series to be simulated.
 #' @param nComp number of mixing components when simulating time series using MAR models.
 #' @param n length of the simulated time series.
 #' @return a list of time series together with the SARIMA coefficients used in each mixing
 #' component and the corresponding mixing weights.
 #' @author Yanfei Kang and Feng Li
-#' @references Wong, CS & WK Li (2000). 
+#' @references Wong, CS & WK Li (2000).
 #' @export
 #' @examples
-#' x <- simulate_mixture_data(n.ts = 2, freq = 12, nComp = 2, n = 120)
+#' x <- generate_ts(n.ts = 2, freq = 12, nComp = 2, n = 120)
 #' x$N1$pars
 #' plot(x$N1$x)
-simulate_mixture_data <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120) {
+generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120) {
     count <- 1
     simulated.mixture.data <- list()
     sigmas <- sample(c(1:5), 5, replace = TRUE)
@@ -47,7 +47,7 @@ simulate_mixture_data <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120) {
           sigmas.list[[i]] = rep(sigmas[i], n + freq * 10)
         }
         pars$weights <- mixture.weights
-        x <- rmixnorm.ts(
+        x <- rmixnorm_ts(
           n = n + freq * 10,
           means.ar.par.list = means.ar.par.list,
           sigmas.list = sigmas.list,
@@ -77,14 +77,14 @@ simulate_mixture_data <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120) {
         means.ar.par.list = lapply(pars, function(x) {
           d = sample(c(0, 1, 2), 1,  prob = c(0.1, 0.6, 0.3))
           c(phi0, pi_coefficients(ar = x[1:2], d = d, m = freq))
-          
+
         })
         sigmas.list <- list()
         for (i in 1:nComp) {
           sigmas.list[[i]] = rep(sigmas[i], n + freq * 10)
         }
         pars$weights <- mixture.weights
-        x <- rmixnorm.ts(
+        x <- rmixnorm_ts(
           n = n + freq * 10,
           means.ar.par.list = means.ar.par.list,
           sigmas.list = sigmas.list,
@@ -120,14 +120,14 @@ simulate_mixture_data <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120) {
 #' x <- simulate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2)
 #' plot(x)
 simulate_msts <- function(seasonal.periods = c(7, 365), n = 800, nComp = NULL){
-  x.list <- map(seasonal.periods, function(p) {simulate_mixture_data(n.ts = 1, freq = p, n = n, nComp = nComp)$N1$x})
+  x.list <- map(seasonal.periods, function(p) {generate_ts(n.ts = 1, freq = p, n = n, nComp = nComp)$N1$x})
   names(x.list) <- paste0('Season', seasonal.periods)
   x.list[1:(length(x.list) - 1)] <- lapply(x.list[1:(length(x.list) - 1)], function(x){x - trendcycle(stl(x, 'per'))})
   weights <- msts_weights(length(seasonal.periods))
   res <- as_tibble(scale(x.list %>% bind_cols())[,]) %>%
     mapply('*', ., weights) %>%
     as_tibble() %>%
-    mutate(x = rowSums(.)) %>% 
+    mutate(x = rowSums(.)) %>%
     select(x) %>% msts(seasonal.periods = seasonal.periods)
   return(res)
 }

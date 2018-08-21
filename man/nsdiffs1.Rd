@@ -9,6 +9,12 @@ nsdiffs1(x)
 \arguments{
 \item{x}{}
 }
+\value{
+NA
+}
 \description{
 Title
+}
+\examples{
+# Not Run
 }

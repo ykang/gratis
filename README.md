@@ -16,6 +16,24 @@ devtools::install_github("ykang/tsgeneration")
 
 ```
 
+Usage
+-----
+
+### Load the package
+
+``` r
+require("tsgeneration")
+```
+
+
+### Web Application
+
+You could run the time series generation procedure in a web application
+``` r
+tsgeneration:::run.tsgeneration.app()
+```
+
+
 References
 ----------
 

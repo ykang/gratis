@@ -30,6 +30,9 @@ A vector of AR coefficients.
 \description{
 Convert SARIMA coefficients to pi coefficients of an AR process.
 }
+\examples{
+# Not Run
+}
 \author{
 Rob J Hyndman
 }

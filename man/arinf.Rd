@@ -15,6 +15,9 @@ A vector of AR coefficients
 \description{
 Compute pi coefficients from ARIMA model
 }
+\examples{
+# Not Run
+}
 \author{
 Rob J Hyndman
 }

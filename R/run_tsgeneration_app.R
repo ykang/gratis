@@ -1,14 +1,16 @@
-#' Title
+#' Web Application to generate time series
 #'
 #' @return
+#' NULL
 #' @export
 #'
 #' @examples
-runGAgeneration <- function() {
-  appDir <- system.file("shiny-generation", "GAgeneration", package = "tsgeneration")
+#' # Not Run
+run_tsgeneration_app <- function() {
+  appDir <- system.file("shiny", "tsgeneration", package = "tsgeneration")
   if (appDir == "") {
     stop("Could not find example directory. Try re-installing `tsgeneration`.", call. = FALSE)
   }
-  
+
   shiny::runApp(appDir, display.mode = "normal", quiet = TRUE)
 }

@@ -8,7 +8,7 @@
 #' @return "matrix".
 #' @references Villani et al 2009.
 #' @author Feng Li, Central University of Finance and Economics.
-#' @examples 
+#' @examples
 #' n <- 1000
 #' means <- matrix(c(-5, 0, 5), 1)
 #' sigmas <- array(c(1, 1, 1), c(1, 1, 3))
@@ -57,7 +57,7 @@ dmixnorm <- function(x, means, sigmas, weights, log = FALSE)
                 sigma = matrix(sigmas[, ,comp.i], q, q),
                 log = TRUE)
     }, x = x,  means = means, sigmas = sigmas, q = q)
-    
+
 
     out.sum <- sum(exp(out.comp.log)*weights)
 
@@ -97,20 +97,20 @@ dmixnorm <- function(x, means, sigmas, weights, log = FALSE)
 #' @return vector of n follows a mixture distribution.
 #' @references Li 2010 JSPI.
 #' @author Feng Li, Central University of Finance and Economics.
-#' @examples 
+#' @examples
 #' n = 1000
 #' means.ar.par.list = list(c(0, 0.8), c(0, 0.6, 0.3))
 #' require("fGarch")
 #' sigmas.spec <- list(garchSpec(model = list(alpha = c(0.05, 0.06)), cond.dist = "norm"),
 #'                     garchSpec(model = list(alpha = c(0.05, 0.05)), cond.dist = "norm"))
-#' sigmas.list <- lapply(lapply(sigmas.spec, garchSim, extended = TRUE, n = n), 
+#' sigmas.list <- lapply(lapply(sigmas.spec, garchSim, extended = TRUE, n = n),
 #' function(x) x$sigma)
 #' weights <- c(0.8, 0.2)
-#' y = rmixnorm.ts(n = n, means.ar.par.list = means.ar.par.list, sigmas.list = sigmas.list,
+#' y = rmixnorm_ts(n = n, means.ar.par.list = means.ar.par.list, sigmas.list = sigmas.list,
 #'                 weights = weights)
 #' plot(y)
 #' @export
-rmixnorm.ts <- function(n, means.ar.par.list, sigmas.list, weights, yinit = 0)
+rmixnorm_ts <- function(n, means.ar.par.list, sigmas.list, weights, yinit = 0)
 {
     y <- rep(NA, n)
     nComp <- length(means.ar.par.list)
@@ -142,7 +142,7 @@ rmixnorm.ts <- function(n, means.ar.par.list, sigmas.list, weights, yinit = 0)
 }
 
 
-dmixnorm.ts <- function(y, means.ar.par.list, sigmas.list, weights, log = FALSE)
+dmixnorm_ts <- function(y, means.ar.par.list, sigmas.list, weights, log = FALSE)
 {
     nComp <- length(means.ar.par.list)
     nLags <- lapply(means.ar.par.list, function(x) length(x)-1)
@@ -193,7 +193,7 @@ dmixnorm.ts <- function(y, means.ar.par.list, sigmas.list, weights, log = FALSE)
 ## sigmas.list <- lapply(lapply(sigmas.spec, garchSim, extended = TRUE, n = n),
 ##                       function(x) x$sigma)
 ## weights <- c(0.8, 0.2)
-## y = rmixnorm.ts(n = n, means.ar.par.list = means.ar.par.list, sigmas.list = sigmas.list,
+## y = rmixnorm_ts(n = n, means.ar.par.list = means.ar.par.list, sigmas.list = sigmas.list,
 ##                 weights = weights)
-## out = dmixnorm.ts(y = y, means.ar.par.list = means.ar.par.list,
+## out = dmixnorm_ts(y = y, means.ar.par.list = means.ar.par.list,
 ##                   sigmas.list = sigmas.list, weights = weights, log = TRUE)
