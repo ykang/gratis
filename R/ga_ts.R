@@ -1,4 +1,4 @@
-#' A revise version of genetic algorithms (R package"GA") to allow for time series
+#' A revised version of genetic algorithms (R package `GA`) to allow for time series
 #' generation.
 #'
 #' @param type the type of genetic algorithm to be run depending on the nature of decision
@@ -52,7 +52,7 @@
 #'     ga-class object and show the evolution of the search.
 #' @param seed an integer value containing the random number generator state.
 #'
-#' @return Returns an object of class `ga-class`.
+#' @return An object of class `ga-class`.
 #' @export
 #'
 #' @examples

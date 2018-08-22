@@ -1,4 +1,4 @@
-#' Web Application to generate time series
+#' Web Application to generate time series with controllable features.
 #'
 #' @return
 #' NULL

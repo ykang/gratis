@@ -2,7 +2,7 @@
 % Please edit documentation in R/ga_ts.R
 \name{ga_ts}
 \alias{ga_ts}
-\title{A revise version of genetic algorithms (R package"GA") to allow for time series
+\title{A revised version of genetic algorithms (R package `GA`) to allow for time series
 generation.}
 \usage{
 ga_ts(type = c("binary", "real-valued", "permutation"), fitness, ..., n,
@@ -99,10 +99,10 @@ ga-class object and show the evolution of the search.}
 \item{seed}{an integer value containing the random number generator state.}
 }
 \value{
-Returns an object of class `ga-class`.
+An object of class `ga-class`.
 }
 \description{
-A revise version of genetic algorithms (R package"GA") to allow for time series
+A revised version of genetic algorithms (R package `GA`) to allow for time series
 generation.
 }
 \examples{

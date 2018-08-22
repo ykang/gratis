@@ -85,3 +85,16 @@ arinf <- function(object)
 # library(forecast)
 # USAccDeaths %>% auto.arima %>% arinf %>% plot
 # lynx %>% auto.arima %>% arinf %>% plot
+
+#' Set the number of seasonal differences for yearly data to be -1.
+#'
+#' @param x
+#'
+#' @return
+#' NA
+#'
+#' @examples
+#' # Not Run
+nsdiffs1 <- function(x){
+  c(nsdiffs=ifelse(frequency(x)==1L, -1, forecast::nsdiffs(x)))
+}

@@ -1,12 +1,12 @@
 ##############################################################################
 #                                                                            #
 #                          GENETIC OPERATORS                                 #
-#                                                                            #
+#  A revised version from R package `GA` to allow for time series generation.                                                                          #
 ##############################################################################
 
 ##
 ## Generic GA operators
-##
+## 
 
 ga_lrSelection <- function(object,
                             r = 2/(object@popSize*(object@popSize-1)),

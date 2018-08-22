@@ -2,12 +2,12 @@
 % Please edit documentation in R/run_tsgeneration_app.R
 \name{run_tsgeneration_app}
 \alias{run_tsgeneration_app}
-\title{Web Application to generate time series}
+\title{Web Application to generate time series with controllable features.}
 \usage{
 run_tsgeneration_app()
 }
 \description{
-Web Application to generate time series
+Web Application to generate time series with controllable features.
 }
 \examples{
 # Not Run

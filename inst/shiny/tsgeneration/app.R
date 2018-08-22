@@ -55,10 +55,6 @@ ui <- fluidPage(
                    min = 1,
                    max = 100,
                    value = 1),
-      # checkboxGroupInput(
-      #   'Features',
-      #   label = "Please select the features you are interested in:",
-      #   choices = featureNames),
       h4('Please set values for the features you are interested in:'),
       eval(parse(text = paste('wellPanel(',  paste(
         "numericInput(featureNames[", 1:9, "], label = featureNames[", 1:9, "], value = 0)",

@@ -7,8 +7,8 @@ diverse and controllable characteristics.
 Installation
 ------------
 
-The package requires the [`tsfeatures`](https://github.com/robjhyndman/tsfeatures) package
-to be installed.
+The package requires the `tsfeatures` package from [GitHub
+Repository](https://github.com/robjhyndman/tsfeatures).
 
 ``` r
 # install.packages("devtools")
@@ -36,14 +36,21 @@ require("tsgeneration")
 ``` r
 x <- generate_ts(n.ts = 2, freq = 12, nComp = 2, n = 120)
 x$N1$pars
-plot(x$N1$x)
+autoplot(x$N1$x)
 ```
 
-### Simulate mutiple seasonal time series
+### Generate mutiple seasonal time series
 
 ``` r
-x <- simulate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2)
-plot(x)
+x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2)
+autoplot(x)
+```
+
+### Generate time series with controllable features
+
+``` r
+x <- generate_ts_with_target(n = 1, ts.length = 60, freq = 1, seasonal = 0, features = c('entropy', 'stl_features'), selected.features = c('entropy', 'trend'), c(0.6, 0.9))
+autoplot(x)
 ```
 
 ### Web application
@@ -56,7 +63,7 @@ run_tsgeneration_app()
 See also
 --------
 
-- R package ['tsfeatures'](https://github.com/robjhyndman/tsfeatures)
+- R package `tsfeatures` from [GitHub Repository](https://github.com/robjhyndman/tsfeatures).
 
 
 References

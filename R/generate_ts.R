@@ -1,48 +1,142 @@
-#' Generating diverse time series
+#' Generate time series from random parameter spaces of the mixture autoregressive (MAR) models.
 #'
-#' @param n Length of time series
-#' @param selected.features Selected features.
-#' @param target Target features.
-#' @param seasonal Seasonal effects.
-#' @param ts.length Length
-#' @param freq Frequence
-#'
-#' @return NA
-#' @export
-#'
+#' Generate time series from random parameter spaces of the mixture autoregressive (MAR) models.
+#' @param n.ts number of time series to be generated.
+#' @param freq seasonal period of the time series to be generated.
+#' @param nComp number of mixing components when simulating time series using MAR models.
+#' @param n length of the generated time series.
+#' @return A list of time series together with the SARIMA coefficients used in each mixing
+#' component and the corresponding mixing weights.
+#' @author Yanfei Kang and Feng Li
 #' @examples
-#' # Not Run
-generate_ts <- function(n, ts.length, freq, seasonal, features, selected.features, target){
-  ga_min <-
-    if (seasonal == 0){
-      c(rep(0, 10))
-    }else if (seasonal == 1){
-      c(rep(0, 17))
-    }else{
-      c(rep(0, 35))
+#' x <- generate_ts(n.ts = 2, freq = 12, nComp = 2, n = 120)
+#' x$N1$pars
+#' forecast::autoplot(x$N1$x)
+#' @references Wong, CS & WK Li (2000).
+#' @export
+generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120) {
+    count <- 1
+    generated.mixture.data <- list()
+    sigmas <- sample(c(1:5), 5, replace = TRUE)
+    phi0 <- sample(c(0, 3), 1)
+    while (count <= n.ts) {
+      if (is.null(nComp)) {
+        # set the number of components
+        nComp <- sample(1:5, 1)
+      } else{
+        nComp = nComp
+      }
+      pars <- list()
+      # seasonal data
+      if (freq != 1) {
+        for (i in 1:nComp) {
+          pars[[sprintf("pars%d", i)]] <- rnorm(4, 0, 0.5)
+        }
+        mixture.weights <- rep(NA, nComp)
+        for (i in 1:nComp) {
+          mixture.weights[i] <- runif(1)
+        }
+        mixture.weights <- mixture.weights/sum(mixture.weights)
+        means.ar.par.list = lapply(pars, function(x) {
+          d = sample(c(0,1), 1, prob = c(0.1, 0.9))
+          D = sample(c(0,1), 1, prob = c(0.6, 0.4))
+          c(phi0, pi_coefficients(ar = x[1:2], sar = x[3:4], d = d, D = D, m = freq))
+        })
+        sigmas.list <- list()
+        for (i in 1:nComp) {
+          sigmas.list[[i]] = rep(sigmas[i], n + freq * 10)
+        }
+        pars$weights <- mixture.weights
+        x <- rmixnorm_ts(
+          n = n + freq * 10,
+          means.ar.par.list = means.ar.par.list,
+          sigmas.list = sigmas.list,
+          weights = mixture.weights
+        )
+        # allow spikes
+        if (runif(1) <= 0.01){
+          x[sample(1:length(x), 1)] <- max(x) * sample(2:5, 1)}
+        x <- ts(x[(1 + freq * 10):(n + freq * 10)], frequency = freq)
+        if (!(any(is.na(x)) || (max(abs(x), na.rm = TRUE) > 1e5))) {
+          number <- paste0('N', count)
+          generated.mixture.data[[number]] <- list()
+          generated.mixture.data[[number]]$x <- x
+          generated.mixture.data[[number]]$pars <- pars
+          count = count + 1
+        }
+      } else{
+        # nonseasonal data
+        for (i in 1:nComp) {
+          pars[[sprintf("pars%d", i)]] <- rnorm(2, 0, 0.5)
+        }
+        mixture.weights <- rep(NA, nComp)
+        for (i in 1:nComp) {
+          mixture.weights[i] <- runif(1)
+        }
+        mixture.weights <- mixture.weights/sum(mixture.weights)
+        means.ar.par.list = lapply(pars, function(x) {
+          d = sample(c(0, 1, 2), 1,  prob = c(0.1, 0.6, 0.3))
+          c(phi0, pi_coefficients(ar = x[1:2], d = d, m = freq))
+
+        })
+        sigmas.list <- list()
+        for (i in 1:nComp) {
+          sigmas.list[[i]] = rep(sigmas[i], n + freq * 10)
+        }
+        pars$weights <- mixture.weights
+        x <- rmixnorm_ts(
+          n = n + freq * 10,
+          means.ar.par.list = means.ar.par.list,
+          sigmas.list = sigmas.list,
+          weights = mixture.weights
+        )
+        # allow spikes
+        if (runif(1) <= 0.01){
+          x[sample(1:length(x), 1)] <- max(x) * sample(2:5, 1)}
+        x <- ts(x[(1 + freq * 10):(n + freq * 10)], frequency = freq)
+        if (max(abs(x), na.rm = TRUE) < 1e5) {
+          number <- paste0('N', count)
+          generated.mixture.data[[number]] <- list()
+          generated.mixture.data[[number]]$x <- x
+          generated.mixture.data[[number]]$pars <- pars
+          count = count + 1
+        }
+      }
     }
-  ga_max <-
-    if (seasonal == 0){
-      c(rep(1, 10))
-    }else if (seasonal == 1){
-      c(rep(1, 17))
-    }else{
-      c(rep(1, 35))
-    }
-  evolved.ts <- c()
-  while(ifelse(is.null(dim(evolved.ts)), 0 < 1, dim(evolved.ts)[2] < n)){
-    GA <- ga_ts(type = "real-valued", fitness = tsgeneration::fitness, features = features, seasonal = seasonal,
-               ts.length, freq, target, 3, selected.features,
-               n = ts.length,
-               min = ga_min,
-               max = ga_max,
-               parallel = TRUE, popSize = 30, maxiter = 100,
-               pmutation = 0.3, pcrossover = 0.8, maxFitness = -0.05,
-               run = 30, keepBest = TRUE, monitor = GA::gaMonitor2)
-    evolved.ts.new <-
-      unique(do.call(cbind,
-                     eval(parse(text = paste( "list(", paste("GA@bestSol[[GA@iter - ", 0:(GA@run-1), ']]', sep = '', collapse = ','), ')')))), MARGIN = 2)
-    evolved.ts <- cbind(evolved.ts, evolved.ts.new)
+    return(generated.mixture.data)
   }
-  return(evolved.ts)
+
+
+
+#' Generate mutiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
+#'
+#' Generate mutiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
+#' @param seasonal.periods a vector of seasonal periods of the time series to be generated.
+#' @param n length of the generated time series.
+#' @param nComp number of mixing components when simulating time series using MAR models.
+#' @return a time series with multiple seasonal periods.
+#' @export
+#' @examples
+#' x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2)
+#' forecast::autoplot(x)
+generate_msts <- function(seasonal.periods = c(7, 365), n = 800, nComp = NULL){
+  x.list <- map(seasonal.periods, function(p) {generate_ts(n.ts = 1, freq = p, n = n, nComp = nComp)$N1$x})
+  names(x.list) <- paste0('Season', seasonal.periods)
+  x.list[1:(length(x.list) - 1)] <- lapply(x.list[1:(length(x.list) - 1)], function(x){x - trendcycle(stl(x, 'per'))})
+  weights <- msts_weights(length(seasonal.periods))
+  res <- as_tibble(scale(x.list %>% bind_cols())[,]) %>%
+    mapply('*', ., weights) %>%
+    as_tibble() %>%
+    mutate(x = rowSums(.)) %>%
+    select(x) %>% msts(seasonal.periods = seasonal.periods)
+  return(res)
+}
+
+#===========================================================================
+# Simulated weights for the simulation of msts
+#===========================================================================
+msts_weights <- function(n.periods){
+  gamma <- runif(n.periods, 0)
+  weights <- gamma/sum(gamma)
+  return(weights)
 }
