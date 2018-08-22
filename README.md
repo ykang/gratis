@@ -69,7 +69,7 @@ See also
 References
 ----------
 
-- Kang, Y., Hyndman, R., and Li, F. (2018) _Efficient generation of time series with
+- Kang, Y., Hyndman, R., and Li, F. (2018). Efficient generation of time series with
 diverse and controllable characteristics. Working paper.
 
 
