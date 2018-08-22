@@ -1,33 +1,3 @@
-pars2list <- function(pars, seasonal, nComp){
-  parslist <- list()
-  if(seasonal == 0){
-    for (i in 1:nComp){
-      parslist[[sprintf("pars%d",i)]] <- pars[(2*i - 1):(2*i)]
-    }
-    parslist$p.change <- pars[2*nComp + 1]
-    parslist$p.diff <- pars[2*nComp + 2]
-    parslist$weights <- c(pars[(2*nComp + 3):(3*nComp + 1)], 1 - sum(pars[(2*nComp + 3):(3*nComp + 1)]))
-    parslist$weights <- exp(parslist$weights)/sum(exp(parslist$weights))
-  }else if (seasonal == 1){
-    for (i in 1:nComp){
-      parslist[[sprintf("pars%d",i)]] <- pars[(4*i - 3):(4*i)]
-    }
-    parslist$p.change <- pars[4*nComp + 1]
-    parslist$p.diff <- pars[4*nComp + 2]
-    parslist$p.Diff <- pars[4*nComp + 3]
-    parslist$weights <- c(pars[(4*nComp + 4):(5*nComp + 2)], 1 - sum(pars[(4*nComp + 4):(5*nComp + 2)]))
-    parslist$weights <- exp(parslist$weights)/sum(exp(parslist$weights))
-  }else{
-    pars1 <- pars[1:((length(pars) - 1)/2)]
-    pars2 <- pars[((length(pars) - 1)/2 + 1):(length(pars)-1)]
-    parslist[[1]] <- pars2list(pars1, 1, nComp)
-    parslist[[2]] <- pars2list(pars2, 1, nComp)
-    parslist$ms.scale <- pars[length(pars)]
-  }
-  return(parslist)
-}
-
-
 #' Fitness function for time series generation.
 #'
 #' @param pars Parameters
@@ -44,7 +14,7 @@ pars2list <- function(pars, seasonal, nComp){
 #'
 #' @examples
 #' # Not Run
-fitness <- function(pars, features, seasonal, n = 120, freq=12, target, nComp, selected.features) {
+fitness_ts <- function(pars, features, seasonal, n = 120, freq=12, target, nComp, selected.features) {
   pars <- pars2list(pars, seasonal, nComp)
   if (seasonal < 2){
     x <- pars2x(pars, seasonal, freq, nComp, n)
@@ -133,7 +103,31 @@ pars2x <- function(pars, seasonal, freq, nComp, n) {
 }
 
 
-fitness.ts <- function(x, freq, target) {
-  x.features <- simple.features(ts(x, frequency = freq), TRUE, 'loglik')
-  return(-sqrt(sum((x.features - target)^2)))
+pars2list <- function(pars, seasonal, nComp){
+  parslist <- list()
+  if(seasonal == 0){
+    for (i in 1:nComp){
+      parslist[[sprintf("pars%d",i)]] <- pars[(2*i - 1):(2*i)]
+    }
+    parslist$p.change <- pars[2*nComp + 1]
+    parslist$p.diff <- pars[2*nComp + 2]
+    parslist$weights <- c(pars[(2*nComp + 3):(3*nComp + 1)], 1 - sum(pars[(2*nComp + 3):(3*nComp + 1)]))
+    parslist$weights <- exp(parslist$weights)/sum(exp(parslist$weights))
+  }else if (seasonal == 1){
+    for (i in 1:nComp){
+      parslist[[sprintf("pars%d",i)]] <- pars[(4*i - 3):(4*i)]
+    }
+    parslist$p.change <- pars[4*nComp + 1]
+    parslist$p.diff <- pars[4*nComp + 2]
+    parslist$p.Diff <- pars[4*nComp + 3]
+    parslist$weights <- c(pars[(4*nComp + 4):(5*nComp + 2)], 1 - sum(pars[(4*nComp + 4):(5*nComp + 2)]))
+    parslist$weights <- exp(parslist$weights)/sum(exp(parslist$weights))
+  }else{
+    pars1 <- pars[1:((length(pars) - 1)/2)]
+    pars2 <- pars[((length(pars) - 1)/2 + 1):(length(pars)-1)]
+    parslist[[1]] <- pars2list(pars1, 1, nComp)
+    parslist[[2]] <- pars2list(pars2, 1, nComp)
+    parslist$ms.scale <- pars[length(pars)]
+  }
+  return(parslist)
 }

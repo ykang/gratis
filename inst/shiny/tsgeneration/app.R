@@ -131,7 +131,7 @@ server <- function(input, output) {
     withProgress(message = 'Generating data', detail = "0%", {
       ptm <- proc.time()
       while(ifelse(is.null(dim(evolved.ts)), 0 < 1, dim(evolved.ts)[2] < input$Number)){
-        GA <- ga_ts(type = "real-valued", fitness = fitness, features = features, seasonal = seasonal,
+        GA <- ga_ts(type = "real-valued", fitness = fitness_ts, features = features, seasonal = seasonal,
                input$Length, freq, target, 3, selected.features,
                n = input$Length,
                min = ga_min,

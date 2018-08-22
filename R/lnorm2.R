@@ -1,15 +1,15 @@
 #' Alternative parametrization of log normal distribution.
 #'
-#' See help("rlnorm") for the details for the log-normal distribution. 
+#' See help("rlnorm") for the details for the log-normal distribution.
 #' @title Log-normal distribution with alternative parametrization.
 #' @param n number of observations.
-#' @param mean "vector" the mean value of the log-normal distribution. 
+#' @param mean "vector" the mean value of the log-normal distribution.
 #' @param sd "vector" the variance of the log-normal distribution.
-#' @return See the corresponding help for the usual log-normal functions. 
+#' @return See the corresponding help for the usual log-normal functions.
 #' @references Li Villani Kohn 2010.
 #' @author Feng Li, Department of Statistics, Stockholm University, Sweden.
-#' @examples 
-#' 
+#' @examples
+#'
 #' @export
 
 rlnorm2 <- function(n, mean, sd)

@@ -4,19 +4,19 @@
 #                                                                            #
 ##############################################################################
 
-## 
+##
 ## Generic GA operators
 ##
 
-ga_lrSelection <- function(object, 
-                            r = 2/(object@popSize*(object@popSize-1)), 
+ga_lrSelection <- function(object,
+                            r = 2/(object@popSize*(object@popSize-1)),
                             q = 2/object@popSize, ...)
 {
 # Linear-rank selection
 # Michalewicz (1996) Genetic Algorithms + Data Structures = Evolution Programs. p. 60
   rank <- (object@popSize+1) - rank(object@fitness, ties.method = "random")
   prob <- q - (rank-1)*r
-  sel <- sample(1:object@popSize, size = object@popSize, 
+  sel <- sample(1:object@popSize, size = object@popSize,
                 prob = pmin(pmax(0, prob), 1, na.rm = TRUE),
                 replace = TRUE)
   out <- list(population = object@population[sel,,drop=FALSE],
@@ -30,7 +30,7 @@ ga_nlrSelection <- function(object, q = 0.25, ...)
 # Michalewicz (1996) Genetic Algorithms + Data Structures = Evolution Programs. p. 60
   rank <- (object@popSize + 1) - rank(object@fitness, ties.method = "random")
   prob <- q*(1-q)^(rank-1)
-  sel <- sample(1:object@popSize, size = object@popSize, 
+  sel <- sample(1:object@popSize, size = object@popSize,
                 prob = pmin(pmax(0, prob), 1, na.rm = TRUE),
                 replace = TRUE)
   out <- list(population = object@population[sel,,drop=FALSE],
@@ -42,7 +42,7 @@ ga_rwSelection <- function(object, ...)
 {
 # Proportional (roulette wheel) selection
   prob <- abs(object@fitness)/sum(abs(object@fitness))
-  sel <- sample(1:object@popSize, size = object@popSize, 
+  sel <- sample(1:object@popSize, size = object@popSize,
                 prob = pmin(pmax(0, prob), 1, na.rm = TRUE),
                 replace = TRUE)
   out <- list(population = object@population[sel,,drop=FALSE],
@@ -52,7 +52,7 @@ ga_rwSelection <- function(object, ...)
 
 ga_tourSelection <- function(object, k = 3, ...)
 {
-# (unbiased) Tournament selection 
+# (unbiased) Tournament selection
   sel <- rep(NA, object@popSize)
   for(i in 1:object@popSize)
      { s <- sample(1:object@popSize, size = k)
@@ -75,10 +75,10 @@ ga_spCrossover <- function(object, parents, ...)
   if(crossOverPoint == 0)
     { children[1:2,] <- parents[2:1,]
       fitnessChildren[1:2] <- fitness[2:1] }
-  else if(crossOverPoint == n) 
+  else if(crossOverPoint == n)
          { children <- parents
            fitnessChildren <- fitness }
-       else 
+       else
          { children[1,] <- c(parents[1,1:crossOverPoint],
                            parents[2,(crossOverPoint+1):n])
            children[2,] <- c(parents[2,1:crossOverPoint],
@@ -88,17 +88,17 @@ ga_spCrossover <- function(object, parents, ...)
   return(out)
 }
 
-## 
-## Binary GA operators 
+##
+## Binary GA operators
 ##
 
 gabin_Population <- function(object, ...)
 {
 # Generate a random population of nBits 0/1 values of size popSize
-  population <- matrix(as.double(NA), 
-                       nrow = object@popSize, 
+  population <- matrix(as.double(NA),
+                       nrow = object@popSize,
                        ncol = object@nBits)
-  for(j in 1:object@nBits) 
+  for(j in 1:object@nBits)
      { population[,j] <- round(runif(object@popSize)) }
   return(population)
 }
@@ -121,7 +121,7 @@ gabin_uCrossover <- function(object, parents, ...)
   u <- runif(n)
   children <- parents
   children[1:2, u > 0.5] <- children[2:1, u > 0.5]
-  out <- list(children = children, fitness = rep(NA,2))  
+  out <- list(children = children, fitness = rep(NA,2))
   return(out)
 }
 
@@ -136,18 +136,18 @@ gabin_raMutation <- function(object, parent, ...)
 }
 
 
-## 
-## Real-value GA operators 
+##
+## Real-value GA operators
 ##
 
 gareal_Population <- function(object, ...)
 {
-# Generate a random population of size popSize in the range [min, max]  
+# Generate a random population of size popSize in the range [min, max]
   min <- object@min
   max <- object@max
   nvars <- length(min)
   population <- matrix(as.double(NA), nrow = object@popSize, ncol = nvars)
-  for(j in 1:nvars) 
+  for(j in 1:nvars)
   { population[,j] <- runif(object@popSize, min[j], max[j]) }
   return(population)
 }
@@ -162,11 +162,11 @@ gareal_tourSelection <- ga_tourSelection
 
 gareal_lsSelection <- function(object, ...)
 {
-# Fitness proportional selection with fitness linear scaling  
+# Fitness proportional selection with fitness linear scaling
   popSize <- object@popSize
   f <- object@fitness
   fmin <- min(f, na.rm = TRUE)
-  if(fmin < 0) 
+  if(fmin < 0)
     { f <- f - fmin
       fmin <- min(f, na.rm = TRUE) }
   fave <- mean(f, na.rm = TRUE)
@@ -178,19 +178,19 @@ gareal_lsSelection <- function(object, ...)
       # 2*ave(f') = max(f')
       delta <- fmax - fave
       a <- (sfactor - 1.0)*fave/delta
-      b <- fave * (fmax - sfactor*fave)/delta 
+      b <- fave * (fmax - sfactor*fave)/delta
     }
   else
     { # ave(f) = ave(f')
       # min(f') = 0
       delta <- fave - fmin
       a <- fave/delta
-      b <- -1*fmin*fave/delta 
+      b <- -1*fmin*fave/delta
     }
   fscaled <- a*f + b
   prob <- abs(fscaled)/sum(abs(fscaled))
-  sel <- sample(1:object@popSize, size = object@popSize, 
-                prob = pmin(pmax(0, prob), 1, na.rm = TRUE), 
+  sel <- sample(1:object@popSize, size = object@popSize,
+                prob = pmin(pmax(0, prob), 1, na.rm = TRUE),
                 replace = TRUE)
   out <- list(population = object@population[sel,,drop=FALSE],
               fitness = object@fitness[sel],
@@ -254,7 +254,7 @@ gareal_blxCrossover <- function(object, parents, ...)
      { x <- sort(parents[,i])
        xl <- max(x[1] - a*(x[2]-x[1]), object@min[i])
        xu <- min(x[2] + a*(x[2]-x[1]), object@max[i])
-       children[,i] <- runif(2, xl, xu) 
+       children[,i] <- runif(2, xl, xu)
      }
   out <- list(children = children, fitness = rep(NA,2))
   return(out)
@@ -263,14 +263,14 @@ gareal_blxCrossover <- function(object, parents, ...)
 # Laplace crossover(a, b)
 #
 # a is the location parameter and b > 0 is the scaling parameter of a Laplace
-# distribution, which is generated as described in 
-# Krishnamoorthy K. (2006) Handbook of Statistical Distributions with 
+# distribution, which is generated as described in
+# Krishnamoorthy K. (2006) Handbook of Statistical Distributions with
 #   Applications, Chapman & Hall/CRC.
 #
-# For smaller values of b offsprings are likely to be produced nearer to 
+# For smaller values of b offsprings are likely to be produced nearer to
 # parents, and for larger values of b offsprings are expected to be produced
 # far from parents.
-# Deep et al. (2009) suggests to use a = 0, b = 0.15 for real-valued 
+# Deep et al. (2009) suggests to use a = 0, b = 0.15 for real-valued
 # variables, and b = 0.35 for integer variables.
 #
 # References
@@ -280,14 +280,14 @@ gareal_blxCrossover <- function(object, parents, ...)
 #   Applied Mathematics and Computation, 212(2), pp. 505-518.
 
 
-gareal_laplaceCrossover <- function (object, parents, a = 0, b = 0.35, ...) 
+gareal_laplaceCrossover <- function (object, parents, a = 0, b = 0.35, ...)
 {
   parents <- object@population[parents, , drop = FALSE]
   n <- ncol(parents)
   children <- matrix(as.double(NA), nrow = 2, ncol = n)
   u <- runif(n)
-  beta <- a + ifelse(u > 0.5, 
-                     -b*log(2*(1 - u)), 
+  beta <- a + ifelse(u > 0.5,
+                     -b*log(2*(1 - u)),
                      +b*log(2*u))
   bpar <- beta*abs(parents[1,] - parents[2,])
   children[1,] <- pmin(pmax(parents[1,] + bpar, object@min), object@max)
@@ -340,11 +340,11 @@ gareal_rsMutation <- function(object, parent, ...)
 # Power mutation(pow)
 #
 # a is the location parameter and b > 0 is the scaling parameter of a Laplace
-# distribution, which is generated as described in 
-# Krishnamoorthy K. (2006) Handbook of Statistical Distributions with 
+# distribution, which is generated as described in
+# Krishnamoorthy K. (2006) Handbook of Statistical Distributions with
 #   Applications, Chapman & Hall/CRC.
 #
-# For smaller values of b offsprings are likely to be produced nearer to 
+# For smaller values of b offsprings are likely to be produced nearer to
 # parents, and for larger values of b offsprings are expected to be produced
 # far from parents.
 
@@ -364,19 +364,19 @@ gareal_powMutation <- function(object, parent, pow = 4, ...)
   s <- runif(1)^pow
   t <- (parent - object@min)/(object@max - parent)
   r <- runif(n)
-  mutate <- parent + ifelse(r > t, 
-                            +s*(object@max - parent), 
+  mutate <- parent + ifelse(r > t,
+                            +s*(object@max - parent),
                             -s*(parent - object@min))
   return(mutate)
 }
 
-## 
-## Permutation GA operators 
+##
+## Permutation GA operators
 ##
 
 gaperm_Population <- function(object, ...)
 {
-# Generate a random permutation of size popSize in the range [min, max]  
+# Generate a random permutation of size popSize in the range [min, max]
   min <- object@min
   max <- object@max
   population <- matrix(as.double(NA), nrow = object@popSize, ncol = max)
@@ -480,14 +480,14 @@ gaperm_simMutation <- function(object, parent, ...)
   m <- seq(m[1], m[2], by = 1)
   if(min(m)==1 & max(m)==n)
     i <- rev(m)
-  else if(min(m)==1) 
+  else if(min(m)==1)
        i <- c(rev(m), seq(max(m)+1, n, by = 1))
-       else if(max(m)==n) 
+       else if(max(m)==n)
             i <- c(seq(1, min(m)-1, by = 1), rev(m))
             else i <- c(seq(1, min(m)-1, by = 1), rev(m), seq(max(m)+1, n, by = 1))
   mutate <- parent[i]
   return(mutate)
-} 
+}
 
 gaperm_ismMutation <- function(object, parent, ...)
 {
@@ -524,7 +524,7 @@ gaperm_dmMutation <- function(object, parent, ...)
   i <- c(setdiff(1:n,m)[1:pos], m, setdiff(1:n,m)[-(1:pos)])
   mutate <- parent[na.omit(i)]
   return(mutate)
-} 
+}
 
 gaperm_scrMutation <- function(object, parent, ...)
 {
@@ -537,9 +537,9 @@ gaperm_scrMutation <- function(object, parent, ...)
   i <- c(setdiff(1:min(m),m), m, setdiff(max(m):n,m))
   mutate <- parent[i]
   return(mutate)
-} 
+}
 
-ga_pmutation <- function(object, p0 = 0.5, p = 0.01, 
+ga_pmutation <- function(object, p0 = 0.5, p = 0.01,
                          T = round(object@maxiter/2), ...)
 {
 # variable probability of mutation
@@ -548,7 +548,7 @@ ga_pmutation <- function(object, p0 = 0.5, p = 0.01,
 # T = maximum iteration after which converges to p
 #
 # Example:
-# p0 = 0.5; p = 0.01; 
+# p0 = 0.5; p = 0.01;
 # maxiter = 1000; T = round(maxiter/2); t = seq(maxiter)
 # pm1 = ifelse(t > T, p, p0 - (p0-p)/T * (t-1)) # linear decay
 # pm2 = (p0 - p)*exp(-2*(t-1)/T) + p # exponential decay
@@ -573,7 +573,7 @@ optimProbsel <- function(x, q = 0.25)
   x <- as.vector(x)
   n <- length(x)
   # selection pressure parameter
-  q <- min(max(sqrt(.Machine$double.eps), q), 
+  q <- min(max(sqrt(.Machine$double.eps), q),
            1 - sqrt(.Machine$double.eps))
   rank <- (n + 1) - rank(x, ties.method = "random", na.last = FALSE)
   # prob <- q*(1-q)^(rank-1) * 1/(1-(1-q)^n)
@@ -582,4 +582,3 @@ optimProbsel <- function(x, q = 0.25)
   prob <- prob/sum(prob)
   return(prob)
 }
-  

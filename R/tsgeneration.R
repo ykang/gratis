@@ -1,5 +1,5 @@
 #' Time Series Generation
-#' 
+#'
 #' The tsgeneration package generates time series data based on MAR models.
 #'
 #' @docType package
@@ -12,7 +12,7 @@
 #' @importFrom methods new slotNames
 #' @importFrom mvtnorm rmvnorm dmvnorm
 #' @importFrom polynom polynomial
-#' @importFrom purrr map 
+#' @importFrom purrr map
 #' @importFrom tibble as_tibble
 #' @importFrom forecast trendcycle msts autoplot
 #' @importFrom dplyr mutate select bind_cols
