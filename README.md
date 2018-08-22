@@ -8,7 +8,7 @@ Installation
 ------------
 
 The package requires the `tsfeatures` package from [GitHub
-Repository](https://github.com/robjhyndman/tsfeatures).
+Repository](https://github.com/robjhyndman/tsfeatures) with:
 
 ``` r
 # install.packages("devtools")
@@ -70,7 +70,7 @@ References
 ----------
 
 - Kang, Y., Hyndman, R., and Li, F. (2018) _Efficient generation of time series with
-diverse and controllable characteristics_ Working paper.
+diverse and controllable characteristics. Working paper.
 
 
 License
