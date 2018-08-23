@@ -5,7 +5,7 @@
 \title{Generating time series with controllable features.}
 \usage{
 generate_ts_with_target(n, ts.length, freq, seasonal, features,
-  selected.features, target)
+  selected.features, target, parallel = TRUE)
 }
 \arguments{
 \item{n}{number of time series to be generated.}
@@ -21,6 +21,9 @@ generate_ts_with_target(n, ts.length, freq, seasonal, features,
 \item{selected.features}{selected features to be controlled.}
 
 \item{target}{target feature values.}
+
+\item{parallel}{An optional argument which allows to specify if the Genetic Algorithm
+should be run sequentially or in parallel.}
 }
 \value{
 A time-series object of class "ts" or "msts".
@@ -30,7 +33,9 @@ Generating time series with controllable features.
 }
 \examples{
 library(tsfeatures)
-x <- generate_ts_with_target(n = 1, ts.length = 60, freq = 1, seasonal = 0, features = c('entropy', 'stl_features'), selected.features = c('entropy', 'trend'), c(0.6, 0.9))
+x <- generate_ts_with_target(n = 1, ts.length = 60, freq = 1, seasonal = 0,
+  features = c('entropy', 'stl_features'), selected.features = c('entropy', 'trend'),
+  target=c(0.6, 0.9),  parallel=FALSE)
 forecast::autoplot(x)
 }
 \author{
