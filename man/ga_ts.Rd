@@ -16,8 +16,8 @@ ga_ts(type = c("binary", "real-valued", "permutation"), fitness, ..., n,
   suggestions = NULL, optim = FALSE, optimArgs = list(method =
   "L-BFGS-B", poptim = 0.05, pressel = 0.5, control = list(fnscale = -1,
   maxit = 100)), keepBest = FALSE, parallel = FALSE, monitor = if
-  (interactive()) {     if (is.RStudio())          gaMonitor     else FALSE
-  } else FALSE, seed = NULL)
+  (interactive()) {     if (shiny::is.RStudio())          gaMonitor    
+  else FALSE } else {     FALSE }, seed = NULL)
 }
 \arguments{
 \item{type}{the type of genetic algorithm to be run depending on the nature of decision

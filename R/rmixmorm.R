@@ -16,61 +16,55 @@
 #' out <- rmixnorm(n, means, sigmas, weights)
 #' hist(out, breaks = 100, freq = FALSE)
 #' @export
-rmixnorm <- function(n, means, sigmas, weights)
-{
+rmixnorm <- function(n, means, sigmas, weights) {
+  if (!is.matrix(means) | length(dim(sigmas)) != 3) {
+    stop("means must be a q-by-k matrix and sigmas must be a q-by-q-by-k array.")
+  }
 
-    if(!is.matrix(means) | length(dim(sigmas)) != 3)
-    {
-        stop("means must be a q-by-k matrix and sigmas must be a q-by-q-by-k array.")
-    }
+  k <- length(weights) # K-components
+  q <- dim(means)[1] # q-dimensional
 
-    k <- length(weights) # K-components
-    q <- dim(means)[1] # q-dimensional
+  idx <- rmultinom(n = n, 1, prob = weights) # k-by-n matrix
 
-    idx <- rmultinom(n = n, 1, prob = weights) # k-by-n matrix
+  out <- apply(idx, 2, function(x, means, sigmas, q) {
+    which.comp <- which(x == 1)
+    rmvnorm(
+      n = 1, mean = means[, which.comp],
+      sigma = matrix(sigmas[, , which.comp], q, q)
+    )
+  }, means = means, sigmas = sigmas, q = q)
 
-    out <- apply(idx, 2, function(x, means, sigmas, q)
-    {
-        which.comp <- which(x == 1)
-        rmvnorm(n = 1, mean = means[, which.comp],
-                sigma = matrix(sigmas[, , which.comp], q, q))
-    }, means = means, sigmas = sigmas, q = q)
-
-    return(out)
+  return(out)
 }
 
 
-dmixnorm <- function(x, means, sigmas, weights, log = FALSE)
-{
+dmixnorm <- function(x, means, sigmas, weights, log = FALSE) {
+  if (!is.matrix(means) | length(dim(sigmas)) != 3) {
+    stop("means must be a q-by-k matrix and sigmas must be a q-by-q-by-k array.")
+  }
 
-    if(!is.matrix(means) | length(dim(sigmas)) != 3)
-    {
-        stop("means must be a q-by-k matrix and sigmas must be a q-by-q-by-k array.")
-    }
+  k <- length(weights) # K-components
+  q <- dim(means)[1] # q-dimensional
 
-    k <- length(weights) # K-components
-    q <- dim(means)[1] # q-dimensional
-
-    out.comp.log <- apply(matrix(1:k), 1, function(comp.i, x, means, sigmas, q)
-    {
-        dmvnorm(x = matrix(x, 1, q), mean = matrix(means[, comp.i], 1, q),
-                sigma = matrix(sigmas[, ,comp.i], q, q),
-                log = TRUE)
-    }, x = x,  means = means, sigmas = sigmas, q = q)
+  out.comp.log <- apply(matrix(1:k), 1, function(comp.i, x, means, sigmas, q) {
+    dmvnorm(
+      x = matrix(x, 1, q), mean = matrix(means[, comp.i], 1, q),
+      sigma = matrix(sigmas[, , comp.i], q, q),
+      log = TRUE
+    )
+  }, x = x, means = means, sigmas = sigmas, q = q)
 
 
-    out.sum <- sum(exp(out.comp.log)*weights)
+  out.sum <- sum(exp(out.comp.log) * weights)
 
-    if(log  == TRUE)
-    {
-        out <- log(out.sum)
-    }
-    else
-    {
-        out <- out.sum
-    }
+  if (log == TRUE) {
+    out <- log(out.sum)
+  }
+  else {
+    out <- out.sum
+  }
 
-    return(out)
+  return(out)
 }
 
 
@@ -110,78 +104,76 @@ dmixnorm <- function(x, means, sigmas, weights, log = FALSE)
 #'                 weights = weights)
 #' plot(y)
 #' @export
-rmixnorm_ts <- function(n, means.ar.par.list, sigmas.list, weights, yinit = 0)
-{
-    y <- rep(NA, n)
-    nComp <- length(means.ar.par.list)
-    nLags <- lapply(means.ar.par.list, function(x) length(x)-1)
-    maxLag <- max(unlist(nLags))
+rmixnorm_ts <- function(n, means.ar.par.list, sigmas.list, weights, yinit = 0) {
+  y <- rep(NA, n)
+  nComp <- length(means.ar.par.list)
+  nLags <- lapply(means.ar.par.list, function(x) length(x) - 1)
+  maxLag <- max(unlist(nLags))
 
-    if(any(unlist(nLags)<1))
-    {
-        stop("Drift is always included. Set the first elements in ar.par.list be zero to remove the drift effect.")
-    }
+  if (any(unlist(nLags) < 1)) {
+    stop("Drift is always included. Set the first elements in ar.par.list be zero to remove the drift effect.")
+  }
 
-    y[1:maxLag] <- yinit
+  y[1:maxLag] <- yinit
 
-    sigmas.ary <- do.call(cbind, sigmas.list)
+  sigmas.ary <- do.call(cbind, sigmas.list)
 
-    for(i in (maxLag+1):n)
-    {
-        meansComp <- lapply(means.ar.par.list, function(par, y, i){
-            nLag <- length(par)-1
-            yPre <- c(1, y[(i-1):(i-nLag)])
-            yCurr <- sum(par*yPre)
-            return(yCurr)
-        }, y = y, i = i)
-        sigmas.i <- array(sigmas.ary[i, ], dim = c(1, 1, nComp))
-        y[i] <- rmixnorm(n = 1, means = matrix(unlist(meansComp), nrow = 1),
-                         sigmas = sigmas.i, weights = weights)
-    }
-    return(as.ts(y))
+  for (i in (maxLag + 1):n)
+  {
+    meansComp <- lapply(means.ar.par.list, function(par, y, i) {
+      nLag <- length(par) - 1
+      yPre <- c(1, y[(i - 1):(i - nLag)])
+      yCurr <- sum(par * yPre)
+      return(yCurr)
+    }, y = y, i = i)
+    sigmas.i <- array(sigmas.ary[i, ], dim = c(1, 1, nComp))
+    y[i] <- rmixnorm(
+      n = 1, means = matrix(unlist(meansComp), nrow = 1),
+      sigmas = sigmas.i, weights = weights
+    )
+  }
+  return(as.ts(y))
 }
 
 
-dmixnorm_ts <- function(y, means.ar.par.list, sigmas.list, weights, log = FALSE)
-{
-    nComp <- length(means.ar.par.list)
-    nLags <- lapply(means.ar.par.list, function(x) length(x)-1)
-    maxLag <- max(unlist(nLags))
-    n <- length(y)
+dmixnorm_ts <- function(y, means.ar.par.list, sigmas.list, weights, log = FALSE) {
+  nComp <- length(means.ar.par.list)
+  nLags <- lapply(means.ar.par.list, function(x) length(x) - 1)
+  maxLag <- max(unlist(nLags))
+  n <- length(y)
 
-    if(any(unlist(nLags)<1))
-    {
-        stop("Drift is always included. Set the first elements in ar.par.list be zero to remove the drift effect.")
-    }
+  if (any(unlist(nLags) < 1)) {
+    stop("Drift is always included. Set the first elements in ar.par.list be zero to remove the drift effect.")
+  }
 
-    out.log <- y
-    out.log[] <- 0 # Set the density be zero for the first maxlags.
+  out.log <- y
+  out.log[] <- 0 # Set the density be zero for the first maxlags.
 
-    sigmas.ary <- matrix(do.call(cbind, sigmas.list), n, nComp, byrow = TRUE)
+  sigmas.ary <- matrix(do.call(cbind, sigmas.list), n, nComp, byrow = TRUE)
 
-    for(i in (maxLag+1):n)
-    {
-        meansComp <- lapply(means.ar.par.list, function(par, y, i){
-            nLag <- length(par)-1
-            yPre <- c(1, y[(i-1):(i-nLag)])
-            yCurr <- sum(par*yPre)
-            ## print(cbind(yPre, par))
-            return(yCurr)
-        }, y = y, i = i)
-        sigmas.i <- array(sigmas.ary[i, ], dim = c(1, 1, nComp))
-        out.log[i] <- dmixnorm(x = y[i], means = matrix(unlist(meansComp), nrow = 1),
-                               sigmas = sigmas.i, weights = weights, log = TRUE)
-    }
+  for (i in (maxLag + 1):n)
+  {
+    meansComp <- lapply(means.ar.par.list, function(par, y, i) {
+      nLag <- length(par) - 1
+      yPre <- c(1, y[(i - 1):(i - nLag)])
+      yCurr <- sum(par * yPre)
+      ## print(cbind(yPre, par))
+      return(yCurr)
+    }, y = y, i = i)
+    sigmas.i <- array(sigmas.ary[i, ], dim = c(1, 1, nComp))
+    out.log[i] <- dmixnorm(
+      x = y[i], means = matrix(unlist(meansComp), nrow = 1),
+      sigmas = sigmas.i, weights = weights, log = TRUE
+    )
+  }
 
-    if(log == TRUE)
-    {
-        out <- out.log
-    }
-    else
-    {
-        out <- exp(log)
-    }
-    return(out)
+  if (log == TRUE) {
+    out <- out.log
+  }
+  else {
+    out <- exp(log)
+  }
+  return(out)
 }
 
 ## n = 1000

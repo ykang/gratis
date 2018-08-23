@@ -7,7 +7,7 @@
 nsdiffs1(x)
 }
 \arguments{
-\item{x}{}
+\item{x}{Univariate time series or numerical vector}
 }
 \value{
 NA

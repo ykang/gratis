@@ -16,46 +16,46 @@
 #'
 #' @examples
 #' # Not Run
-pi_coefficients <- function(ar=0, d=0L, ma=0, sar=0, D=0L, sma=0, m=1L, tol=1e-07)
-{
+pi_coefficients <- function(ar = 0, d = 0L, ma = 0, sar = 0, D = 0L, sma = 0, m = 1L, tol = 1e-07) {
   # non-seasonal AR
   ar <- polynomial(c(1, -ar)) * polynomial(c(1, -1))^d
 
   # seasonal AR
-  if(m > 1)
-  {
+  if (m > 1) {
     P <- length(sar)
     seasonal_poly <- numeric(m * P)
     seasonal_poly[m * seq(P)] <- sar
-    sar <- polynomial(c(1, -seasonal_poly)) * polynomial(c(1, rep(0, m-1), -1))^D
+    sar <- polynomial(c(1, -seasonal_poly)) * polynomial(c(1, rep(0, m - 1), -1))^D
   }
-  else
+  else {
     sar <- 1
+  }
 
   # non-seasonal MA
   ma <- polynomial(c(1, ma))
 
   # seasonal MA
-  if(m > 1)
-  {
+  if (m > 1) {
     Q <- length(sma)
     seasonal_poly <- numeric(m * Q)
     seasonal_poly[m * seq(Q)] <- sma
     sma <- polynomial(c(1, seasonal_poly))
   }
-  else
+  else {
     sma <- 1
+  }
 
   n <- 500L
   theta <- -c(coef(ma * sma))[-1]
-  if(length(theta)==0L)
+  if (length(theta) == 0L) {
     theta <- 0
+  }
   phi <- -c(coef(ar * sar)[-1], numeric(n))
   q <- length(theta)
   pie <- c(numeric(q), 1, numeric(n))
   for (j in seq(n))
     pie[j + q + 1L] <- -phi[j] - sum(theta * pie[(q:1L) + j])
-  pie <- pie[(0L:n)+q+1L]
+  pie <- pie[(0L:n) + q + 1L]
 
   # Return up to last element greater than tol
   maxj <- max(which(abs(pie) > tol))
@@ -74,12 +74,14 @@ pi_coefficients <- function(ar=0, d=0L, ma=0, sar=0, D=0L, sma=0, m=1L, tol=1e-0
 #'
 #' @examples
 #' # Not Run
-arinf <- function(object)
-{
-  if(!("Arima" %in% class(object)))
+arinf <- function(object) {
+  if (!("Arima" %in% class(object))) {
     stop("Argument should be an ARIMA object")
-  pi_coefficients(ar=object$model$phi, ma=object$model$theta,
-      d=object$arma[6], D=object$arma[7], m=object$arma[5])
+  }
+  pi_coefficients(
+    ar = object$model$phi, ma = object$model$theta,
+    d = object$arma[6], D = object$arma[7], m = object$arma[5]
+  )
 }
 
 # library(forecast)
@@ -88,13 +90,13 @@ arinf <- function(object)
 
 #' Set the number of seasonal differences for yearly data to be -1.
 #'
-#' @param x
+#' @param x Univariate time series or numerical vector
 #'
 #' @return
 #' NA
 #'
 #' @examples
 #' # Not Run
-nsdiffs1 <- function(x){
-  c(nsdiffs=ifelse(frequency(x)==1L, -1, forecast::nsdiffs(x)))
+nsdiffs1 <- function(x) {
+  c(nsdiffs = ifelse(frequency(x) == 1L, -1, forecast::nsdiffs(x)))
 }

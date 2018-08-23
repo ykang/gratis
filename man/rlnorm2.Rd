@@ -22,9 +22,6 @@ Alternative parametrization of log normal distribution.
 \details{
 See help("rlnorm") for the details for the log-normal distribution.
 }
-\examples{
-
-}
 \references{
 Li Villani Kohn 2010.
 }
