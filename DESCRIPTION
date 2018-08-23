@@ -10,7 +10,7 @@ LazyLoad: yes
 Repository: CRAN
 URL: https://github.com/ykang/tsgeneration
 BugReports: https://github.com/ykang/tsgeneration/issues/
-Depends: R (>= 3.4.2)
+Depends: R (>= 3.4.0)
 Imports: tsfeatures, doRNG, polynom, mvtnorm, forecast, dplyr, stats, tibble, utils, purrr, magrittr, shiny, GA, foreach, methods
 Suggests: fGarch
 NeedsCompilation: no
