@@ -92,8 +92,9 @@ arinf <- function(object) {
 #'
 #' @param x Univariate time series or numerical vector
 #'
-#' @return
-#' NA
+#' @return A numerical scalar value
+#'
+#' @export
 #'
 #' @examples
 #' # Not Run

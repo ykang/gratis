@@ -10,7 +10,7 @@ nsdiffs1(x)
 \item{x}{Univariate time series or numerical vector}
 }
 \value{
-NA
+A numerical scalar value
 }
 \description{
 Set the number of seasonal differences for yearly data to be -1.
