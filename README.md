@@ -7,14 +7,6 @@ diverse and controllable characteristics.
 Installation
 ------------
 
-The package requires the `tsfeatures` package from [GitHub
-Repository](https://github.com/robjhyndman/tsfeatures) with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("robjhyndman/tsfeatures")
-```
-
 You can install the **development** version of `tsgeneration` package from [GitHub
 Repository](https://github.com/ykang/tsgeneration) with:
 
