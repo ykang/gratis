@@ -29,7 +29,30 @@ shinyUI(
     dashboardBody(
       tabItems(
         tabItem("tab_struct",
-                "ts structure"
+                box(
+                  title = "Time series structure",
+                  selectInput("data_frequency",
+                              label = "Time series observation frequency:",
+                              choices = c(
+                                "Yearly", "Quarterly", "Monthly",
+                                "Weekly", "Daily"
+                              ),
+                              selected = "Yearly"
+                  ),
+                  uiOutput("seasonal_patterns"),
+                  numericInput("data_length",
+                               label = "Series length:",
+                               min = 30,
+                               max = 150,
+                               value = 60
+                  ),
+                  numericInput("data_ngen",
+                               label = "Number of series generated:",
+                               min = 1,
+                               max = 100,
+                               value = 1
+                  )
+                )
 
         ),
 
