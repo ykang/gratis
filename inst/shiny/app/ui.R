@@ -20,8 +20,8 @@ shinyUI(
                      style = "margin: 0;",
                      label = NULL,
                      class = "",
-                     icon("floppy-o"),
-                     span("Export Grades")
+                     icon("download"),
+                     span("Download series")
           )
         )
       )
