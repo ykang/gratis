@@ -29,17 +29,8 @@ shinyUI(
     dashboardBody(
       tabItems(
         tabItem("tab_struct",
-                uiOutput(
-                  "ui_cache"
-                ),
-                box(
-                  title = "File Input (ZIP)",
-                  fileInput("files", label = NULL, accept = "application/zip"),
-                  width = 12,
-                  status = "primary",
-                  collapsible = TRUE
-                ),
-                withSpinner(uiOutput("out_status"))
+                "ts structure"
+
         ),
 
         tabItem("tab_features",
