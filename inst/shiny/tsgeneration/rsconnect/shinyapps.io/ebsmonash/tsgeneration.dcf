@@ -1,0 +1,12 @@
+name: tsgeneration
+title: tsgeneration
+username:
+account: ebsmonash
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 406003
+bundleId: 1549928
+url: https://ebsmonash.shinyapps.io/tsgeneration/
+when: 1534991233.16871
+asMultiple: FALSE
+asStatic: FALSE
