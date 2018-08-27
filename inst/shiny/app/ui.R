@@ -57,6 +57,41 @@ shinyUI(
         ),
 
         tabItem("tab_features",
+                box(
+                  title = "Differences",
+                  uiOutput("feature_diff"),
+                  width = 3, collapsible = TRUE, collapsed = TRUE
+                ),
+                box(
+                  title = "ACF",
+                  uiOutput("feature_acf"),
+                  width = 3, collapsible = TRUE, collapsed = TRUE
+                ),
+                box(
+                  title = "PACF",
+                  uiOutput("feature_pacf"),
+                  width = 3, collapsible = TRUE, collapsed = TRUE
+                ),
+                box(
+                  title = "Seasonality",
+                  uiOutput("feature_seas"),
+                  width = 3, collapsible = TRUE, collapsed = TRUE
+                ),
+                box(
+                  title = "Shift",
+                  uiOutput("feature_shift"),
+                  width = 3, collapsible = TRUE, collapsed = TRUE
+                ),
+                box(
+                  title = "Behaviour",
+                  uiOutput("feature_behave"),
+                  width = 3, collapsible = TRUE, collapsed = TRUE
+                ),
+                box(
+                  title = "(G)ARCH",
+                  uiOutput("feature_arch"),
+                  width = 3, collapsible = TRUE, collapsed = TRUE
+                ),
                 uiOutput("out_features")
         ),
 
