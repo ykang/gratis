@@ -53,37 +53,37 @@ shinyUI(
                 box(
                   title = "Differences",
                   uiOutput("feature_diff"),
-                  width = 3, collapsible = TRUE, collapsed = TRUE
+                  width = 3, collapsible = TRUE, collapsed = FALSE
                 ),
                 box(
                   title = "ACF",
                   uiOutput("feature_acf"),
-                  width = 3, collapsible = TRUE, collapsed = TRUE
+                  width = 3, collapsible = TRUE, collapsed = FALSE
                 ),
                 box(
                   title = "PACF",
                   uiOutput("feature_pacf"),
-                  width = 3, collapsible = TRUE, collapsed = TRUE
+                  width = 3, collapsible = TRUE, collapsed = FALSE
                 ),
                 box(
                   title = "Seasonality",
                   uiOutput("feature_seas"),
-                  width = 3, collapsible = TRUE, collapsed = TRUE
+                  width = 3, collapsible = TRUE, collapsed = FALSE
                 ),
                 box(
                   title = "Shift",
                   uiOutput("feature_shift"),
-                  width = 3, collapsible = TRUE, collapsed = TRUE
+                  width = 3, collapsible = TRUE, collapsed = FALSE
                 ),
                 box(
                   title = "Behaviour",
                   uiOutput("feature_behave"),
-                  width = 3, collapsible = TRUE, collapsed = TRUE
+                  width = 3, collapsible = TRUE, collapsed = FALSE
                 ),
                 box(
                   title = "(G)ARCH",
                   uiOutput("feature_arch"),
-                  width = 3, collapsible = TRUE, collapsed = TRUE
+                  width = 3, collapsible = TRUE, collapsed = FALSE
                 ),
                 actionButton("btn_gen", "Generate"),
                 uiOutput("out_features")
