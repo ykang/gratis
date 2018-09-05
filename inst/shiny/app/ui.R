@@ -31,14 +31,7 @@ shinyUI(
         tabItem("tab_struct",
                 box(
                   title = "Time series structure",
-                  selectInput("data_frequency",
-                              label = "Time series observation frequency:",
-                              choices = c(
-                                "Yearly", "Quarterly", "Monthly",
-                                "Weekly", "Daily"
-                              ),
-                              selected = "Yearly"
-                  ),
+                  uiOutput("series_period"),
                   uiOutput("seasonal_patterns"),
                   numericInput("data_length",
                                label = "Series length:",
