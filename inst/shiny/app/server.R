@@ -13,6 +13,10 @@ shinyServer(
       avgperiods[input$data_period]
     })
 
+    seasonal_freq <- reactive({
+      freq_sec[input$data_freq] / interval_seconds()
+    })
+
     output$series_period <- renderUI({
       selectInput("data_period",
                   label = "Time series observation frequency:",
@@ -30,6 +34,19 @@ shinyServer(
                            selected = seasonal_periods,
                            inline = TRUE)
       }
+    })
+
+    output$feature_diff <- renderUI({
+      do.call("tagList", c(
+          list(numericInput("par_ndiff", "Number of differences:", value = 0, min = 0, max = 2)),
+          map(names(seasonal_freq()),
+              ~ numericInput(
+                paste0("par_nsdiff_", .x),
+                paste0("Number of seasonal differences [", .x, "]:"),
+                value = 0, min = 0, max = 2)
+          )
+        )
+      )
     })
 
     observeEvent(input$btn_gen, {
