@@ -31,6 +31,32 @@ shinyServer(
                            inline = TRUE)
       }
     })
+
+    observeEvent(input$btn_gen, {
+      # features: list of relevant features
+      # target: target features for fitness in GA
+      # seasonal: number of seasonal components
+      # n: length of series to generate
+      # freq: frequencies of time series seasonality
+      # nComp: Number of components in mixture models
+      # selected.features: Features actually used
+
+      ga_len <- switch(seasonal, `0` = 10, `1` = 17, 35)
+      ga_min <- rep(0, ga_len)
+      ga_max <- rep(1, ga_len)
+
+      ga_ts(
+        type = "real-valued", fitness = fitness_ts, features = features, seasonal = seasonal,
+        input$data_length, # n for fitness_ts
+        freq = freq, target = target, nComp = 3, selected.features = selected.features,
+        min = ga_min,
+        max = ga_max,
+        parallel = TRUE, popSize = 30, maxiter = 100,
+        pmutation = 0.3, pcrossover = 0.8, maxFitness = -0.05,
+        run = 30, keepBest = TRUE, monitor = GA::gaMonitor
+      )
+    })
+
     output$export <- downloadHandler(
       filename = function() {
         paste0("tsgen-", Sys.time(), ".csv")

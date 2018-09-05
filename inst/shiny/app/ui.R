@@ -85,6 +85,7 @@ shinyUI(
                   uiOutput("feature_arch"),
                   width = 3, collapsible = TRUE, collapsed = TRUE
                 ),
+                actionButton("btn_gen", "Generate"),
                 uiOutput("out_features")
         ),
 
