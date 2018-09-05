@@ -122,7 +122,7 @@ shinyServer(
       if(!is_empty(seasonal_freq())){
         seas <- cross2(names(seasonal_freq()), stl_seas_features) %>%
           map(~ numericInput(
-            paste0("par_", .x[[2]], "_", .x[[1]]),
+            paste0("par_", .x[[2]], match(.x, names(seasonal_freq()))),
             paste0(.x[[2]], " [", .x[[1]], "]"),
             value = 0, step = 0.01))
 
