@@ -7,6 +7,7 @@ shinyServer(
     # Constantns
     avgperiods <- c(Yearly = 31557600, Quarterly = 7889400, Monthly = 2629800, Weekly = 604800, Daily = 86400, Hourly = 3600)
     freq_sec <- c(Year = 31557600, Week = 604800, Day = 86400, Hour = 3600)
+    acf_features <- c("x_acf1", "diff1_acf1", "diff2_acf1", "x_acf10", "diff1_acf10", "diff2_acf10")
 
     interval_seconds <- reactive({
       req(input$data_period)
@@ -46,6 +47,22 @@ shinyServer(
                 value = 0, min = 0, max = 2)
           )
         )
+      )
+    })
+
+    output$feature_acf <- renderUI({
+      features <- acf_features
+      if(!is_empty(seasonal_freq())){
+        features <- c(features, "seas_acf1")
+      }
+
+      do.call("tagList",
+              map(features,
+                  ~ numericInput(
+                    paste0("par_", .x),
+                    paste0(.x),
+                    value = 0, min = -1, max = 1, step = 0.01)
+              )
       )
     })
 
