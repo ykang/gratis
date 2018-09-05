@@ -16,6 +16,7 @@ shinyServer(
                         "max_var_shift", "time_var_shift")
     behaviour_features <- c("entropy", "nonlinearity", "hurst", "stability", "lumpiness",
                             "unitroot_kpss", "unitroot_pp")
+    heterogeneity_features <- c("arch_acf", "garch_acf", "arch_r2", "garch_r2")
 
     interval_seconds <- reactive({
       req(input$data_period)
@@ -142,6 +143,28 @@ shinyServer(
                     paste0("par_", .x),
                     paste0(.x),
                     value = 0, step = 0.01)
+              )
+      )
+    })
+
+    output$feature_behave <- renderUI({
+      do.call("tagList",
+              map(behaviour_features,
+                  ~ numericInput(
+                    paste0("par_", .x),
+                    paste0(.x),
+                    value = 0, step = 0.01)
+              )
+      )
+    })
+
+    output$feature_heterogeneity <- renderUI({
+      do.call("tagList",
+              map(heterogeneity_features,
+                  ~ numericInput(
+                    paste0("par_", .x),
+                    paste0(.x),
+                    value = 0, min = -1, max = 1, step = 0.01)
               )
       )
     })

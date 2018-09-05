@@ -81,8 +81,8 @@ shinyUI(
                   width = 3, collapsible = TRUE, collapsed = FALSE
                 ),
                 box(
-                  title = "(G)ARCH",
-                  uiOutput("feature_arch"),
+                  title = "Heterogeneity",
+                  uiOutput("feature_heterogeneity"),
                   width = 3, collapsible = TRUE, collapsed = FALSE
                 ),
                 actionButton("btn_gen", "Generate"),
