@@ -11,6 +11,9 @@ shinyServer(
     pacf_features <- c("x_pacf5", "diff1x_pacf5", "diff2x_pacf5")
     stl_features <- c("trend", "spike", "linearity", "curvature", "e_acf1", "e_acf10")
     stl_seas_features <- c("seasonal_strength", "peak", "trough")
+    shift_features <- c("max_level_shift", "time_level_shift",
+                        "max_kl_shift", "time_kl_shift",
+                        "max_var_shift", "time_var_shift")
 
     interval_seconds <- reactive({
       req(input$data_period)
@@ -106,6 +109,28 @@ shinyServer(
       }
 
       do.call("tagList", io)
+    })
+
+    output$feature_shift <- renderUI({
+      timevars <- grepl("time", shift_features, fixed = TRUE)
+
+      time_shift <- map(shift_features[timevars],
+                  ~ numericInput(
+                    paste0("par_", .x),
+                    paste0(.x),
+                    value = 0, min = 0, max = input$data_length, step = 1)
+      )
+
+      max_shift <- map(shift_features[!timevars],
+                      ~ numericInput(
+                        paste0("par_", .x),
+                        paste0(.x),
+                        value = 0, step = 0.01)
+      )
+
+      do.call("tagList",
+              c(time_shift, max_shift)
+      )
     })
 
     observeEvent(input$btn_gen, {
