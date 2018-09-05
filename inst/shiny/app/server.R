@@ -14,6 +14,8 @@ shinyServer(
     shift_features <- c("max_level_shift", "time_level_shift",
                         "max_kl_shift", "time_kl_shift",
                         "max_var_shift", "time_var_shift")
+    behaviour_features <- c("entropy", "nonlinearity", "hurst", "stability", "lumpiness",
+                            "unitroot_kpss", "unitroot_pp")
 
     interval_seconds <- reactive({
       req(input$data_period)
@@ -130,6 +132,17 @@ shinyServer(
 
       do.call("tagList",
               c(time_shift, max_shift)
+      )
+    })
+
+    output$feature_behave <- renderUI({
+      do.call("tagList",
+              map(behaviour_features,
+                  ~ numericInput(
+                    paste0("par_", .x),
+                    paste0(.x),
+                    value = 0, step = 0.01)
+              )
       )
     })
 
