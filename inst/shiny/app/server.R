@@ -4,11 +4,13 @@ library(rlang)
 
 shinyServer(
   function(input, output, session) {
-    # Constantns
+    # Constants
     avgperiods <- c(Yearly = 31557600, Quarterly = 7889400, Monthly = 2629800, Weekly = 604800, Daily = 86400, Hourly = 3600)
     freq_sec <- c(Year = 31557600, Week = 604800, Day = 86400, Hour = 3600)
     acf_features <- c("x_acf1", "diff1_acf1", "diff2_acf1", "x_acf10", "diff1_acf10", "diff2_acf10")
     pacf_features <- c("x_pacf5", "diff1x_pacf5", "diff2x_pacf5")
+    stl_features <- c("trend", "spike", "linearity", "curvature", "e_acf1", "e_acf10")
+    stl_seas_features <- c("seasonal_strength", "peak", "trough")
 
     interval_seconds <- reactive({
       req(input$data_period)
@@ -81,6 +83,29 @@ shinyServer(
                     value = 0, min = -1, max = 1, step = 0.01)
               )
       )
+    })
+
+    output$feature_stl <- renderUI({
+      features <- stl_features
+
+      io <- map(stl_features,
+          ~ numericInput(
+            paste0("par_", .x),
+            .x,
+            value = 0, step = 0.01)
+      )
+
+      if(!is_empty(seasonal_freq())){
+        seas <- cross2(names(seasonal_freq()), stl_seas_features) %>%
+          map(~ numericInput(
+            paste0("par_", .x[[2]], "_", .x[[1]]),
+            paste0(.x[[2]], " [", .x[[1]], "]"),
+            value = 0, step = 0.01))
+
+        io <- c(io, seas)
+      }
+
+      do.call("tagList", io)
     })
 
     observeEvent(input$btn_gen, {

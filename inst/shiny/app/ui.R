@@ -66,8 +66,8 @@ shinyUI(
                   width = 3, collapsible = TRUE, collapsed = FALSE
                 ),
                 box(
-                  title = "Seasonality",
-                  uiOutput("feature_seas"),
+                  title = "STL features",
+                  uiOutput("feature_stl"),
                   width = 3, collapsible = TRUE, collapsed = FALSE
                 ),
                 box(
