@@ -249,7 +249,7 @@ shinyServer(
         paste0("tsgen-", Sys.time(), ".csv")
       },
       content = function(file){
-        write_csv(generated_ts(), path = file)
+        write.csv(generated_ts(), file = file, row.names = FALSE)
       }
     )
   }
