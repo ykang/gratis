@@ -198,6 +198,7 @@ shinyServer(
       )
     })
 
+    generated_ts <- reactiveVal()
     observeEvent(input$btn_gen, {
       # features: list of relevant features
       # target: target features for fitness in GA
@@ -216,16 +217,30 @@ shinyServer(
 
       freq <- if(is_empty(seasonal_freq())) 1 else seasonal_freq()
 
-      ga_ts(
-        type = "real-valued", fitness = fitness_ts, features = feature_fns, seasonal = length(seasonal_freq()),
-        input$data_length, # n for fitness_ts
-        freq = freq, target = target, nComp = 3, selected.features = selected.features,
-        n = input$data_length,
-        min = ga_min,
-        max = ga_max,
-        parallel = TRUE, popSize = 30, maxiter = 100,
-        pmutation = 0.3, pcrossover = 0.8, maxFitness = -0.05,
-        run = 30, keepBest = TRUE, monitor = GA::gaMonitor
+      evolved.ts <- NULL
+      withProgress(message = "Generating data", detail = "0%", {
+        while (is_empty(evolved.ts) || NCOL(evolved.ts) < input$data_ngen) {
+          y <- ga_ts(
+            type = "real-valued", fitness = fitness_ts, features = feature_fns, seasonal = length(seasonal_freq()),
+            input$data_length, # n for fitness_ts
+            freq = freq, target = target, nComp = 3, selected.features = selected.features,
+            n = input$data_length,
+            min = ga_min,
+            max = ga_max,
+            parallel = TRUE, popSize = 30, maxiter = 100,
+            pmutation = 0.3, pcrossover = 0.8, maxFitness = -0.05,
+            run = 30, keepBest = TRUE, monitor = GA::gaMonitor
+          )
+          evolved.ts.new <- unique(do.call("cbind", y@bestSol), MARGIN = 2)
+          evolved.ts <- cbind(
+            evolved.ts,
+            evolved.ts.new
+          )
+          incProgress(NCOL(evolved.ts.new) / input$Number, detail = paste0(min(round(NCOL(evolved.ts) / input$Number, 2) * 100, 100), "%"))
+        }
+      })
+      generated_ts(
+        msts(evolved.ts[, seq_len(input$data_ngen)], seasonal.periods = freq)
       )
     })
 
