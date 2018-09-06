@@ -19,7 +19,8 @@ shinyServer(
     heterogeneity_features <- c("arch_acf", "garch_acf", "arch_r2", "garch_r2")
 
     all_features <- reactive({
-      out <- c(acf_features, pacf_features,
+      out <- c("ndiffs",
+        acf_features, pacf_features,
         stl_features,
         shift_features,
         behaviour_features,
@@ -29,7 +30,8 @@ shinyServer(
         out <- c(out,
                  "seas_acf1",
                  "seas_pacf",
-                 outer(stl_seas_features, seq_along(seasonal_freq()), "paste0")
+                 outer(stl_seas_features, seq_along(seasonal_freq()), "paste0"),
+                 paste0("nsdiffs", seq_along(seasonal_freq()))
                  )
       }
       out
