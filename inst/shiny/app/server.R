@@ -1,6 +1,7 @@
 library(shiny)
 library(purrr)
 library(rlang)
+library(forecast)
 
 shinyServer(
   function(input, output, session) {
@@ -242,6 +243,10 @@ shinyServer(
       generated_ts(
         msts(evolved.ts[, seq_len(input$data_ngen)], seasonal.periods = freq)
       )
+    })
+
+    output$out_plot <- renderPlot({
+      autoplot(generated_ts(), ylab = "Evolved Time Series") + ggplot2::theme(legend.position = "none", text = ggplot2::element_text(size = 20))
     })
 
     output$export <- downloadHandler(

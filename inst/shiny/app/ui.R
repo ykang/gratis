@@ -90,7 +90,7 @@ shinyUI(
         ),
 
         tabItem("tab_vis",
-                uiOutput("out_plot")
+                plotOutput("out_plot")
         )
       )
     )
