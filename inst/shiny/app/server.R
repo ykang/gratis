@@ -2,6 +2,7 @@ library(shiny)
 library(purrr)
 library(rlang)
 library(forecast)
+library(tsgeneration)
 
 shinyServer(
   function(input, output, session) {
