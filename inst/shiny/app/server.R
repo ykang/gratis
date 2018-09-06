@@ -66,11 +66,11 @@ shinyServer(
 
     output$feature_diff <- renderUI({
       do.call("tagList", c(
-          list(numericInput("par_ndiff", "Number of differences:", value = 0, min = 0, max = 2)),
-          map(names(seasonal_freq()),
+          list(numericInput("par_ndiffs", "Number of differences:", value = 0, min = 0, max = 2)),
+          map(seq_along(seasonal_freq()),
               ~ numericInput(
-                paste0("par_nsdiff_", .x),
-                paste0("Number of seasonal differences [", .x, "]:"),
+                paste0("par_nsdiffs", .x),
+                paste0("Number of seasonal differences [", names(seasonal_freq())[.x], "]:"),
                 value = 0, min = 0, max = 2)
           )
         )
