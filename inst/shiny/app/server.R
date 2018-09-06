@@ -18,6 +18,15 @@ shinyServer(
                             "unitroot_kpss", "unitroot_pp")
     heterogeneity_features <- c("arch_acf", "garch_acf", "arch_r2", "garch_r2")
 
+    feature_fns <- c(
+      "ndiffs", "nsdiffs1",
+      "acf_features", "pacf_features",
+      "entropy", "nonlinearity", "hurst", "stability", "lumpiness",
+      "unitroot_kpss", "unitroot_pp",
+      "max_level_shift", "max_kl_shift", "max_var_shift",
+      "stl_features", "heterogeneity"
+    )
+
     all_features <- reactive({
       out <- c("ndiffs",
         acf_features, pacf_features,
