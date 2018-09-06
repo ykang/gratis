@@ -207,16 +207,20 @@ shinyServer(
       # nComp: Number of components in mixture models
       # selected.features: Features actually used
 
-      target <- map(all_features(), ~ input[[paste0("par_", .x)]])
+      target <- map_dbl(all_features(), ~ input[[paste0("par_", .x)]]) %>% set_names(all_features())
+      selected.features <- all_features()[target != 0]
 
       ga_len <- c(10,17,35)[min(2, length(seasonal_freq())+1)]
       ga_min <- rep(0, ga_len)
       ga_max <- rep(1, ga_len)
 
+      freq <- if(is_empty(seasonal_freq())) 1 else seasonal_freq()
+
       ga_ts(
-        type = "real-valued", fitness = fitness_ts, features = all_features(), seasonal = length(seasonal_freq()),
+        type = "real-valued", fitness = fitness_ts, features = feature_fns, seasonal = length(seasonal_freq()),
         input$data_length, # n for fitness_ts
-        freq = seasonal_freq(), target = target, nComp = 3, selected.features = all_features(),
+        freq = freq, target = target, nComp = 3, selected.features = selected.features,
+        n = input$data_length,
         min = ga_min,
         max = ga_max,
         parallel = TRUE, popSize = 30, maxiter = 100,
