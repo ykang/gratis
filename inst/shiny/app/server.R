@@ -248,7 +248,7 @@ shinyServer(
             pmutation = 0.3, pcrossover = 0.8, maxFitness = -0.05,
             run = 30, keepBest = TRUE, monitor = GA::gaMonitor
           )
-          evolved.ts.new <- unique(do.call("cbind", y@bestSol), MARGIN = 2)
+          evolved.ts.new <- unique(do.call("cbind", y@bestSol[y@iter - 0:(y@run-1)]), MARGIN = 2)
           evolved.ts <- cbind(
             evolved.ts,
             evolved.ts.new
