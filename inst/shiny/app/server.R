@@ -3,6 +3,7 @@ library(purrr)
 library(rlang)
 library(forecast)
 library(tsgeneration)
+library(tsfeatures)
 
 shinyServer(
   function(input, output, session) {
@@ -12,7 +13,21 @@ shinyServer(
     acf_features <- c("x_acf1", "diff1_acf1", "diff2_acf1", "x_acf10", "diff1_acf10", "diff2_acf10")
     pacf_features <- c("x_pacf5", "diff1x_pacf5", "diff2x_pacf5")
     stl_features <- c("trend", "spike", "linearity", "curvature", "e_acf1", "e_acf10")
-    stl_seas_features <- c("seasonal_strength", "peak", "trough")
+    stl_seas_features <- reactive({
+      if(is_empty(seasonal_freq())){
+        NULL
+      }
+      else{
+        features <- c("seasonal_strength", "peak", "trough")
+        if(length(seasonal_freq()) == 1){
+          features
+        }
+        else{
+          cross2(seq_along(seasonal_freq()), c("seasonal_strength", "peak", "trough")) %>%
+            map_chr(~ paste0("par_", .x[[2]], .x[[1]]))
+        }
+      }
+    })
     shift_features <- c("max_level_shift", "time_level_shift",
                         "max_kl_shift", "time_kl_shift",
                         "max_var_shift", "time_var_shift")
@@ -41,8 +56,8 @@ shinyServer(
         out <- c(out,
                  "seas_acf1",
                  "seas_pacf",
-                 outer(stl_seas_features, seq_along(seasonal_freq()), "paste0"),
-                 paste0("nsdiffs", seq_along(seasonal_freq()))
+                 stl_seas_features(),
+                 paste0("nsdiffs")#, if(is_empty(seasonal_freq())) "" else seq_along(seasonal_freq()))
                  )
       }
       out
@@ -80,10 +95,10 @@ shinyServer(
     output$feature_diff <- renderUI({
       do.call("tagList", c(
           list(numericInput("par_ndiffs", "Number of differences:", value = 0, min = 0, max = 2)),
-          map(seq_along(seasonal_freq()),
+          map(seq_len(min(1, length(seasonal_freq()))),
               ~ numericInput(
-                paste0("par_nsdiffs", .x),
-                paste0("Number of seasonal differences [", names(seasonal_freq())[.x], "]:"),
+                paste0("par_nsdiffs"),#, ifelse(is_empty(seasonal_freq()), "", .x)),
+                paste0("Number of seasonal differences [Year]"),# names(seasonal_freq())[.x], "]:"),
                 value = 0, min = 0, max = 2)
           )
         )
@@ -133,10 +148,10 @@ shinyServer(
       )
 
       if(!is_empty(seasonal_freq())){
-        seas <- cross2(names(seasonal_freq()), stl_seas_features) %>%
-          map(~ numericInput(
-            paste0("par_", .x[[2]], match(.x, names(seasonal_freq()))),
-            paste0(.x[[2]], " [", .x[[1]], "]"),
+        seas <- map2(stl_seas_features(), rep(seq_along(seasonal_freq()), 3),
+          ~ numericInput(
+            paste0("par_", .x),
+            paste0(.x, " [", names(seasonal_freq())[.y], "]"),
             value = 0, step = 0.01))
 
         io <- c(io, seas)
