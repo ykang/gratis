@@ -240,7 +240,7 @@ shinyServer(
           y <- ga_ts(
             type = "real-valued", fitness = fitness_ts, features = feature_fns, seasonal = length(seasonal_freq()),
             input$data_length, # n for fitness_ts
-            freq = freq, target = target, nComp = 3, selected.features = selected.features,
+            freq = freq, target = target[selected.features], nComp = 3, selected.features = selected.features,
             n = input$data_length,
             min = ga_min,
             max = ga_max,
