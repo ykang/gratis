@@ -56,6 +56,7 @@ shinyUI(
                     uiOutput("feature_diff"),
                     width = 12, collapsible = TRUE, collapsed = FALSE
                   ),
+                  uiOutput("out_features"),
                   actionLink("btn_gen",
                              box("Generate", width = 12, background = "green")
                   )
@@ -95,8 +96,7 @@ shinyUI(
                     uiOutput("feature_heterogeneity"),
                     width = 12, collapsible = TRUE, collapsed = FALSE
                   )
-                ),
-                uiOutput("out_features")
+                )
         ),
 
         tabItem("tab_vis",

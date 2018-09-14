@@ -264,6 +264,17 @@ shinyServer(
       generated_ts(
         msts(evolved.ts[, seq_len(input$data_ngen)], seasonal.periods = freq)
       )
+      output$out_features <- renderUI({
+        box(
+          title = "Generated series features",
+          renderTable({
+            generated_ts() %>%
+              tsfeatures(features = feature_fns) %>%
+              .[selected.features]
+          }),
+          width = 12
+        )
+      })
     })
 
     output$out_plot <- renderPlot({
