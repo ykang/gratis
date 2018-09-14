@@ -24,7 +24,7 @@ shinyServer(
         }
         else{
           cross2(seq_along(seasonal_freq()), c("seasonal_strength", "peak", "trough")) %>%
-            map_chr(~ paste0("par_", .x[[2]], .x[[1]]))
+            map_chr(~ paste0(.x[[2]], .x[[1]]))
         }
       }
     })
