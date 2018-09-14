@@ -228,6 +228,11 @@ shinyServer(
       target <- map_dbl(all_features(), ~ input[[paste0("par_", .x)]]) %>% set_names(all_features())
       selected.features <- all_features()[target != 0]
 
+      if(length(selected.features) == 0){
+        showNotification("No features specified, unable to generate time series.", type = "error")
+        return()
+      }
+
       ga_len <- c(10,17,35)[min(2, length(seasonal_freq())+1)]
       ga_min <- rep(0, ga_len)
       ga_max <- rep(1, ga_len)
