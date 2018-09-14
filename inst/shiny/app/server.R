@@ -233,7 +233,7 @@ shinyServer(
         return()
       }
 
-      ga_len <- c(10,17,35)[min(2, length(seasonal_freq())+1)]
+      ga_len <- c(10,17,35)[min(3, length(seasonal_freq())+1)]
       ga_min <- rep(0, ga_len)
       ga_max <- rep(1, ga_len)
 
