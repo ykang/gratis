@@ -278,6 +278,7 @@ shinyServer(
     })
 
     output$out_plot <- renderPlot({
+      req(generated_ts())
       autoplot(generated_ts(), ylab = "Evolved Time Series") + ggplot2::theme(legend.position = "none", text = ggplot2::element_text(size = 20))
     })
 
