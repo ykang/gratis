@@ -50,42 +50,52 @@ shinyUI(
         ),
 
         tabItem("tab_features",
-                box(
-                  title = "Differences",
-                  uiOutput("feature_diff"),
-                  width = 3, collapsible = TRUE, collapsed = FALSE
+                column(3,
+                  box(
+                    title = "Differences",
+                    uiOutput("feature_diff"),
+                    width = 12, collapsible = TRUE, collapsed = FALSE
+                  ),
+                  actionLink("btn_gen",
+                             box("Generate", width = 12, background = "green")
+                  )
                 ),
-                box(
-                  title = "ACF",
-                  uiOutput("feature_acf"),
-                  width = 3, collapsible = TRUE, collapsed = FALSE
+                column(3,
+                  box(
+                    title = "ACF",
+                    uiOutput("feature_acf"),
+                    width = 12, collapsible = TRUE, collapsed = FALSE
+                  ),
+                  box(
+                    title = "PACF",
+                    uiOutput("feature_pacf"),
+                    width = 12, collapsible = TRUE, collapsed = FALSE
+                  )
                 ),
-                box(
-                  title = "PACF",
-                  uiOutput("feature_pacf"),
-                  width = 3, collapsible = TRUE, collapsed = FALSE
+                column(3,
+                  box(
+                    title = "STL features",
+                    uiOutput("feature_stl"),
+                    width = 12, collapsible = TRUE, collapsed = FALSE
+                  ),
+                  box(
+                    title = "Behaviour",
+                    uiOutput("feature_behave"),
+                    width = 12, collapsible = TRUE, collapsed = FALSE
+                  )
                 ),
-                box(
-                  title = "STL features",
-                  uiOutput("feature_stl"),
-                  width = 3, collapsible = TRUE, collapsed = FALSE
+                column(3,
+                  box(
+                    title = "Shift",
+                    uiOutput("feature_shift"),
+                    width = 12, collapsible = TRUE, collapsed = FALSE
+                  ),
+                  box(
+                    title = "Heterogeneity",
+                    uiOutput("feature_heterogeneity"),
+                    width = 12, collapsible = TRUE, collapsed = FALSE
+                  )
                 ),
-                box(
-                  title = "Shift",
-                  uiOutput("feature_shift"),
-                  width = 3, collapsible = TRUE, collapsed = FALSE
-                ),
-                box(
-                  title = "Behaviour",
-                  uiOutput("feature_behave"),
-                  width = 3, collapsible = TRUE, collapsed = FALSE
-                ),
-                box(
-                  title = "Heterogeneity",
-                  uiOutput("feature_heterogeneity"),
-                  width = 3, collapsible = TRUE, collapsed = FALSE
-                ),
-                actionButton("btn_gen", "Generate"),
                 uiOutput("out_features")
         ),
 
