@@ -71,3 +71,10 @@ diverse and controllable characteristics. [Working paper](https://robjhyndman.co
 License
 -------
 This package is free and open source software, licensed under GPL-3.
+
+
+Acknowlegdements
+----------------
+Feng Li and Yanfei Kang's research were supported by the 
+National Natural Science Foundation of China 
+(No. 11501587 and No. 11701022 respectively). 
