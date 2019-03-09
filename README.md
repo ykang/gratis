@@ -54,6 +54,7 @@ You could run the time series generation procedure in a web application
 ``` r
 run_tsgeneration_app()
 ```
+Or visit our [online Shiny APP](https://ebsmonash.shinyapps.io/tsgeneration/)
 
 See also
 --------
@@ -64,8 +65,8 @@ See also
 References
 ----------
 
-- Kang, Y., Hyndman, R., and Li, F. (2018). Efficient generation of time series with
-diverse and controllable characteristics. [Working paper](https://robjhyndman.com/publications/tsgeneration/).
+- Kang, Y., Hyndman, R., and Li, F. (2018). **GRATIS**: **G**ene**RA**ting **TI**me **S**eries with
+diverse and controllable characteristics. [Working paper on arXiv](http://arxiv.org/abs/1903.02787).
 
 
 License
@@ -75,6 +76,7 @@ This package is free and open source software, licensed under GPL-3.
 
 Acknowledgements
 ----------------
-Feng Li and Yanfei Kang's research were supported by the
+Feng Li and Yanfei Kang are supported by the
 National Natural Science Foundation of China
-(No. 11501587 and No. 11701022 respectively).
+(No. 11501587 and No. 11701022 respectively). Rob J Hyndman is supported by the Australian
+Centre of Excellence in Mathematical and Statistical Frontiers.
