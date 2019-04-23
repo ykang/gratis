@@ -101,3 +101,8 @@ arinf <- function(object) {
 nsdiffs1 <- function(x) {
   c(nsdiffs = ifelse(frequency(x) == 1L, -1, forecast::nsdiffs(x)))
 }
+
+
+nroot <- function(x,n){
+  abs(x)^(1/n)*sign(x)
+}
