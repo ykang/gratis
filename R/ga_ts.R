@@ -132,26 +132,26 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
 
   # check GA search type
   switch(type,
-    "binary" = {
-      nBits <- as.vector(nBits)[1]
-      min <- max <- NA
-      nvars <- nBits
-    },
-    "real-valued" = {
-      min <- as.vector(min)
-      max <- as.vector(max)
-      nBits <- NA
-      if (length(min) != length(max)) {
-        stop("min and max must be vector of the same length!")
-      }
-      nvars <- length(max)
-    },
-    "permutation" = {
-      min <- as.vector(min)[1]
-      max <- as.vector(max)[1]
-      nBits <- NA
-      nvars <- length(seq(min, max))
-    }
+         "binary" = {
+           nBits <- as.vector(nBits)[1]
+           min <- max <- NA
+           nvars <- nBits
+         },
+         "real-valued" = {
+           min <- as.vector(min)
+           max <- as.vector(max)
+           nBits <- NA
+           if (length(min) != length(max)) {
+             stop("min and max must be vector of the same length!")
+           }
+           nvars <- length(max)
+         },
+         "permutation" = {
+           min <- as.vector(min)[1]
+           max <- as.vector(max)[1]
+           nBits <- NA
+           nvars <- length(seq(min, max))
+         }
   )
 
   # check suggestions
@@ -237,25 +237,25 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
   popTs <- matrix(NA, n, popSize)
 
   object <- new("ga",
-    call = call,
-    type = type,
-    min = min,
-    max = max,
-    nBits = nBits,
-    names = if (is.null(names)) character() else names,
-    popSize = popSize,
-    iter = 0,
-    run = 1,
-    maxiter = maxiter,
-    suggestions = suggestions,
-    population = matrix(),
-    popTs = matrix(),
-    elitism = elitism,
-    pcrossover = pcrossover,
-    pmutation = if (is.numeric(pmutation)) pmutation else NA,
-    fitness = Fitness,
-    summary = fitnessSummary,
-    bestSol = bestSol
+                call = call,
+                type = type,
+                min = min,
+                max = max,
+                nBits = nBits,
+                names = if (is.null(names)) character() else names,
+                popSize = popSize,
+                iter = 0,
+                run = 1,
+                maxiter = maxiter,
+                suggestions = suggestions,
+                population = matrix(),
+                popTs = matrix(),
+                elitism = elitism,
+                pcrossover = pcrossover,
+                pmutation = if (is.numeric(pmutation)) pmutation else NA,
+                fitness = Fitness,
+                summary = fitnessSummary,
+                bestSol = bestSol
   )
 
   # generate beginning population
@@ -321,8 +321,8 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
       if (optimArgs$poptim > runif(1)) { # perform local search from random selected solution
         # with prob proportional to fitness
         i <- sample(1:popSize,
-          size = 1,
-          prob = optimProbsel(Fitness, q = optimArgs$pressel)
+                    size = 1,
+                    prob = optimProbsel(Fitness, q = optimArgs$pressel)
         )
         # run local search
         opt <- try(suppressWarnings(
@@ -665,24 +665,24 @@ plot.ga <- function(x, y, ylim, cex.points = 0.7,
   }
 
   plot(iters, summary[, 1],
-    type = "n", ylim = ylim,
-    xlab = "Generation", ylab = "Fitness value", ...
+       type = "n", ylim = ylim,
+       xlab = "Generation", ylab = "Fitness value", ...
   )
   if (is.final & is.function(grid)) {
     grid(equilogs = FALSE)
   }
   points(iters, summary[, 1],
-    type = ifelse(is.final, "o", "p"),
-    pch = pch[1], lty = lty[1], col = col[1], cex = cex.points
+         type = ifelse(is.final, "o", "p"),
+         pch = pch[1], lty = lty[1], col = col[1], cex = cex.points
   )
   points(iters, summary[, 2],
-    type = ifelse(is.final, "o", "p"),
-    pch = pch[2], lty = lty[2], col = col[2], cex = cex.points
+         type = ifelse(is.final, "o", "p"),
+         pch = pch[2], lty = lty[2], col = col[2], cex = cex.points
   )
   if (is.final) {
     polygon(c(iters, rev(iters)),
-      c(summary[, 4], rev(summary[, 1])),
-      border = FALSE, col = col[3]
+            c(summary[, 4], rev(summary[, 1])),
+            border = FALSE, col = col[3]
     )
   }
   else {
@@ -691,11 +691,11 @@ plot.ga <- function(x, y, ylim, cex.points = 0.7,
   if (is.final & legend) {
     inc <- !is.na(col)
     legend("bottomright",
-      legend = c("Best", "Mean", "Median")[inc],
-      col = col[inc], pch = c(pch, NA)[inc],
-      lty = c(lty, 1)[inc], lwd = c(1, 1, 10)[inc],
-      pt.cex = c(rep(cex.points, 2), 2)[inc],
-      inset = 0.02
+           legend = c("Best", "Mean", "Median")[inc],
+           col = col[inc], pch = c(pch, NA)[inc],
+           lty = c(lty, 1)[inc], lwd = c(1, 1, 10)[inc],
+           pt.cex = c(rep(cex.points, 2), 2)[inc],
+           inset = 0.02
     )
   }
 
