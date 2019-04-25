@@ -143,3 +143,44 @@ pars2list <- function(pars, seasonal, nComp) {
   }
   return(parslist)
 }
+
+fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp) {
+  pars <- pars2list(pars, seasonal, nComp)
+  if (seasonal < 2) {
+    x <- pars2x(pars, seasonal, freq, nComp, n)
+    if (max(abs(x)) > 1e5) {
+      return(list(value = -100, x = x))
+    }
+    return(list(
+      # value = -sqrt(sum((tsfeatures(x, features = features) %>% select(selected.features) - target)^2)) / sqrt(sum(target^2)),
+      value = -sqrt(sum(( tsfeatures:::scalets(as.vector(x)) - tsfeatures:::scalets(as.vector(x0)))^2)),
+      x = x
+    ))
+  } else {
+    x.list <- as.list(rep(0, length(freq)))
+    for (i in seq(freq)) {
+      x.list[[i]] <- pars2x(pars[[i]], 1, freq[i], nComp, n)
+    }
+    x.list[1:(length(x.list) - 1)] <- lapply(x.list[1:(length(x.list) - 1)], function(x) {
+      x - trendcycle(stl(x, "per"))
+    })
+    names(x.list) <- paste0("Season", seq(freq))
+    res <- as_tibble(scale(x.list %>% bind_cols())[, ]) %>% mutate(Season2 = Season2 / pars$ms.scale)
+    x <- res %>%
+      mutate(x = rowSums(.[seq(freq)])) %>%
+      dplyr::select(x) %>%
+      unlist() %>%
+      as.numeric() %>%
+      msts(seasonal.periods = freq)
+    if (is.na(max(abs(x))) | max(abs(x)) > 1e5) {
+      return(list(value = -100, x = x))
+    }
+    return(list(
+      # value = -sqrt(sum((tsfeatures::tsfeatures(x, features = features) %>%
+      #   select(selected.features) - target)^2)) / sqrt(sum(target^2)),
+      value = -sqrt(sum(( tsfeatures:::scalets(as.vector(x)) - tsfeatures:::scalets(as.vector(x0)))^2)),
+      x = x
+    ))
+  }
+}
+
