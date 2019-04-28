@@ -148,12 +148,15 @@ fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp) {
   pars <- pars2list(pars, seasonal, nComp)
   if (seasonal < 2) {
     x <- pars2x(pars, seasonal, freq, nComp, n)
+    x <- tsfeatures:::scalets(x)
     if (max(abs(x)) > 1e5) {
       return(list(value = -100, x = x))
     }
     return(list(
-      # value = -sqrt(sum((tsfeatures(x, features = features) %>% select(selected.features) - target)^2)) / sqrt(sum(target^2)),
-      value = -sqrt(sum(( tsfeatures:::scalets(as.vector(x)) - tsfeatures:::scalets(as.vector(x0)))^2)),
+      # value = cor(tsfeatures:::scalets(as.vector(x[1:length(x0)])), tsfeatures:::scalets(as.vector(x0))),
+      value = - mean(abs(as.vector(x[1:length(x0)]) - as.vector(x0))),
+      # value = - sqrt(sum((as.vector(x[1:length(x0)]) - as.vector(x0))^2)),
+      # value = -mean(abs(scalets(as.vector(x[1:length(x0)])) - scalets(as.vector(x0)))),
       x = x
     ))
   } else {
