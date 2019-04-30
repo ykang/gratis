@@ -106,3 +106,15 @@ nsdiffs1 <- function(x) {
 nroot <- function(x,n){
   abs(x)^(1/n)*sign(x)
 }
+
+corrtemporder1 <- function (x, y) {
+  p <- length(x)
+  sum((x[2:p] - x[1:(p - 1)]) * (y[2:p] - y[1:(p - 1)]))/(sqrt(sum((x[2:p] -
+                                                                      x[1:(p - 1)])^2)) * sqrt(sum((y[2:p] - y[1:(p - 1)])^2)))
+}
+
+diss.cort <- function (x, y, k = 2){
+  corrt <- corrtemporder1(x, y)
+  typedist <- as.numeric(dist(rbind(x, y)))
+  (2/(1 + exp(k * corrt))) * typedist
+}

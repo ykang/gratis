@@ -28,8 +28,7 @@ Imports:
   methods,
   rlang,
   shiny,
-  shinydashboard,
-  TSclust
+  shinydashboard
 Suggests: 
   fGarch
 Remotes: 
