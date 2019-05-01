@@ -1,4 +1,4 @@
-generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, parallel=TRUE) {
+generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fitness = -3, parallel=TRUE) {
   ga_min <-
     if (seasonal == 0) {
       c(rep(0, 10))
@@ -24,7 +24,7 @@ generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, paralle
       min = ga_min,
       max = ga_max,
       parallel = parallel, popSize = 30, maxiter = 100,
-      pmutation = 0.3, pcrossover = 0.8, maxFitness = -3,
+      pmutation = 0.3, pcrossover = 0.8, maxFitness = max.fitness,
       run = 30, keepBest = TRUE, monitor = GA::gaMonitor
     )
     evolved.ts.new <-
