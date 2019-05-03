@@ -118,3 +118,12 @@ diss.cort <- function (x, y, k = 2){
   typedist <- as.numeric(dist(rbind(x, y)))
   (2/(1 + exp(k * corrt))) * typedist
 }
+
+scalets01 <- function(x){
+  n <- length(x)
+  scaledx <- as.numeric((x-min(x))/(max(x)-min(x)))
+  y <- as.ts(scaledx)
+  tsp(y) <- tsp(x)
+  return(y)
+}
+

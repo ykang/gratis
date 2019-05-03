@@ -1,4 +1,4 @@
-generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fitness = -3, parallel=TRUE) {
+generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fitness = -3, h = 8, parallel=TRUE) {
   ga_min <-
     if (seasonal == 0) {
       c(rep(0, 10))
@@ -19,7 +19,7 @@ generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fit
   while (ifelse(is.null(dim(evolved.ts)), 0 < 1, dim(evolved.ts)[2] < n)) {
     GA <- ga_ts(
       type = "real-valued", fitness = fitness_ts1, x0 = x0, seasonal = seasonal,
-      ts.length, freq, 3,
+      ts.length, freq, 3, h = h,
       n = ts.length,
       min = ga_min,
       max = ga_max,

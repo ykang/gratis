@@ -144,22 +144,25 @@ pars2list <- function(pars, seasonal, nComp) {
   return(parslist)
 }
 
-fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp) {
+fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp, h = 18) {
   pars <- pars2list(pars, seasonal, nComp)
   if (seasonal < 2) {
     x <- pars2x(pars, seasonal, freq, nComp, n)
-    x <- tsfeatures:::scalets(x)
+    x1 <- x[1:(length(x) - h)]
+    x2 <- x[(length(x) - h + 1):length(x)]
+    x <- tsfeatures:::scalets(x1)
+    xx <- (x2 - mean(x1))/sd(x1)
     if (max(abs(x)) > 1e5) {
-      return(list(value = -100, x = x))
+      return(list(value = -100, x = c(x, xx)))
     }
     return(list(
       # pearson correlation distance
       # value = cor(as.vector(x[1:length(x0)]), as.vector(x0)),
       # cort distance
-      value = - diss.cort(as.vector(x[1:length(x0)]), as.vector(x0), k = 2),
+      value = - diss.cort(as.vector(x), as.vector(x0), k = 2),
       # value = - mean(abs(as.vector(x[1:length(x0)]) - as.vector(x0))),
       # value = - sqrt(sum((as.vector(x[1:length(x0)]) - as.vector(x0))^2)),
-      x = x
+      x = c(x, xx)
     ))
   } else {
     x.list <- as.list(rep(0, length(freq)))
