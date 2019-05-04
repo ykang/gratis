@@ -11,7 +11,7 @@ generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fit
     if (seasonal == 0) {
       c(rep(1, 10))
     } else if (seasonal == 1) {
-      c(rep(1, 17))
+      c(rep(0.5, 17))
     } else {
       c(rep(1, 35))
     }
