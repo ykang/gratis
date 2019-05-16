@@ -102,7 +102,7 @@ pars2x <- function(pars, seasonal, freq, nComp, n) {
       t.change <- sample(1:n, 1)
       x[t.change:n] <- x[t.change:n] + 50
     }
-    if (pars$p.diff <= 0) {
+    if (pars$p.diff <= 0.25) {
       x <- ts(diffinv(x), frequency = freq)
       x <- window(x, start = c(1, 2))
     }
@@ -160,9 +160,9 @@ fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp, h = 18) {
       # value = cor(as.vector(x[1:length(x0)]), as.vector(x0)),
       # cort distance
       # value = - diss.cort(as.vector(x), as.vector(x0), k = 2),
-      value = tsgeneration:::corrtemporder1(as.vector(x), as.vector(x0)),
+      # value = tsgeneration:::corrtemporder1(as.vector(x), as.vector(x0)),
       # value = - mean(abs(as.vector(x[1:length(x0)]) - as.vector(x0))),
-      # value = - sqrt(sum((as.vector(x[1:length(x0)]) - as.vector(x0))^2)),
+      value = - sqrt(sum((as.vector(x) - as.vector(x0))^2)),
       x = c(x, xx)
     ))
   } else {
