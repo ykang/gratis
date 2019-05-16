@@ -159,7 +159,7 @@ fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp, h = 18) {
       # pearson correlation distance
       # value = cor(as.vector(x[1:length(x0)]), as.vector(x0)),
       # cort distance
-      # value = - diss.cort(as.vector(x), as.vector(x0), k = 3),
+      # value = - diss.cort(as.vector(x), as.vector(x0), k = 2),
       value = tsgeneration:::corrtemporder1(as.vector(x), as.vector(x0)),
       # value = - mean(abs(as.vector(x[1:length(x0)]) - as.vector(x0))),
       # value = - sqrt(sum((as.vector(x[1:length(x0)]) - as.vector(x0))^2)),
