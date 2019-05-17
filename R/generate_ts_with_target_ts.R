@@ -25,7 +25,7 @@ generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fit
       max = ga_max,
       parallel = parallel, popSize = 30, maxiter = 100,
       pmutation = 0.3, pcrossover = 0.8, maxFitness = max.fitness,
-      run = 30, keepBest = TRUE, monitor = GA::gaMonitor
+      run = 10, keepBest = TRUE, monitor = GA::gaMonitor
     )
     evolved.ts.new <-
       unique(do.call(
