@@ -106,7 +106,7 @@ pars2x <- function(pars, seasonal, freq, nComp, n, x0) {
       x <- ts(diffinv(x), frequency = freq)
       x <- window(x, start = c(1, 2))
     }
-    if (pars$p.Diff <= 0.25) {
+    if (pars$p.Diff <= ifelse(nsdiffs(x0) > 0, 0.25, 0)) {
       x <- ts(diffinv(x, lag = freq), frequency = freq)
       x <- window(x, start = c(2, 1))
     }
