@@ -3,9 +3,7 @@ generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fit
     if (seasonal == 0) {
       c(rep(0, 10))
     } else if (seasonal == 1) {
-      c(rep(c(ifelse(ndiffs(x0) >= 1, -0.5, -1),
-            ifelse(nsdiffs(x0) == 1, -0.5, -1)),
-            times = 3, each = 2), rep(0, 5))
+      c(rep(ifelse(nsdiffs(x0) == 1, 0, -1), 12), rep(0, 5))
     } else {
       c(rep(0, 35))
     }
@@ -13,9 +11,7 @@ generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fit
     if (seasonal == 0) {
       c(rep(1, 10))
     } else if (seasonal == 1) {
-      c(rep(c(ifelse(ndiffs(x0) >= 1, 0.5, 1),
-              ifelse(nsdiffs(x0) == 1, 0.5, 1)),
-            times = 3, each = 2), rep(0.5, 5))
+      c(rep(ifelse(nsdiffs(x0) == 1, 0.5, 1), 12), rep(0.5, 5))
     } else {
       c(rep(1, 35))
     }
