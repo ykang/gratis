@@ -1,7 +1,7 @@
 generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fitness = -3, h = 8, parallel=TRUE) {
   ga_min <-
     if (seasonal == 0) {
-      c(rep(0, 10))
+      c(rep(-1, 6), rep(0, 4))
     } else if (seasonal == 1) {
       c(rep(ifelse(nsdiffs(x0) == 1, -0.5, -1), 12), rep(0, 5))
     } else {
@@ -9,9 +9,9 @@ generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fit
     }
   ga_max <-
     if (seasonal == 0) {
-      c(rep(1, 10))
+      c(rep(1, 6), rep(1, 4))
     } else if (seasonal == 1) {
-      c(rep(ifelse(nsdiffs(x0) == 1, 0.5, 1), 12), rep(0.5, 5))
+      c(rep(ifelse(nsdiffs(x0) == 1, 0.5, 1), 12), rep(1, 5))
     } else {
       c(rep(1, 35))
     }
