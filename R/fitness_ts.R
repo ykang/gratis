@@ -55,7 +55,66 @@ fitness_ts <- function(pars, features, seasonal, n = 120, freq = 12, target, nCo
   }
 }
 
-pars2x <- function(pars, seasonal, freq, nComp, n, x0) {
+pars2x <- function(pars, seasonal, freq, nComp, n) {
+  if (seasonal == 0) {
+    means.ar.par.list <- lapply(pars[1:nComp], function(x) {
+      c(0, pi_coefficients(ar = x[1:2], m = freq))
+    })
+    sigmas.list <- list()
+    for (i in 1:nComp) {
+      sigmas.list[[i]] <- rep(i, n + freq * 10)
+    }
+    weights <- pars$weights
+    x <- rmixnorm_ts(
+      n = n + freq * 10,
+      means.ar.par.list = means.ar.par.list,
+      sigmas.list = sigmas.list,
+      weights = weights
+    )
+    x <- ts(x[(1 + freq * 10):(n + freq * 10)], frequency = freq)
+    if (pars$p.change <= 0.1) {
+      t.change <- sample(1:n, 1)
+      x[t.change:n] <- x[t.change:n] + 50
+    }
+    if (pars$p.diff <= 0.5) {
+      x <- ts(diffinv(x), frequency = freq)
+      x <- window(x, start = c(1, 2))
+    }
+  } else {
+    means.ar.par.list <- lapply(pars[1:nComp], function(x) {
+      # d = sample(c(0,1), 1)
+      # D =  sample(c(0,1), 1)
+      c(0, pi_coefficients(ar = x[1:2], sar = x[3:4], d = 0, D = 0, m = freq))
+    })
+    sigmas.list <- list()
+    for (i in 1:nComp) {
+      sigmas.list[[i]] <- rep(i, n + freq * 10)
+    }
+    weights <- pars$weights
+    x <- rmixnorm_ts(
+      n = n + freq * 10,
+      means.ar.par.list = means.ar.par.list,
+      sigmas.list = sigmas.list,
+      weights = weights
+    )
+    x <- ts(x[(1 + freq * 10):(n + freq * 10)], frequency = freq)
+    if (pars$p.change <= 0.1) {
+      t.change <- sample(1:n, 1)
+      x[t.change:n] <- x[t.change:n] + 50
+    }
+    if (pars$p.diff <= 0.5) {
+      x <- ts(diffinv(x), frequency = freq)
+      x <- window(x, start = c(1, 2))
+    }
+    if (pars$p.Diff <= 0.5) {
+      x <- ts(diffinv(x, lag = freq), frequency = freq)
+      x <- window(x, start = c(2, 1))
+    }
+  }
+  return(x)
+}
+
+pars2x1 <- function(pars, seasonal, freq, nComp, n, x0) {
   if (seasonal == 0) {
     means.ar.par.list <- lapply(pars[1:nComp], function(x) {
       c(0, pi_coefficients(ar = x[1:2], m = freq))
@@ -147,7 +206,7 @@ pars2list <- function(pars, seasonal, nComp) {
 fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp, h = 18) {
   pars <- pars2list(pars, seasonal, nComp)
   if (seasonal < 2) {
-    x <- pars2x(pars, seasonal, freq, nComp, n, x0)
+    x <- pars2x1(pars, seasonal, freq, nComp, n, x0)
     x1 <- x[1:(length(x) - h)]
     x2 <- x[(length(x) - h + 1):length(x)]
     x <- tsfeatures:::scalets(x1)
