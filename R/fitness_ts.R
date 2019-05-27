@@ -136,8 +136,8 @@ pars2x1 <- function(pars, seasonal, freq, nComp, n, x0) {
       x[t.change:n] <- x[t.change:n] + 50
     }
     if (pars$p.diff <= ifelse(ndiffs(x0) > 0, 0.5, 0)) {
-      x <- ts(diffinv(x), frequency = freq)
-      x <- window(x, start = c(1, 2))
+      x <- ts(diffinv(x, differences = ndiffs(x0)), frequency = freq)
+      x <- window(x, start = c(1, 1 + ndiffs(x0)))
     }
   } else {
     means.ar.par.list <- lapply(pars[1:nComp], function(x) {
@@ -227,7 +227,7 @@ fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp, h = 18) {
   } else {
     x.list <- as.list(rep(0, length(freq)))
     for (i in seq(freq)) {
-      x.list[[i]] <- pars2x(pars[[i]], 1, freq[i], nComp, n)
+      x.list[[i]] <- pars2x1(pars[[i]], 1, freq[i], nComp, n)
     }
     x.list[1:(length(x.list) - 1)] <- lapply(x.list[1:(length(x.list) - 1)], function(x) {
       x - trendcycle(stl(x, "per"))
