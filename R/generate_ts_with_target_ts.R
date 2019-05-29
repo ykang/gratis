@@ -1,7 +1,7 @@
 generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fitness = -3, h = 8, parallel=TRUE) {
   ga_min <-
     if (seasonal == 0) {
-      c(rep(-1, 6), rep(0, 4))
+      c(rep(-0.5, 6), rep(0, 4))
     } else if (seasonal == 1) {
       c(rep(ifelse(nsdiffs(x0) == 1, -0.5, -1), 12), rep(0, 5))
     } else {
@@ -9,7 +9,7 @@ generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fit
     }
   ga_max <-
     if (seasonal == 0) {
-      c(rep(1, 6), rep(1, 4))
+      c(rep(0.5, 6), rep(1, 4))
     } else if (seasonal == 1) {
       c(rep(ifelse(nsdiffs(x0) == 1, 0.5, 1), 12), rep(1, 5))
     } else {
@@ -25,7 +25,7 @@ generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fit
       max = ga_max,
       parallel = parallel, popSize = 30, maxiter = 100,
       pmutation = 0.3, pcrossover = 0.8, maxFitness = max.fitness,
-      run = 10, keepBest = TRUE, monitor = GA::gaMonitor
+      run = 30, keepBest = TRUE, monitor = GA::gaMonitor
     )
     evolved.ts.new <-
       unique(do.call(
