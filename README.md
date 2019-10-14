@@ -1,17 +1,17 @@
-`tsgeneration`
-==============
+`gratis`
+========
 
-The R package `tsgeneration` provides efficient algorithms for generating time series with
+The R package `gratis` (previously known as `tsgeneration`) provides efficient algorithms for generating time series with
 diverse and controllable characteristics.
 
 Installation
 ------------
 
-You can install the **development** version of `tsgeneration` package from [GitHub
-Repository](https://github.com/ykang/tsgeneration) with:
+You can install the **development** version of `gratis` package from [GitHub
+Repository](https://github.com/ykang/gratis) with:
 
 ``` r
-devtools::install_github("ykang/tsgeneration")
+devtools::install_github("ykang/gratis")
 ```
 
 Usage
@@ -20,7 +20,7 @@ Usage
 ### Load the package
 
 ``` r
-require("tsgeneration")
+require("gratis")
 ```
 
 ### Generate diverse time series
@@ -76,7 +76,6 @@ This package is free and open source software, licensed under GPL-3.
 
 Acknowledgements
 ----------------
-Feng Li and Yanfei Kang are supported by the
-National Natural Science Foundation of China
+Feng Li and Yanfei Kang are supported by the National Natural Science Foundation of China
 (No. 11501587 and No. 11701022 respectively). Rob J Hyndman is supported by the Australian
 Centre of Excellence in Mathematical and Statistical Frontiers.
