@@ -38,7 +38,7 @@ generate_ts_with_target <- function(n, ts.length, freq, seasonal, features, sele
   evolved.ts <- c()
   while (ifelse(is.null(dim(evolved.ts)), 0 < 1, dim(evolved.ts)[2] < n)) {
     GA <- ga_ts(
-      type = "real-valued", fitness = tsgeneration::fitness_ts, features = features, seasonal = seasonal,
+      type = "real-valued", fitness = gratis::fitness_ts, features = features, seasonal = seasonal,
       ts.length, freq, target, 3, selected.features,
       n = ts.length,
       min = ga_min,
