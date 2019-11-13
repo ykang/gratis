@@ -52,7 +52,7 @@ autoplot(x)
 
 You could run the time series generation procedure in a web application
 ``` r
-run_gratis_app()
+app_gratis()
 ```
 Or visit our [online Shiny APP](https://ebsmonash.shinyapps.io/tsgeneration/)
 
