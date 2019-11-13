@@ -31,8 +31,6 @@ Imports:
   shinydashboard
 Suggests: 
   fGarch
-Remotes: 
-  robjhyndman/tsfeatures
 NeedsCompilation: no
 License: GPL (>= 2)
 Encoding: UTF-8
