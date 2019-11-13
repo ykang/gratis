@@ -4,9 +4,9 @@ library(shinydashboard)
 shinyUI(
   dashboardPage(
     dashboardHeader(
-      title = "tsgeneration",
+      title = "gratis",
       titleWidth = "200px",
-      tags$li(class = "dropdown", a(href="https://github.com/ykang/tsgeneration", target="_blank", span(icon("github"), " GitHub")))
+      tags$li(class = "dropdown", a(href="https://github.com/ykang/gratis", target="_blank", span(icon("github"), " GitHub")))
     ),
     dashboardSidebar(
       width = "200px",

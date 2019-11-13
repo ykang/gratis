@@ -2,7 +2,7 @@ library(shiny)
 library(purrr)
 library(rlang)
 library(forecast)
-library(tsgeneration)
+library(gratis)
 library(tsfeatures)
 
 shinyServer(
