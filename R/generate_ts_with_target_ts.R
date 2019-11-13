@@ -1,9 +1,9 @@
-generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fitness = -3, h = 8, parallel=TRUE) {
+generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x, max.fitness = -3, h = 8, preprocessing = 1, parallel=TRUE) {
   ga_min <-
     if (seasonal == 0) {
       c(rep(-0.5, 6), rep(0, 4))
     } else if (seasonal == 1) {
-      c(rep(ifelse(nsdiffs(x0) == 1, -0.5, -1), 12), rep(0, 5))
+      c(rep(ifelse(nsdiffs(x) == 1, -0.5, -1), 12), rep(0, 5))
     } else {
       c(rep(0, 35))
     }
@@ -11,10 +11,25 @@ generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fit
     if (seasonal == 0) {
       c(rep(0.5, 6), rep(1, 4))
     } else if (seasonal == 1) {
-      c(rep(ifelse(nsdiffs(x0) == 1, 0.5, 1), 12), rep(0.5, 5))
+      c(rep(ifelse(nsdiffs(x) == 1, 0.5, 1), 12), rep(0.5, 5))
     } else {
       c(rep(1, 35))
     }
+
+  if (preprocessing==1){
+    out_req <- Smoothing_ts2(x, h, h)
+    x0 <- out_req$series
+    SeasIndIn <- out_req$seasonalIn
+    SeasInd <- out_req$seasonal
+    lambda <- out_req$lambda
+  }else{
+    x0 <- x
+    SeasIndIn <- rep(0, length(x))
+    SeasInd <- rep(0, h)
+  }
+  x0.mean = mean(x0)
+  x0.sd = sd(x0)
+  x0 <- (x0 - x0.mean)/x0.sd
   evolved.ts <- c()
   while (ifelse(is.null(dim(evolved.ts)), 0 < 1, dim(evolved.ts)[2] < n)) {
     GA <- ga_ts(
@@ -35,9 +50,15 @@ generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x0, max.fit
     evolved.ts <- cbind(evolved.ts, evolved.ts.new)
   }
   if (length(freq) == 1) {
-    evolved.ts <- ts(evolved.ts[, 1:n], frequency = freq)
+    evolved.ts <- ts(x0.sd * evolved.ts[, 1:n] + x0.mean, frequency = freq, start = attributes(x)$tsp[1])
   } else {
     evolved.ts <- msts(evolved.ts[, 1:n], seasonal.periods = freq)
+  }
+  if (all(SeasIndIn==0)==F){
+    for (i in 1:n){
+      evolved.ts[,i] <- ts(InvBoxCox((BoxCox(evolved.ts[,i], lambda) + c(SeasIndIn, SeasInd)) , lambda),
+                              frequency = freq, start = attributes(x)$tsp[1])
+    }
   }
   return(evolved.ts)
 }
