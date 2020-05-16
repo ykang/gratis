@@ -65,8 +65,8 @@ See also
 References
 ----------
 
-- Kang, Y., Hyndman, R., and Li, F. (2018). **GRATIS**: **G**ene**RA**ting **TI**me **S**eries with
-diverse and controllable characteristics. [Working paper on arXiv](http://arxiv.org/abs/1903.02787).
+- Kang, Y., Hyndman, R., and Li, F. (2020). **GRATIS**: **G**ene**RA**ting **TI**me **S**eries with
+diverse and controllable characteristics. [Statistical Analysis and Data Mining](https://doi.org/10.1002/sam.11461).
 
 
 License
