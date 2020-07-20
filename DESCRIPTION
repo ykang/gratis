@@ -3,8 +3,13 @@ Type: Package
 Title: GeneRAting TIme Series with diverse and controllable characteristics
 Version: 0.2
 Date: 2018-08-02
-Author: Yanfei Kang, Feng Li and Rob J Hyndman
-Maintainer: Yanfei Kang <yanfeikang@buaa.edu.cn>
+Authors@R: c(
+    person("Yanfei", "Kang", role = c("aut", "cre"), email = "yanfeikang@buaa.edu.cn", comment = c(ORCID = "0000-0001-8769-6650")),
+    person("Feng", "Li", role = "aut", email = "feng.li@cufe.edu.cn", comment = c(ORCID = "0000-0002-4248-9778")),
+    person("Rob", "Hyndman", role = "ctb", email = "rob.hyndman@monash.edu", comment = c(ORCID = "0000-0002-2140-5352")),
+    person("Mitchell", "O'Hara-Wild", role = "ctb", email = "mail@mitchelloharawild.com", comment = c(ORCID = "0000-0001-6729-7695")),
+    person("Bocong", "Zhao", role = "ctb", email = "bocongzhao@163.com")
+    )
 Description: The gratis package generates time series based on mixture autoregressive models.
 LazyLoad: yes
 Repository: CRAN
@@ -32,6 +37,7 @@ Imports:
 Suggests: 
   fGarch
 NeedsCompilation: no
-License: GPL (>= 2)
+License: GPLv3
 Encoding: UTF-8
 RoxygenNote: 6.1.0
+VignetteBuilder: knitr
