@@ -3,7 +3,7 @@ title: "Introduction to gratis"
 author: "Bocong Zhao"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{my-vignette}
+  %\VignetteIndexEntry{Introduction to gratis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,7 +21,6 @@ options(tibble.print_min = 5)
 ```{r, message=FALSE, include = FALSE}
 library(fpp3)
 library(parallel)
-library(doParallel)
 ```
 
 ## About gratis
