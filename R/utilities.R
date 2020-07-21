@@ -13,6 +13,7 @@
 #' @return A vector of AR coefficients.
 #' @author Rob J Hyndman
 #' @export
+#' @importFrom stats dist
 #'
 #' @examples
 #' # Not Run
