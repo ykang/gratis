@@ -14,6 +14,10 @@
 #' @author Rob J Hyndman
 #' @export
 #'
+#' @importFrom stats acf
+#' @importFrom forecast BoxCox.lambda
+#' @importFrom stats loess
+#'
 #' @examples
 #' # Not Run
 pi_coefficients <- function(ar = 0, d = 0L, ma = 0, sar = 0, D = 0L, sma = 0, m = 1L, tol = 1e-07) {
