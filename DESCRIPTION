@@ -37,7 +37,7 @@ Imports:
 Suggests: 
   fGarch
 NeedsCompilation: no
-License: GPLv3
+License: GPL-3+ file LICENSE
 Encoding: UTF-8
 RoxygenNote: 6.1.0
-VignetteBuilder: knitr
+VignetteBuilder: utils
