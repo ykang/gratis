@@ -11,6 +11,8 @@
 #'
 #' @return NA
 #' @export
+#' 
+#' @importFrom forecast ndiffs
 #'
 #' @examples
 #' # Not Run

@@ -14,6 +14,11 @@
 #' @author Rob J Hyndman
 #' @export
 #' @importFrom stats dist
+#' @importFrom stats tsp
+#' @importFrom stats tsp<-
+#' @importFrom stats acf
+#' @importFrom forecast BoxCox.lambda
+#' @importFrom stats loess
 #'
 #' @examples
 #' # Not Run
