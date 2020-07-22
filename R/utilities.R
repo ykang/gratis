@@ -13,6 +13,9 @@
 #' @return A vector of AR coefficients.
 #' @author Rob J Hyndman
 #' @export
+#' 
+#' @importFrom stats tsp
+#' @importFrom stats tsp<-
 #'
 #' @importFrom stats acf
 #' @importFrom forecast BoxCox.lambda
