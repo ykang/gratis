@@ -1,3 +1,7 @@
+#' @importFrom forecast nsdiffs
+#' @importFrom forecast BoxCox
+#' @importFrom forecast InvBoxCox
+
 generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x, max.fitness = -3, h = 8, preprocessing = 1, parallel=TRUE) {
   ga_min <-
     if (seasonal == 0) {
