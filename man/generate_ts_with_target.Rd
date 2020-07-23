@@ -4,8 +4,16 @@
 \alias{generate_ts_with_target}
 \title{Generating time series with controllable features.}
 \usage{
-generate_ts_with_target(n, ts.length, freq, seasonal, features,
-  selected.features, target, parallel = TRUE)
+generate_ts_with_target(
+  n,
+  ts.length,
+  freq,
+  seasonal,
+  features,
+  selected.features,
+  target,
+  parallel = TRUE
+)
 }
 \arguments{
 \item{n}{number of time series to be generated.}

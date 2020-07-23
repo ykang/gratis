@@ -5,19 +5,38 @@
 \title{A revised version of genetic algorithms (R package `GA`) to allow for time series
 generation.}
 \usage{
-ga_ts(type = c("binary", "real-valued", "permutation"), fitness, ..., n,
-  min, max, nBits, population = gaControl(type)$population,
+ga_ts(
+  type = c("binary", "real-valued", "permutation"),
+  fitness,
+  ...,
+  n,
+  min,
+  max,
+  nBits,
+  population = gaControl(type)$population,
   selection = gaControl(type)$selection,
   crossover = gaControl(type)$crossover,
-  mutation = gaControl(type)$mutation, popSize = 50,
-  pcrossover = 0.8, pmutation = 0.1, elitism = base::max(1,
-  round(popSize * 0.05)), updatePop = FALSE, postFitness = NULL,
-  maxiter = 100, run = maxiter, maxFitness = Inf, names = NULL,
-  suggestions = NULL, optim = FALSE, optimArgs = list(method =
-  "L-BFGS-B", poptim = 0.05, pressel = 0.5, control = list(fnscale = -1,
-  maxit = 100)), keepBest = FALSE, parallel = FALSE, monitor = if
-  (interactive()) {     if (shiny::is.RStudio())          gaMonitor    
-  else FALSE } else {     FALSE }, seed = NULL)
+  mutation = gaControl(type)$mutation,
+  popSize = 50,
+  pcrossover = 0.8,
+  pmutation = 0.1,
+  elitism = base::max(1, round(popSize * 0.05)),
+  updatePop = FALSE,
+  postFitness = NULL,
+  maxiter = 100,
+  run = maxiter,
+  maxFitness = Inf,
+  names = NULL,
+  suggestions = NULL,
+  optim = FALSE,
+  optimArgs = list(method = "L-BFGS-B", poptim = 0.05, pressel = 0.5, control =
+    list(fnscale = -1, maxit = 100)),
+  keepBest = FALSE,
+  parallel = FALSE,
+  monitor = if (interactive()) {     if (shiny::is.RStudio())          gaMonitor    
+    else FALSE } else {     FALSE },
+  seed = NULL
+)
 }
 \arguments{
 \item{type}{the type of genetic algorithm to be run depending on the nature of decision

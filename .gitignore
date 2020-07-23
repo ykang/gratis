@@ -6,3 +6,4 @@ data/
 *.html
 *.Rproj
 *.rda
+inst/doc

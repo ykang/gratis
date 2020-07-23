@@ -4,8 +4,16 @@
 \alias{fitness_ts}
 \title{Fitness function for time series generation.}
 \usage{
-fitness_ts(pars, features, seasonal, n = 120, freq = 12, target, nComp,
-  selected.features)
+fitness_ts(
+  pars,
+  features,
+  seasonal,
+  n = 120,
+  freq = 12,
+  target,
+  nComp,
+  selected.features
+)
 }
 \arguments{
 \item{pars}{Parameters}

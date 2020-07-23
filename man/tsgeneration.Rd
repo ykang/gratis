@@ -3,7 +3,6 @@
 \docType{package}
 \name{tsgeneration}
 \alias{tsgeneration}
-\alias{tsgeneration-package}
 \title{Time Series Generation}
 \description{
 The tsgeneration package generates time series data based on MAR models.

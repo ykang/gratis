@@ -35,9 +35,11 @@ Imports:
   shiny,
   shinydashboard
 Suggests: 
-  fGarch
+    fGarch,
+    knitr,
+    rmarkdown
 NeedsCompilation: no
 License: GPL-3+ file LICENSE
 Encoding: UTF-8
-RoxygenNote: 6.1.0
-VignetteBuilder: utils
+RoxygenNote: 7.1.1
+VignetteBuilder: knitr
