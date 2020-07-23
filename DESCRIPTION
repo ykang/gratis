@@ -1,7 +1,7 @@
 Package: gratis
 Type: Package
 Title: GeneRAting TIme Series with diverse and controllable characteristics
-Version: 0.2
+Version: 0.2.0
 Date: 2018-08-02
 Authors@R: c(
     person("Yanfei", "Kang", role = c("aut", "cre"), email = "yanfeikang@buaa.edu.cn", comment = c(ORCID = "0000-0001-8769-6650")),
