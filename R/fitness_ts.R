@@ -11,6 +11,7 @@
 #'
 #' @return NA
 #' @export
+#' @importFrom forecast ndiffs
 #'
 #' @examples
 #' # Not Run
@@ -203,6 +204,27 @@ pars2list <- function(pars, seasonal, nComp) {
   return(parslist)
 }
 
+#  scalets(), scale time series function is adapted from tsfeatures packages 
+#  Rob Hyndman, Yanfei Kang, Pablo Montero-Manso, Thiyanga Talagala, Earo Wang,
+#  Yangzhuoran Yang and Mitchell O'Hara-Wild (2020). tsfeatures: Time Series Feature
+#  Extraction. R package version 1.0.2.
+#  https://CRAN.R-project.org/package=tsfeatures
+scalets <- function(x) {
+  n <- length(x)
+  if (forecast::is.constant(x)) {
+    return(x)
+  }
+  scaledx <- as.numeric(scale(x, center = TRUE, scale = TRUE))
+  if ("msts" %in% class(x)) {
+    msts <- attributes(x)$msts
+    y <- forecast::msts(scaledx, seasonal.periods = msts)
+  }
+  else {
+    y <- as.ts(scaledx)
+  }
+  tsp(y) <- tsp(x)
+  return(y)
+}
 
 fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp, h = 18) {
   pars <- pars2list(pars, seasonal, nComp)
@@ -210,7 +232,7 @@ fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp, h = 18) {
     x <- pars2x1(pars, seasonal, freq, nComp, n, x0)
     x1 <- x[1:(length(x) - h)]
     x2 <- x[(length(x) - h + 1):length(x)]
-    x <- tsfeatures:::scalets(x1)
+    x <- scalets(x1)
     xx <- (x2 - mean(x1))/sd(x1)
     if (max(abs(x)) > 1e5) {
       return(list(value = -100, x = c(x, xx)))
@@ -247,8 +269,8 @@ fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp, h = 18) {
     return(list(
       # value = -sqrt(sum((tsfeatures::tsfeatures(x, features = features) %>%
       #   select(selected.features) - target)^2)) / sqrt(sum(target^2)),
-      value = -sqrt(sum(( tsfeatures:::scalets(as.vector(x)) -
-                            tsfeatures:::scalets(as.vector(x0)))^2)),
+      value = -sqrt(sum(( scalets(as.vector(x)) -
+                            scalets(as.vector(x0)))^2)),
       x = x
     ))
   }

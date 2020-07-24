@@ -4,8 +4,16 @@
 \alias{pi_coefficients}
 \title{Compute pi coefficients of an AR process from SARIMA coefficients.}
 \usage{
-pi_coefficients(ar = 0, d = 0L, ma = 0, sar = 0, D = 0L,
-  sma = 0, m = 1L, tol = 1e-07)
+pi_coefficients(
+  ar = 0,
+  d = 0L,
+  ma = 0,
+  sar = 0,
+  D = 0L,
+  sma = 0,
+  m = 1L,
+  tol = 1e-07
+)
 }
 \arguments{
 \item{ar}{AR coefficients in the SARIMA model.}
