@@ -39,7 +39,7 @@ Suggests:
     knitr,
     rmarkdown
 NeedsCompilation: no
-License: GPL-3+ file LICENSE
+License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
