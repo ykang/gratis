@@ -1,6 +1,6 @@
 Package: gratis
 Type: Package
-Title: GeneRAting TIme Series with Diverse and Controllable Characteristics
+Title: Generating Time Series with Diverse and Controllable Characteristics
 Version: 0.2.0
 Date: 2020-7-24
 Authors@R: c(
