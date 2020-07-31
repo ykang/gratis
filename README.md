@@ -1,4 +1,4 @@
-`gratis` <a <img src='man/figures/logo.png' align="right" height="138.5"/></a>
+`gratis` <img src="man/figure/logo.png" align="right" height="138.5"/>
 ========
 
 <!-- badges: start -->
