@@ -15,7 +15,13 @@ opts_chunk$set(
   fig.width = 7, fig.height = 6, fig.align = 'centre',
   comment = "#>"
 )
+
+original <- options("tibble.print_min")
 options(tibble.print_min = 5)
+
+# <---- Do stuff with changed option, e.g. print some tibbles ----> 
+
+options(tibble.print_min = original)
 ```
 
 ```{r, message=FALSE, include = FALSE}
