@@ -10,7 +10,7 @@ Authors@R: c(
     person("Mitchell", "O'Hara-Wild", role = "ctb", email = "mail@mitchelloharawild.com", comment = c(ORCID = "0000-0001-6729-7695")),
     person("Bocong", "Zhao", role = "ctb", email = "bocongzhao@163.com")
     )
-Description: The gratis package generates time series based on mixture autoregressive models.
+Description: Generates time series based on mixture autoregressive models.
 LazyLoad: yes
 Repository: CRAN
 URL: https://github.com/ykang/gratis
