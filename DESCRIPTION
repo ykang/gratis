@@ -31,13 +31,13 @@ Imports:
   GA,
   foreach,
   methods,
-  rlang,
-  shiny,
-  shinydashboard
+  shiny
 Suggests: 
     fGarch,
     knitr,
-    rmarkdown
+    rmarkdown,
+    rlang,
+    shinydashboard
 NeedsCompilation: no
 License: GPL-3
 Encoding: UTF-8
