@@ -11,6 +11,14 @@ diverse and controllable characteristics.
 Installation
 ------------
 
+### [CRAN version](https://cran.r-project.org/web/packages/gratis/index.html)
+
+```r
+install.packages("gratis")
+```
+
+### Development version
+
 You can install the **development** version of `gratis` package from [GitHub
 Repository](https://github.com/ykang/gratis) with:
 
