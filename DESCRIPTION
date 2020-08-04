@@ -1,8 +1,8 @@
 Package: gratis
 Type: Package
-Title: GeneRAting TIme Series with diverse and controllable characteristics
+Title: Generating Time Series with Diverse and Controllable Characteristics
 Version: 0.2.0
-Date: 2018-08-02
+Date: 2020-07-24
 Authors@R: c(
     person("Yanfei", "Kang", role = c("aut", "cre"), email = "yanfeikang@buaa.edu.cn", comment = c(ORCID = "0000-0001-8769-6650")),
     person("Feng", "Li", role = "aut", email = "feng.li@cufe.edu.cn", comment = c(ORCID = "0000-0002-4248-9778")),
@@ -10,7 +10,7 @@ Authors@R: c(
     person("Mitchell", "O'Hara-Wild", role = "ctb", email = "mail@mitchelloharawild.com", comment = c(ORCID = "0000-0001-6729-7695")),
     person("Bocong", "Zhao", role = "ctb", email = "bocongzhao@163.com")
     )
-Description: The gratis package generates time series based on mixture autoregressive models.
+Description: Generates time series based on mixture autoregressive models. Kang,Y.,Hyndman,R.,Li,F.(2020)<doi:10.1002/sam.11461>.
 LazyLoad: yes
 Repository: CRAN
 URL: https://github.com/ykang/gratis
@@ -31,15 +31,15 @@ Imports:
   GA,
   foreach,
   methods,
-  rlang,
-  shiny,
-  shinydashboard
+  shiny
 Suggests: 
     fGarch,
     knitr,
-    rmarkdown
+    rmarkdown,
+    rlang,
+    shinydashboard
 NeedsCompilation: no
-License: GPL-3+ file LICENSE
+License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr

@@ -6,8 +6,10 @@
 #' @param mean "vector" the mean value of the log-normal distribution.
 #' @param sd "vector" the variance of the log-normal distribution.
 #' @return See the corresponding help for the usual log-normal functions.
-#' @references Li Villani Kohn 2010.
-#' @author Feng Li, Department of Statistics, Stockholm University, Sweden.
+#' @references Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
+#'     Conditional Distributions using Smooth Mixtures of Asymmetric Student T Densities,
+#'     Journal of Statistical Planning and Inference, 140(12), pp. 3638-3654
+#' @author Feng Li, Central University of Finance and Economics .
 #' @export
 
 rlnorm2 <- function(n, mean, sd) {

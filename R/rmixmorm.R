@@ -87,9 +87,11 @@ dmixnorm <- function(x, means, sigmas, weights, log = FALSE) {
 #' @param means.ar.par.list parameters in AR(p) within each mixing compoment.
 #' @param sigmas.list variance list.
 #' @param weights weight in each list.
-#' @param yinit  initial values.
-#' @return vector of n follows a mixture distribution.
-#' @references Li 2010 JSPI.
+#' @param yinit initial values.
+#' @return vector of length n follows a mixture distribution.
+#' @references Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
+#'     Conditional Distributions using Smooth Mixtures of Asymmetric Student T Densities,
+#'     Journal of Statistical Planning and Inference, 140(12), pp. 3638-3654.
 #' @author Feng Li, Central University of Finance and Economics.
 #' @examples
 #' n = 1000

@@ -1,11 +1,23 @@
-`gratis`
+`gratis` <img src="man/figures/logo.PNG" align="right" height="210"/>
 ========
+
+<!-- badges: start -->
+  [![R build status](https://github.com/ykang/gratis/workflows/R-CMD-check/badge.svg)](https://github.com/ykang/gratis/actions)
+  <!-- badges: end -->
 
 The R package `gratis` (previously known as `tsgeneration`) provides efficient algorithms for generating time series with
 diverse and controllable characteristics.
 
 Installation
 ------------
+
+### [CRAN version](https://cran.r-project.org/web/packages/gratis/index.html)
+
+```r
+install.packages("gratis")
+```
+
+### Development version
 
 You can install the **development** version of `gratis` package from [GitHub
 Repository](https://github.com/ykang/gratis) with:
