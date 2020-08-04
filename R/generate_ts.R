@@ -1,12 +1,13 @@
 #' Generate time series from random parameter spaces of the mixture autoregressive (MAR) models.
 #'
-#' Generate time series from random parameter spaces of the mixture autoregressive (MAR) models.
+#' Generate time series from random parameter spaces of the mixture autoregressive (MAR)
+#' models.
 #' @param n.ts number of time series to be generated.
 #' @param freq seasonal period of the time series to be generated.
 #' @param nComp number of mixing components when simulating time series using MAR models.
 #' @param n length of the generated time series.
 #' @return A list of time series together with the SARIMA coefficients used in each mixing
-#' component and the corresponding mixing weights.
+#'     component and the corresponding mixing weights.
 #' @author Yanfei Kang and Feng Li
 #' @examples
 #' x <- generate_ts(n.ts = 2, freq = 12, nComp = 2, n = 120)
@@ -146,4 +147,3 @@ msts_weights <- function(n.periods) {
   weights <- gamma / sum(gamma)
   return(weights)
 }
-
