@@ -3,6 +3,7 @@
 
 <!-- badges: start -->
   [![R build status](https://github.com/ykang/gratis/workflows/R-CMD-check/badge.svg)](https://github.com/ykang/gratis/actions)
+  [![](https://cranlogs.r-pkg.org/badges/gratis)](https://cran.rstudio.com/web/packages/gratis/index.html)
   <!-- badges: end -->
 
 The R package `gratis` (previously known as `tsgeneration`) provides efficient algorithms for generating time series with
