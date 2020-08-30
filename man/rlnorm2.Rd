@@ -23,8 +23,10 @@ Alternative parametrization of log normal distribution.
 See help("rlnorm") for the details for the log-normal distribution.
 }
 \references{
-Li Villani Kohn 2010.
+Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
+    Conditional Distributions using Smooth Mixtures of Asymmetric Student T Densities,
+    Journal of Statistical Planning and Inference, 140(12), pp. 3638-3654
 }
 \author{
-Feng Li, Department of Statistics, Stockholm University, Sweden.
+Feng Li, Central University of Finance and Economics .
 }

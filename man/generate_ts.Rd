@@ -17,10 +17,11 @@ generate_ts(n.ts = 1, freq = 1, nComp = NULL, n = 120)
 }
 \value{
 A list of time series together with the SARIMA coefficients used in each mixing
-component and the corresponding mixing weights.
+    component and the corresponding mixing weights.
 }
 \description{
-Generate time series from random parameter spaces of the mixture autoregressive (MAR) models.
+Generate time series from random parameter spaces of the mixture autoregressive (MAR)
+models.
 }
 \examples{
 x <- generate_ts(n.ts = 2, freq = 12, nComp = 2, n = 120)

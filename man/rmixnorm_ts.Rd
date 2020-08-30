@@ -18,7 +18,7 @@ rmixnorm_ts(n, means.ar.par.list, sigmas.list, weights, yinit = 0)
 \item{yinit}{initial values.}
 }
 \value{
-vector of n follows a mixture distribution.
+vector of length n follows a mixture distribution.
 }
 \description{
 This function simulates random samples from a finite mixture of Gaussian distribution
@@ -38,7 +38,9 @@ y = rmixnorm_ts(n = n, means.ar.par.list = means.ar.par.list, sigmas.list = sigm
 plot(y)
 }
 \references{
-Li 2010 JSPI.
+Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
+    Conditional Distributions using Smooth Mixtures of Asymmetric Student T Densities,
+    Journal of Statistical Planning and Inference, 140(12), pp. 3638-3654.
 }
 \author{
 Feng Li, Central University of Finance and Economics.
