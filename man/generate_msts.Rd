@@ -4,7 +4,12 @@
 \alias{generate_msts}
 \title{Generate mutiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.}
 \usage{
-generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = NULL)
+generate_msts(
+  seasonal.periods = c(7, 365),
+  n = 800,
+  nComp = NULL,
+  output_format = "list"
+)
 }
 \arguments{
 \item{seasonal.periods}{a vector of seasonal periods of the time series to be generated.}
@@ -12,6 +17,8 @@ generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = NULL)
 \item{n}{length of the generated time series.}
 
 \item{nComp}{number of mixing components when simulating time series using MAR models.}
+
+\item{output_format}{An optional argument which allows to choose output format between "list" and "tsibble"}
 }
 \value{
 a time series with multiple seasonal periods.
@@ -20,6 +27,6 @@ a time series with multiple seasonal periods.
 Generate mutiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
 }
 \examples{
-x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2)
+x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2, output_format= "list")
 forecast::autoplot(x)
 }
