@@ -112,7 +112,7 @@ Suppose we want to use MAR model to generate a time series with **2** mixing com
 
 ```{r fig.height = 6, fig.width = 7}
 # Generate mutiple seasonal time series
-x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2)
+x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2,output_format="tsibble")
 ```
 
 **Plot time series**

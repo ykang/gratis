@@ -121,7 +121,7 @@ generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120) {
 #' @examples
 #' x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2)
 #' forecast::autoplot(x)
-generate_msts <- function(seasonal.periods = c(7, 365), n = 800, nComp = NULL) {
+generate_msts <- function(seasonal.periods = c(7, 365), n = 800, nComp = NULL,output_format="list") {
   x.list <- map(seasonal.periods, function(p) {
     generate_ts(n.ts = 1, freq = p, n = n, nComp = nComp)$N1$x
   })
@@ -136,7 +136,13 @@ generate_msts <- function(seasonal.periods = c(7, 365), n = 800, nComp = NULL) {
     mutate(x = rowSums(.)) %>%
     select(x) %>%
     msts(seasonal.periods = seasonal.periods)
-  return(res)
+  # New content
+  output <- if (output_format == "list") {
+    res
+  } else if (output_format == "tsibble") {
+    as_tsibble(res)
+  }
+  return(output)
 }
 
 # ===========================================================================
