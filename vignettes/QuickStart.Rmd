@@ -26,6 +26,7 @@ options(tibble.print_min = original)
 
 ```{r, message=FALSE, include = FALSE}
 library(forecast)
+library(tsibble)
 ```
 
 ## About gratis
@@ -111,13 +112,18 @@ Here are the definitions of parameter settings in function generate_msts():
 Suppose we want to use MAR model to generate a time series with **2** mixing components and the length **800** from random parameter spaces. Particularly, this time series has two seasonal periods **7** and **365**.
 
 ```{r fig.height = 6, fig.width = 7}
-# Generate mutiple seasonal time series
+# Generate mutiple seasonal time series with 'tsibble' output format
 x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2,output_format="tsibble")
+
+head(x)
 ```
 
 **Plot time series**
 
 ```{r fig.height = 6, fig.width = 7}
+# Generate mutiple seasonal time series with 'list' output format
+x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2,output_format="list")
+
 autoplot(x)
 ```
 
