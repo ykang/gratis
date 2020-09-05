@@ -9,6 +9,7 @@
 #' @param target target feature values.
 #' @param parallel An optional argument which allows to specify if the Genetic Algorithm
 #'     should be run sequentially or in parallel.
+#' @param output_format An optional argument which allows to choose output format between 'list' and 'tsibble'
 #' @return A time-series object of class "ts" or "msts".
 #' @author Yanfei Kang
 #' @examples
@@ -18,7 +19,7 @@
 #'   target=c(0.6, 0.9),  parallel=FALSE)
 #' forecast::autoplot(x)
 #' @export
-generate_ts_with_target <- function(n, ts.length, freq, seasonal, features, selected.features, target, parallel=TRUE) {
+generate_ts_with_target <- function(n, ts.length, freq, seasonal, features, selected.features, target, parallel=TRUE, output_format= "list") {
   ga_min <-
     if (seasonal == 0) {
       c(rep(0, 10))
@@ -59,5 +60,11 @@ generate_ts_with_target <- function(n, ts.length, freq, seasonal, features, sele
   } else {
     evolved.ts <- msts(evolved.ts[, 1:n], seasonal.periods = freq)
   }
-  return(evolved.ts)
+  # New content 
+  output <- if (output_format == "list") {
+    evolved.ts
+  } else if (output_format == "tsibble") {
+    as_tsibble(evolved.ts)
+  }
+  return(output)
 }

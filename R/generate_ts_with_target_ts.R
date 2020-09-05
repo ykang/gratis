@@ -2,7 +2,7 @@
 #' @importFrom forecast BoxCox
 #' @importFrom forecast InvBoxCox
 
-generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x, max.fitness = -3, h = 8, preprocessing = 1, parallel=TRUE) {
+generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x, max.fitness = -3, h = 8, preprocessing = 1, parallel=TRUE, output_format="list") {
   ga_min <-
     if (seasonal == 0) {
       c(rep(-0.5, 6), rep(0, 4))
@@ -64,5 +64,12 @@ generate_ts_with_target_ts <- function(n, ts.length, freq, seasonal, x, max.fitn
                               frequency = freq, start = attributes(x)$tsp[1])
     }
   }
-  return(evolved.ts)
+  
+  # New content 
+  output <- if (output_format == "list") {
+    evolved.ts
+  } else if (output_format == "tsibble") {
+    as_tsibble(evolved.ts)
+  }
+  return(output)
 }
