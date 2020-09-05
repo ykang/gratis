@@ -31,7 +31,8 @@ Imports:
   GA,
   foreach,
   methods,
-  shiny
+  shiny,
+  tsibble
 Suggests: 
     fGarch,
     knitr,
