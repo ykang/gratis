@@ -12,7 +12,8 @@ generate_ts_with_target(
   features,
   selected.features,
   target,
-  parallel = TRUE
+  parallel = TRUE,
+  output_format = "list"
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ generate_ts_with_target(
 
 \item{parallel}{An optional argument which allows to specify if the Genetic Algorithm
 should be run sequentially or in parallel.}
+
+\item{output_format}{An optional argument which allows to choose output format between 'list' and 'tsibble'}
 }
 \value{
 A time-series object of class "ts" or "msts".

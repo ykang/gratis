@@ -155,17 +155,30 @@ Here are the definitions of parameter settings in function generate_ts_with_targ
 Suppose we want to use MAR model to generate **1 non-seasonal data** time series with frequency **1** and the length **60**. Particularly, this time series has two selected features, **entropy** and **trend** with target value between **0.6** to **0.9**
 
 ```{r fig.height = 6, fig.width = 7}
+# Generate mutiple seasonal time series with 'tsibble' output format
 x <- generate_ts_with_target(
   n = 1, ts.length = 60, freq = 1, seasonal = 0,
                         features = c('entropy', 'stl_features'),
                       selected.features = c('entropy', 'trend'),
                         target = c(0.6, 0.9),  
-                        parallel=FALSE
+                        parallel=FALSE,
+                        output_format = "tsibble"
                         )
+
+head(x)
 ```
 
 **Plot time series**
 
 ```{r fig.height = 6, fig.width = 7}
+# Generate mutiple seasonal time series with 'list' output format
+x <- generate_ts_with_target(
+  n = 1, ts.length = 60, freq = 1, seasonal = 0,
+                        features = c('entropy', 'stl_features'),
+                      selected.features = c('entropy', 'trend'),
+                        target = c(0.6, 0.9),  
+                        parallel=FALSE,
+                        output_format = "list"
+                        )
 autoplot(x)
 ```
