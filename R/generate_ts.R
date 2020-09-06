@@ -108,8 +108,9 @@ generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120, output_format
   # New content
   output <- if (output_format == "list") {
     generated.mixture.data
-  } else if (output_format == "tibble") {
-    as_tibble(generated.mixture.data)
+  } else if (output_format == "tsibble") {
+    x <-  generated.mixture.data
+    map(x,  ~ as_tsibble(.x$x))
   }
   return(output)
 }

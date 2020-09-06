@@ -69,7 +69,7 @@ Suppose we want to use MAR model to generate **3** time series from random param
 
 ```{r fig.height = 6, fig.width = 7}
 # Generate diverse time series
-x <- generate_ts(n.ts = 3, freq = 12, nComp = 2, n = 120,output_format = "tibble")
+x <- generate_ts(n.ts = 3, freq = 12, nComp = 2, n = 120, output_format = "tsibble")
 ```
 
 **Output**
