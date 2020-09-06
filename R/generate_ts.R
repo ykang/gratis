@@ -15,7 +15,7 @@
 #' forecast::autoplot(x$N1$x)
 #' @references Wong, CS & WK Li (2000).
 #' @export
-generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120) {
+generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120, output_format="list") {
   count <- 1
   generated.mixture.data <- list()
   sigmas <- sample(c(1:5), 5, replace = TRUE)
@@ -105,7 +105,13 @@ generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120) {
       }
     }
   }
-  return(generated.mixture.data)
+  # New content
+  output <- if (output_format == "list") {
+    generated.mixture.data
+  } else if (output_format == "tibble") {
+    as_tibble(generated.mixture.data)
+  }
+  return(output)
 }
 
 

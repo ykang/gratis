@@ -4,7 +4,7 @@
 \alias{generate_ts}
 \title{Generate time series from random parameter spaces of the mixture autoregressive (MAR) models.}
 \usage{
-generate_ts(n.ts = 1, freq = 1, nComp = NULL, n = 120)
+generate_ts(n.ts = 1, freq = 1, nComp = NULL, n = 120, output_format = "list")
 }
 \arguments{
 \item{n.ts}{number of time series to be generated.}
