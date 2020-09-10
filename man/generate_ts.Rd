@@ -14,6 +14,8 @@ generate_ts(n.ts = 1, freq = 1, nComp = NULL, n = 120, output_format = "list")
 \item{nComp}{number of mixing components when simulating time series using MAR models.}
 
 \item{n}{length of the generated time series.}
+
+\item{output_format}{An optional argument which allows to choose output format between "list" and "tsibble"}
 }
 \value{
 A list of time series together with the SARIMA coefficients used in each mixing

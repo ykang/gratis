@@ -6,6 +6,7 @@
 #' @param freq seasonal period of the time series to be generated.
 #' @param nComp number of mixing components when simulating time series using MAR models.
 #' @param n length of the generated time series.
+#' @param output_format An optional argument which allows to choose output format between "list" and "tsibble"
 #' @return A list of time series together with the SARIMA coefficients used in each mixing
 #'     component and the corresponding mixing weights.
 #' @author Yanfei Kang and Feng Li
