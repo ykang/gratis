@@ -15,13 +15,13 @@ opts_chunk$set(
   fig.width = 7, fig.height = 6, fig.align = 'centre',
   comment = "#>"
 )
-
-original <- options("tibble.print_min")
-options(tibble.print_min = 5)
+# To avoid knit problem, change initial knitr option settings.
+#original <- options("tibble.print_min")
+#options(tibble.print_min = 5)
 
 # <---- Do stuff with changed option, e.g. print some tibbles ----> 
 
-options(tibble.print_min = original)
+#options(tibble.print_min = original)
 ```
 
 ```{r, message=FALSE, include = FALSE}
@@ -67,12 +67,14 @@ Here are the definitions of parameter settings in function generate_ts():
 
 Suppose we want to use MAR model to generate **3** time series from random parameter spaces. Each time series has **12** seasonal periods, **2** mixing components and the length **120**.
 
+By setting the parameter **output_format**, **generate_ts** now has an option to transform their time series output into a tsibble format. Without setting the parameter, it would keep output as default setting, list format.
+
+**1.Generate diverse time series with 'tsibble' output format**
 ```{r fig.height = 6, fig.width = 7}
-# Generate diverse time series
-x <- generate_ts(n.ts = 3, freq = 12, nComp = 2, n = 120, output_format = "tsibble")
+generate_ts(n.ts = 3, freq = 12, nComp = 2, n = 120, output_format = "tsibble")
 ```
 
-**Output**
+*Output*
 
 We can see **3** different time series be simulated, which are **N1**, **N2** and **N3**. In this example we use time series **N1** for further analysis.
 
@@ -80,13 +82,14 @@ As required, there are **2** mixing components when simulating time series using
 
 Each component stands for different weight.
 
+**2. Generate diverse time series with 'list' output format**
 ```{r fig.height = 6, fig.width = 7}
-# N1 time series
 x <- generate_ts(n.ts = 3, freq = 12, nComp = 2, n = 120,output_format = "list")
+# N1 time series
 x$N1$pars
 ```
 
-**Plot time series**
+*Plot time series*
 ```{r fig.height = 6, fig.width = 7}
 # plot N1 time series
 autoplot(x$N1$x)
@@ -112,19 +115,20 @@ Here are the definitions of parameter settings in function generate_msts():
 
 Suppose we want to use MAR model to generate a time series with **2** mixing components and the length **800** from random parameter spaces. Particularly, this time series has two seasonal periods **7** and **365**.
 
-```{r fig.height = 6, fig.width = 7}
-# Generate mutiple seasonal time series with 'tsibble' output format
-x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2,output_format="tsibble")
+By setting the parameter **output_format**, **generate_msts** now has an option to transform their time series output into a tsibble format.  Without setting the parameter, it would keep output as default setting, list format.
 
-head(x)
+**1. Generate mutiple seasonal time series with 'tsibble' output format**
+```{r fig.height = 6, fig.width = 7}
+generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2,output_format="tsibble")
 ```
 
-**Plot time series**
-
+**2. Generate mutiple seasonal time series with 'list' output format**
 ```{r fig.height = 6, fig.width = 7}
-# Generate mutiple seasonal time series with 'list' output format
 x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2,output_format="list")
+```
 
+*Plot time series*
+```{r}
 autoplot(x)
 ```
 
@@ -155,9 +159,11 @@ Here are the definitions of parameter settings in function generate_ts_with_targ
 
 Suppose we want to use MAR model to generate **1 non-seasonal data** time series with frequency **1** and the length **60**. Particularly, this time series has two selected features, **entropy** and **trend** with target value between **0.6** to **0.9**
 
+By setting the parameter **output_format**, **generate_ts_with_target** now has an option to transform their time series output into a tsibble format.  Without setting the parameter, it would keep output as default setting, list format.
+
+**1. Generate mutiple seasonal time series with 'tsibble' output format**
 ```{r fig.height = 6, fig.width = 7}
-# Generate mutiple seasonal time series with 'tsibble' output format
-x <- generate_ts_with_target(
+generate_ts_with_target(
   n = 1, ts.length = 60, freq = 1, seasonal = 0,
                         features = c('entropy', 'stl_features'),
                       selected.features = c('entropy', 'trend'),
@@ -165,14 +171,10 @@ x <- generate_ts_with_target(
                         parallel=FALSE,
                         output_format = "tsibble"
                         )
-
-head(x)
 ```
 
-**Plot time series**
-
+**2. Generate mutiple seasonal time series with 'list' output format**
 ```{r fig.height = 6, fig.width = 7}
-# Generate mutiple seasonal time series with 'list' output format
 x <- generate_ts_with_target(
   n = 1, ts.length = 60, freq = 1, seasonal = 0,
                         features = c('entropy', 'stl_features'),
@@ -181,5 +183,9 @@ x <- generate_ts_with_target(
                         parallel=FALSE,
                         output_format = "list"
                         )
+```
+
+*Plot time series*
+```{r}
 autoplot(x)
 ```
