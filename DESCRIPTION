@@ -8,7 +8,7 @@ Authors@R: c(
     person("Feng", "Li", role = "aut", email = "feng.li@cufe.edu.cn", comment = c(ORCID = "0000-0002-4248-9778")),
     person("Rob", "Hyndman", role = "ctb", email = "rob.hyndman@monash.edu", comment = c(ORCID = "0000-0002-2140-5352")),
     person("Mitchell", "O'Hara-Wild", role = "ctb", email = "mail@mitchelloharawild.com", comment = c(ORCID = "0000-0001-6729-7695")),
-    person("Bocong", "Zhao", role = "ctb", email = "bocongzhao@163.com")
+    person("Bocong", "Zhao", role = "ctb", email = "bocongzhao@163.com", comment = c(ORCID = "0000-0001-8434-9047"))
     )
 Description: Generates time series based on mixture autoregressive models. Kang,Y.,Hyndman,R.,Li,F.(2020)<doi:10.1002/sam.11461>.
 LazyLoad: yes
