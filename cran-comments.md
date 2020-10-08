@@ -2,7 +2,7 @@
 
 This is a resubmission. In this version I have:
 
-* Use canonical URL of the CRAN page in README.md for gratis package, which is https://CRAN.R-project.org/package=pkgname
+* Use canonical URL of the CRAN page in README.md for gratis package, which is https://CRAN.R-project.org/package=gratis
 
 ## Test environments
 
