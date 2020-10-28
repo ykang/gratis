@@ -4,6 +4,15 @@ This is a resubmission. In this version I have:
 
 * Use canonical URL of the CRAN page in README.md for gratis package, which is https://CRAN.R-project.org/package=gratis
 
+* Start the description with "Generates ..." instead of package name.
+
+* Add references in the description field of DESCRIPTION file.
+
+* Replace print()/cat() by message().
+
+* Reset to user's options()after I changed it in vignettes.
+
+
 ## Test environments
 
 * local windows install, R 4.1.0

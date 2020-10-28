@@ -1,4 +1,3 @@
-
 # gratis 0.2.1
 
 ## Improvements
@@ -9,7 +8,7 @@
 ## Bug fixes
 
 * Corrected dependencies in R code, which is namespaces in Imports field not imported from: 'rlang' 'shinydashboard'
-  
+
 # gratis 0.2.0
 
 * First release.
