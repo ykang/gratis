@@ -17,12 +17,12 @@ opts_chunk$set(
 )
 
 
-original <- options("tibble.print_min")
-options(tibble.print_min = 5)
+#original <- options("tibble.print_min")
+#options(tibble.print_min = 5)
 
 # <---- Do stuff with changed option, e.g. print some tibbles ----> 
 
-options(tibble.print_min = original)
+#options(tibble.print_min = original)
 
 ```
 
