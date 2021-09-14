@@ -8,10 +8,10 @@ citEntry(
                         as.person("Rob J Hyndman"),
                         as.person("Mitchell O'Hara-Wild"),
                         as.person("Bocong Zhao")),
-  year     = "2020",
-  note = "R package version 0.2-1",
+  year     = "2021",
+  note = "R package version 0.3.0",
   url      = "https://CRAN.R-project.org/package=gratis",
-  textVersion = paste("Kang, Y., Hyndman, R., Li, F., O'Hara-Wild, M., Zhao, B. (2020).",
+  textVersion = paste("Kang, Y., Hyndman, R.J., Li, F., O'Hara-Wild, M., Zhao, B. (2020).",
                       "gratis: GeneRAting TIme Series with diverse and controllable characteristics.",
                       "URL https://CRAN.R-project.org/package=gratis")
 )
