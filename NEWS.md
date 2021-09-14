@@ -1,3 +1,9 @@
+# gratis 0.3.0
+
+* Improved documentation
+
+
+
 # gratis 0.2.1
 
 ## Improvements
