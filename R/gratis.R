@@ -1,9 +1,9 @@
-#' Time Series Generation
+#' gratis: Generating Time Series with Diverse and Controllable Characteristics
 #'
-#' The tsgeneration package generates time series data based on MAR models.
+#' The gratis package generates synthetic time series data based on MAR models.
 #'
 #' @docType package
-#' @name tsgeneration
+#' @name gratis
 #' @importFrom stats as.ts coef dlnorm plnorm qlnorm rlnorm rmultinom rnorm runif stl ts
 #' @importFrom stats diffinv fivenum frequency na.exclude na.omit sd window
 #' @importFrom utils head write.csv str flush.console globalVariables
