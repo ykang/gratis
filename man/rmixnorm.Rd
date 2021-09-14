@@ -2,31 +2,28 @@
 % Please edit documentation in R/rmixmorm.R
 \name{rmixnorm}
 \alias{rmixnorm}
-\title{Generate random variables from mixture normal distribution.}
+\title{Generate random variables from a mixture of multivariate normal distributions}
 \usage{
 rmixnorm(n, means, sigmas, weights)
 }
 \arguments{
-\item{n}{"integer", numbers of samples to be generated.}
+\item{n}{an integer for the number of samples to be generated.}
 
-\item{means}{"q-by-k matrix" mean value within each component, total k components.}
+\item{means}{a q x k matrix (or a vector of length k if q=1) containing the means for each component.}
 
-\item{sigmas}{"q-by-q-by-k" variance covariance matrix with in each component.}
+\item{sigmas}{a q x q x k covariance array (or a vector of length k if q=1) for each component.}
 
-\item{weights}{"k-length vector" weights in each component.}
+\item{weights}{a vector of length k containing the weights for each component.}
 }
 \value{
-"matrix".
+An n x q matrix (or a vector if q=1) containing the generated data.
 }
 \description{
-Random variables from mixture of normals.
+Random variables from a mixture of k multivariate normal distributions, each of dimension q.
 }
 \examples{
-n <- 1000
-means <- matrix(c(-5, 0, 5), 1)
-sigmas <- array(c(1, 1, 1), c(1, 1, 3))
-weights <- c(0.3, 0.4, 0.3)
-out <- rmixnorm(n, means, sigmas, weights)
+out <- rmixnorm(n = 1000, means = c(-5,0,5), sigmas = c(1,1,3), 
+  weights=c(0.3,0.4,0.3))
 hist(out, breaks = 100, freq = FALSE)
 }
 \references{

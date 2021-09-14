@@ -2,7 +2,7 @@
 % Please edit documentation in R/rmixmorm.R
 \name{rmixnorm_ts}
 \alias{rmixnorm_ts}
-\title{Simulate AR type random variables from mixture of normal}
+\title{Simulate autoregressive random variables from mixture of normal}
 \usage{
 rmixnorm_ts(n, means.ar.par.list, sigmas.list, weights, yinit = 0)
 }

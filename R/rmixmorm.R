@@ -1,85 +1,94 @@
-#' Generate random variables from mixture normal distribution.
+#' Generate random variables from a mixture of multivariate normal distributions
 #'
-#' Random variables from mixture of normals.
-#' @param n "integer", numbers of samples to be generated.
-#' @param means "q-by-k matrix" mean value within each component, total k components.
-#' @param sigmas "q-by-q-by-k" variance covariance matrix with in each component.
-#' @param weights "k-length vector" weights in each component.
-#' @return "matrix".
+#' Random variables from a mixture of k multivariate normal distributions, each of dimension q.
+#' @param n an integer for the number of samples to be generated.
+#' @param means a q x k matrix (or a vector of length k if q=1) containing the means for each component.
+#' @param sigmas a q x q x k covariance array (or a vector of length k if q=1) for each component.
+#' @param weights a vector of length k containing the weights for each component.
+#' @return An n x q matrix (or a vector if q=1) containing the generated data.
 #' @references Villani et al 2009.
 #' @author Feng Li, Central University of Finance and Economics.
 #' @examples
-#' n <- 1000
-#' means <- matrix(c(-5, 0, 5), 1)
-#' sigmas <- array(c(1, 1, 1), c(1, 1, 3))
-#' weights <- c(0.3, 0.4, 0.3)
-#' out <- rmixnorm(n, means, sigmas, weights)
+#' out <- rmixnorm(n = 1000, means = c(-5,0,5), sigmas = c(1,1,3), 
+#'   weights=c(0.3,0.4,0.3))
 #' hist(out, breaks = 100, freq = FALSE)
 #' @export
 rmixnorm <- function(n, means, sigmas, weights) {
-  if (!is.matrix(means) | length(dim(sigmas)) != 3) {
-    stop("means must be a q-by-k matrix and sigmas must be a q-by-q-by-k array.")
+  # Convert vector inputs to matrix or array
+  if(is.null(dim(means))) {
+    means <- t(means)
+    sigmas <- array(sigmas, dim=c(1,1,length(sigmas)))
   }
+  k <- length(weights) # k-components
+  q <- NROW(means) # q-dimensional
+  if(!identical(dim(means), c(q,k)))
+    stop("means must be a q x k matrix")
+  if(!identical(dim(sigmas), c(q,q,k)))
+    stop("sigmas must be a q x q x k array.")
 
-  k <- length(weights) # K-components
-  q <- dim(means)[1] # q-dimensional
-
-  idx <- rmultinom(n = n, 1, prob = weights) # k-by-n matrix
-
-  out <- apply(idx, 2, function(x, means, sigmas, q) {
-    which.comp <- which(x == 1)
-    rmvnorm(
-      n = 1, mean = means[, which.comp],
-      sigma = matrix(sigmas[, , which.comp], q, q)
-    )
-  }, means = means, sigmas = sigmas, q = q)
-
-  return(out)
+  # Random draws for which component to use for each observation
+  idx <- sample(seq(k), size=n, prob=weights, replace=TRUE)
+  idx <- factor(idx, levels=seq(5))
+  nsamp <- table(idx)
+  data <- matrix(NA_real_, nrow=n, ncol=q)
+  # Generate draws from each component
+  for(i in seq(k)) {
+    if(nsamp[i] > 0) {
+        data[idx==i,] <- mvtnorm::rmvnorm(
+          n = nsamp[i], mean = means[, i], sigma = as.matrix(sigmas[, , i])
+      )
+    }
+  }
+  # Return a vector if q=1, or a matrix otherwise
+  if(q == 1)
+    data <- c(data)
+  data
 }
 
-
+# Density of mixture of multivariate normals
 dmixnorm <- function(x, means, sigmas, weights, log = FALSE) {
-  if (!is.matrix(means) | length(dim(sigmas)) != 3) {
-    stop("means must be a q-by-k matrix and sigmas must be a q-by-q-by-k array.")
+  # Convert vector inputs to matrix or array
+  if(is.null(dim(means))) {
+    means <- t(means)
+    sigmas <- array(sigmas, dim=c(1,1,length(sigmas)))
+    x <- as.matrix(x, ncol=NROW(means))
   }
-
-  k <- length(weights) # K-components
-  q <- dim(means)[1] # q-dimensional
-
-  out.comp.log <- apply(matrix(1:k), 1, function(comp.i, x, means, sigmas, q) {
-    dmvnorm(
-      x = matrix(x, 1, q), mean = matrix(means[, comp.i], 1, q),
-      sigma = matrix(sigmas[, , comp.i], q, q),
-      log = TRUE
-    )
-  }, x = x, means = means, sigmas = sigmas, q = q)
-
-
-  out.sum <- sum(exp(out.comp.log) * weights)
-
+  k <- length(weights) # k-components
+  q <- NROW(means) # q-dimensional
+  if(!identical(dim(means), c(q,k)))
+    stop("means must be a q x k matrix")
+  if(!identical(dim(sigmas), c(q,q,k)))
+    stop("sigmas must be a q x q x k array.")
+  
+  # Compute density of each component
+  component_density <- apply(
+    matrix(1:k), 1, 
+    function(comp.i, x, means, sigmas, q) {
+      mvtnorm::dmvnorm(x = x, mean = means[, comp.i], 
+                       sigma = as.matrix(sigmas[, , comp.i]))
+    }, 
+    x = x, means = means, sigmas = sigmas, q = q
+  )
+  density <- component_density %*% matrix(weights)
   if (log == TRUE) {
-    out <- log(out.sum)
+    return(log(density))
   }
   else {
-    out <- out.sum
+    return(density)
   }
-
-  return(out)
 }
 
-
 ## Tests
-## n <- 1
-## means <- matrix(c(-5, 0, 5), 1)
-## sigmas <- array(c(1, 1, 1), c(1, 1, 3))
-## weights <- c(0.3, 0.4, 0.3)
+## n <- 1000
+## means = c(-5,0,5)
+## sigmas = c(1,1,3)
+## weights=c(0.3,0.4,0.3)
 ## out <- rmixnorm(n, means, sigmas, weights)
 ## out.density <- dmixnorm(out, means, sigmas, weights)
+## hist(out, breaks = 100, freq = FALSE)
+## points(out, out.density)
 
-
-
-
-#' Simulate AR type random variables from mixture of normal
+#' Simulate autoregressive random variables from mixture of normal
 #'
 #' This function simulates random samples from a finite mixture of Gaussian distribution
 #'     where the mean from each components are AR(p) process.
@@ -107,7 +116,7 @@ dmixnorm <- function(x, means, sigmas, weights, log = FALSE) {
 #' plot(y)
 #' @export
 rmixnorm_ts <- function(n, means.ar.par.list, sigmas.list, weights, yinit = 0) {
-  y <- rep(NA, n)
+  y <- rep(yinit, n)
   nComp <- length(means.ar.par.list)
   nLags <- lapply(means.ar.par.list, function(x) length(x) - 1)
   maxLag <- max(unlist(nLags))
@@ -115,8 +124,6 @@ rmixnorm_ts <- function(n, means.ar.par.list, sigmas.list, weights, yinit = 0) {
   if (any(unlist(nLags) < 1)) {
     stop("Drift is always included. Set the first elements in ar.par.list be zero to remove the drift effect.")
   }
-
-  y[1:maxLag] <- yinit
 
   sigmas.ary <- do.call(cbind, sigmas.list)
 
