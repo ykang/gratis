@@ -5,5 +5,6 @@
 \alias{gratis}
 \title{gratis: Generating Time Series with Diverse and Controllable Characteristics}
 \description{
-The gratis package generates synthetic time series data based on MAR models.
+The gratis package generates synthetic time series data based on various
+univariate time series models including MAR and ARIMA processes.
 }

@@ -1,9 +1,9 @@
 # gratis 0.3.0
 
 * Improved documentation
-* Added new functions: mar_model(), simulate.mar()
-
-
+* Added new functions for MAR simulation: mar_model(), simulate.mar()
+* Added arima_model() to randomly specify an ARIMA model
+* Removed some redundant functions
 
 # gratis 0.2.1
 

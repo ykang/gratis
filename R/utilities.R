@@ -69,41 +69,29 @@ pi_coefficients <- function(ar = 0, d = 0L, ma = 0, sar = 0, D = 0L, sma = 0, m 
   return(-pie[-1])
 }
 
-#' Compute pi coefficients from ARIMA model
-#'
-#' Compute pi coefficients from ARIMA model
-#' @param object An object of class "Arima"
-#'
-#' @return A vector of AR coefficients
-#' @author Rob J Hyndman
-#' @export
-#'
-#' @examples
-#' # Not Run
-arinf <- function(object) {
-  if (!("Arima" %in% class(object))) {
-    stop("Argument should be an ARIMA object")
-  }
-  pi_coefficients(
-    ar = object$model$phi, ma = object$model$theta,
-    d = object$arma[6], D = object$arma[7], m = object$arma[5]
-  )
-}
+# Compute pi coefficients from ARIMA model
+#  @param object An object of class "Arima"
+#
+# @return A vector of AR coefficients
+# @author Rob J Hyndman
+#
+# arinf <- function(object) {
+#   if (!("Arima" %in% class(object))) {
+#     stop("Argument should be an ARIMA object")
+#   }
+#   pi_coefficients(
+#     ar = object$model$phi, ma = object$model$theta,
+#     d = object$arma[6], D = object$arma[7], m = object$arma[5]
+#   )
+# }
+# 
+# # library(forecast)
+# # USAccDeaths %>% auto.arima %>% arinf %>% plot
+# # lynx %>% auto.arima %>% arinf %>% plot
 
-# library(forecast)
-# USAccDeaths %>% auto.arima %>% arinf %>% plot
-# lynx %>% auto.arima %>% arinf %>% plot
-
-#' Set the number of seasonal differences for yearly data to be -1.
-#'
-#' @param x Univariate time series or numerical vector
-#'
-#' @return A numerical scalar value
-#'
-#' @export
-#'
-#' @examples
-#' # Not Run
+# Set the number of seasonal differences for yearly data to be -1.
+#
+# @param x Univariate time series or numerical vector
 nsdiffs1 <- function(x) {
   c(nsdiffs = ifelse(frequency(x) == 1L, -1, forecast::nsdiffs(x)))
 }

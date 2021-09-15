@@ -10,7 +10,9 @@ Authors@R: c(
     person("Mitchell", "O'Hara-Wild", role = "ctb", email = "mail@mitchelloharawild.com", comment = c(ORCID = "0000-0001-6729-7695")),
     person("Bocong", "Zhao", role = "ctb", email = "bocongzhao@163.com", comment = c(ORCID = "0000-0001-8434-9047"))
     )
-Description: Generates time series based on mixture autoregressive models. Kang,Y., Hyndman,R.J., Li,F.(2020) <doi:10.1002/sam.11461>.
+Description: 
+  Generates synthetic time series based on various univariate time series models 
+  including MAR and ARIMA processes. Kang,Y., Hyndman,R.J., Li,F.(2020) <doi:10.1002/sam.11461>.
 LazyLoad: yes
 Repository: CRAN
 URL: https://github.com/ykang/gratis

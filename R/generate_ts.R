@@ -17,6 +17,7 @@
 #' @references Wong, CS & WK Li (2000).
 #' @export
 generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120, output_format="list") {
+  warning("This function is deprecated. It is recommended you use model_mar() and simulate.mar() instead.")
   count <- 1
   generated.mixture.data <- list()
   sigmas <- sample(c(1:5), 5, replace = TRUE)
