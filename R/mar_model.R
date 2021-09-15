@@ -24,7 +24,7 @@
 #' @return A `mar` object containing a list of \code{k}, \code{p}, \code{ar},
 #' \code{sigmas} and \code{weights}.
 #' @author Rob J Hyndman
-#' @seealso \code{\link{generate_mar}}
+#' @seealso \code{\link{simulate.mar}}
 #' @examples
 #' n <- 100
 #' # Seasonal MAR model with randomly selected parameters

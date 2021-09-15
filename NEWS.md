@@ -1,6 +1,7 @@
 # gratis 0.3.0
 
 * Improved documentation
+* Added new functions: mar_model(), simulate.mar()
 
 
 

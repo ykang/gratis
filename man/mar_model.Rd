@@ -56,7 +56,7 @@ sigmas.spec <- list(
 model2 <- mar_model(ar = ar, sigmas = sigmas.spec, weights = weights)
 }
 \seealso{
-\code{\link{generate_mar}}
+\code{\link{simulate.mar}}
 }
 \author{
 Rob J Hyndman

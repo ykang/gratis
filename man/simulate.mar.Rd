@@ -16,6 +16,8 @@
 \code{NULL}, will not change the random generator state.}
 
 \item{n.start}{Length of 'burn-in' period.}
+
+\item{...}{Other arguments, not currently used.}
 }
 \value{
 `ts` object of length n.

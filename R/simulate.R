@@ -10,6 +10,7 @@
 #' \code{\link[base]{set.seed}} before simulating the time series. The default, 
 #' \code{NULL}, will not change the random generator state.
 #' @param n.start Length of 'burn-in' period. 
+#' @param ... Other arguments, not currently used.
 #' @return `ts` object of length n.
 #' @references Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
 #'     Conditional Distributions using Smooth Mixtures of Asymmetric Student T Densities,
