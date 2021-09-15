@@ -23,7 +23,7 @@ Imports:
   doRNG,
   polynom,
   mvtnorm,
-  forecast (>= 8.15.0.9000)
+  forecast (>= 8.15.0.9000),
   dplyr,
   stats,
   tibble,
