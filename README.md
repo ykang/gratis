@@ -34,6 +34,10 @@ devtools::install_github("ykang/gratis")
 Usage
 -----
 
+### Tutorial video
+
+Watch [this Youtube video](https://www.youtube.com/watch?v=F3lWECtFa44) provided by [Prof. Rob Hyndman](https://robjhyndman.com/).
+
 ### Load the package
 
 ``` r
