@@ -3,6 +3,7 @@
 S3method(simulate,mar)
 export(app_gratis)
 export(arima_model)
+export(ets_model)
 export(fitness_ts)
 export(ga_ts)
 export(generate_msts)
