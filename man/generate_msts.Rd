@@ -2,7 +2,7 @@
 % Please edit documentation in R/generate_ts.R
 \name{generate_msts}
 \alias{generate_msts}
-\title{Generate mutiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.}
+\title{Generate multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.}
 \usage{
 generate_msts(
   seasonal.periods = c(7, 365),
@@ -24,7 +24,7 @@ generate_msts(
 a time series with multiple seasonal periods.
 }
 \description{
-Generate mutiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
+Generate multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
 }
 \examples{
 x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2, output_format= "list")

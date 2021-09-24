@@ -7,6 +7,7 @@
 #' @name gratis
 #' @importFrom stats as.ts coef dlnorm plnorm qlnorm rlnorm rmultinom rnorm runif stl ts
 #' @importFrom stats diffinv fivenum frequency na.exclude na.omit sd window simulate
+#' @importFrom generics generate
 #' @importFrom utils head write.csv str flush.console globalVariables
 #' @importFrom graphics points polygon title
 #' @importFrom grDevices adjustcolor

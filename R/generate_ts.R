@@ -119,9 +119,9 @@ generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120, output_format
 
 
 
-#' Generate mutiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
+#' Generate multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
 #'
-#' Generate mutiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
+#' Generate multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
 #' @param seasonal.periods a vector of seasonal periods of the time series to be generated.
 #' @param n length of the generated time series.
 #' @param nComp number of mixing components when simulating time series using MAR models.

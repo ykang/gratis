@@ -23,7 +23,7 @@
 `ts` object of length n.
 }
 \description{
-This function simulates random sample paths from a mixture of k Gaussian AR(p) processes.
+This function simulates one random sample path from a mixture of k Gaussian AR(p) processes.
 The model is of the form
 \deqn{y_t = \phi_{0,i} + \phi_{1,i}y_{t-1} + \cdots + \phi_{p,i}y_{t-p} + \sigma_{i,t}\epsilon_t}
 with probability \eqn{\alpha_i}, where \eqn{\epsilon_t} is a N(0,1) variate.
