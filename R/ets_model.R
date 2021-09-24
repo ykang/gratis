@@ -141,7 +141,7 @@ ets_model <- function(frequency = 1, error = NULL, trend = NULL, seasonal = NULL
   # Return
   structure(list(
     method = method,
-    states = states, initstate = states, components = components, m = m,
+    states = states, initstate = states, components = components, m = frequency,
     par = c(alpha = alpha, beta = beta, gamma = gamma, phi = phi), sigma2 = sigma2
   ), class = "ets")
 }

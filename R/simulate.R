@@ -78,5 +78,5 @@ simulate.mar <- function(object, nsim=100, seed = NULL, n.start = 100, ...) {
   for (i in (p + 1L):n) {
     y[i] <- sum(object$ar[,components[i]] * c(1, y[i - seq(p)])) + epsilon[i]
   }
-  return(ts(y[-seq(n.start)]))
+  return(ts(y[-seq(n.start)], frequency=object$m))
 }

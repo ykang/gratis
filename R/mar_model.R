@@ -111,7 +111,7 @@ mar_model <- function(ar = NULL, sigmas = NULL, weights = NULL, frequency = 1) {
   ar <- ar[seq(max(nonzero)),,drop=FALSE]
   
   # Return mar object
-  structure(list(ar = ar, sigmas = sigmas, weights = weights),
+  structure(list(ar = ar, sigmas = sigmas, weights = weights, m=frequency),
     class = "mar"
   )
 }
