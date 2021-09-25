@@ -6,11 +6,11 @@
 \alias{generate.Arima}
 \title{Generate a tsibble of synthetic data from a Mixture Autoregressive model}
 \usage{
-\method{generate}{mar}(x, length = 100, nseries = 10, frequency = 1, ...)
+\method{generate}{mar}(x, length = 100, nseries = 10, ...)
 
-\method{generate}{ets}(x, length = 100, nseries = 10, frequency = 1, ...)
+\method{generate}{ets}(x, length = 100, nseries = 10, ...)
 
-\method{generate}{Arima}(x, length = 100, nseries = 10, frequency = 1, ...)
+\method{generate}{Arima}(x, length = 100, nseries = 10, ...)
 }
 \arguments{
 \item{x}{A `mar` object, usually the output of \code{\link{mar_model}()}.}
@@ -27,7 +27,7 @@
 \description{
 This function simulates multiple random sample paths from a mixture of k Gaussian AR(p) processes.
 The model is of the form
-\deqn{y_t = \phi_{0,i} + \phi_{1,i}y_{t-1} + \cdots + \phi_{p,i}y_{t-p} + \sigma_{i,t}\epsilon_t}
+\deqn{y_t = \phi_{0,i} + \phi_{1,i}y_{t-1} + \dots + \phi_{p,i}y_{t-p} + \sigma_{i,t}\epsilon_t}
 with probability \eqn{\alpha_i}, where \eqn{\epsilon_t} is a N(0,1) variate.
 }
 \examples{
@@ -35,9 +35,7 @@ with probability \eqn{\alpha_i}, where \eqn{\epsilon_t} is a N(0,1) variate.
 ar <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
 weights <- c(0.8, 0.2)
 model1 <- mar_model(ar = ar, sigmas = c(1, 2), weights = weights)
-df <- generate(model1, nseries=5)
-feasts::autoplot(df, value)
-
+df <- generate(model1, nseries = 5)
 }
 \references{
 Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of

@@ -11,8 +11,8 @@
 
 \item{nsim}{length of series to generate}
 
-\item{seed}{Either \code{NULL} or an integer that will be used in a call to 
-\code{\link[base]{set.seed}} before simulating the time series. The default, 
+\item{seed}{Either \code{NULL} or an integer that will be used in a call to
+\code{\link[base]{set.seed}} before simulating the time series. The default,
 \code{NULL}, will not change the random generator state.}
 
 \item{n.start}{Length of 'burn-in' period.}
@@ -20,12 +20,12 @@
 \item{...}{Other arguments, not currently used.}
 }
 \value{
-`ts` object of length n.
+`ts` object of length \code{nsim}.
 }
 \description{
 This function simulates one random sample path from a mixture of k Gaussian AR(p) processes.
 The model is of the form
-\deqn{y_t = \phi_{0,i} + \phi_{1,i}y_{t-1} + \cdots + \phi_{p,i}y_{t-p} + \sigma_{i,t}\epsilon_t}
+\deqn{y_t = \phi_{0,i} + \phi_{1,i}y_{t-1} + \dots + \phi_{p,i}y_{t-p} + \sigma_{i,t}\epsilon_t}
 with probability \eqn{\alpha_i}, where \eqn{\epsilon_t} is a N(0,1) variate.
 }
 \examples{
@@ -41,7 +41,7 @@ sigmas.spec <- list(
   fGarch::garchSpec(model = list(alpha = c(0.05, 0.06))),
   fGarch::garchSpec(model = list(alpha = c(0.05, 0.05)))
 )
-model2 <- mar_model(ar=ar, sigmas=sigmas.spec, weights=weights)
+model2 <- mar_model(ar = ar, sigmas = sigmas.spec, weights = weights)
 y <- simulate(model2, 100)
 plot(y)
 }

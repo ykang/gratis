@@ -4,7 +4,7 @@
 \alias{mar_model}
 \title{Specify parameters for a Mixture Autoregressive model}
 \usage{
-mar_model(ar = NULL, sigmas = NULL, weights = NULL, frequency = 1)
+mar_model(ar = NULL, sigmas = NULL, weights = NULL, seasonal_periods = 1L)
 }
 \arguments{
 \item{ar}{A (p+1) x k numeric matrix containing the AR parameters
@@ -18,7 +18,8 @@ If it is a list, each element should be the output from \code{fGarch::\link[fGar
 \item{weights}{A numeric vector of length k containing the probability of
 each of the component processes, \eqn{\alpha_1,\dots,\alpha_k}.}
 
-\item{frequency}{The number of seasonal periods (e.g., 12 for monthly data).}
+\item{seasonal_periods}{Either a scalar or a numeric vector of length k containing
+the number of seasonal periods for each component.}
 }
 \value{
 A `mar` object containing a list of \code{k}, \code{p}, \code{ar},
@@ -30,7 +31,7 @@ to be specified. The output is used in \code{\link{simulate.mar}()}.
 The model is of the form
 \deqn{y_t = \phi_{0,i} + \phi_{1,i}y_{t-1} + \cdots + \phi_{p,i}y_{t-p} + \sigma_{i,t}\epsilon_t}
 with probability \eqn{\alpha_i}, where \eqn{\epsilon_t} is a N(0,1) variate.
-If any argument is \code{NULL}, the corresponding parameters are randomly selected. 
+If any argument is \code{NULL}, the corresponding parameters are randomly selected.
 The AR parameters may be non-stationary. When randomly selected, they are chosen
 to be the pi weights of an ARIMA(p,d,0)(P,D,0) process where p is in \{0,1,2,3\},
 d is in \{0,1,2\}, P is in \{0,1,2\} and D is in \{0,1\}. The model orders and the
@@ -40,8 +41,10 @@ uniformly sampled on \{1,2,3,4,5\}.
 }
 \examples{
 n <- 100
-# Seasonal MAR model with randomly selected parameters
-mar_model(frequency = 4)
+# Quarterly MAR model with randomly selected parameters
+mar_model(seasonal_periods = 4)
+# Daily MAR model with randomly selected parameters
+mar_model(seasonal_periods = c(7, 365))
 # MAR model with constant variances
 # containing an AR(1) component and an AR(2) component
 ar <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
