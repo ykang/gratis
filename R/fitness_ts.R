@@ -50,7 +50,7 @@ fitness_ts <- function(pars, features, seasonal, n = 120, freq = 12, target, nCo
       # value = -sqrt(sum((tsfeatures::tsfeatures(x, features = features) %>%
       #   select(selected.features) - target)^2)) / sqrt(sum(target^2)),
       value = -sqrt(sum((tsfeatures::tsfeatures(x, features = features) %>%
-                           select(selected.features) - target)^2)),
+        select(selected.features) - target)^2)),
       x = x
     ))
   }
@@ -204,7 +204,7 @@ pars2list <- function(pars, seasonal, nComp) {
   return(parslist)
 }
 
-#  scalets(), scale time series function is adapted from tsfeatures packages 
+#  scalets(), scale time series function is adapted from tsfeatures packages
 #  Rob Hyndman, Yanfei Kang, Pablo Montero-Manso, Thiyanga Talagala, Earo Wang,
 #  Yangzhuoran Yang and Mitchell O'Hara-Wild (2020). tsfeatures: Time Series Feature
 #  Extraction. R package version 1.0.2.
@@ -218,8 +218,7 @@ scalets <- function(x) {
   if ("msts" %in% class(x)) {
     msts <- attributes(x)$msts
     y <- forecast::msts(scaledx, seasonal.periods = msts)
-  }
-  else {
+  } else {
     y <- as.ts(scaledx)
   }
   tsp(y) <- tsp(x)
@@ -233,7 +232,7 @@ fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp, h = 18) {
     x1 <- x[1:(length(x) - h)]
     x2 <- x[(length(x) - h + 1):length(x)]
     x <- scalets(x1)
-    xx <- (x2 - mean(x1))/sd(x1)
+    xx <- (x2 - mean(x1)) / sd(x1)
     if (max(abs(x)) > 1e5) {
       return(list(value = -100, x = c(x, xx)))
     }
@@ -244,7 +243,7 @@ fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp, h = 18) {
       # value = - diss.cort(as.vector(x), as.vector(x0), k = 2),
       # value = tsgeneration:::corrtemporder1(as.vector(x), as.vector(x0)),
       # value = - mean(abs(as.vector(x[1:length(x0)]) - as.vector(x0))),
-      value = - sqrt(sum((as.vector(x) - as.vector(x0))^2)),
+      value = -sqrt(sum((as.vector(x) - as.vector(x0))^2)),
       x = c(x, xx)
     ))
   } else {
@@ -269,10 +268,9 @@ fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp, h = 18) {
     return(list(
       # value = -sqrt(sum((tsfeatures::tsfeatures(x, features = features) %>%
       #   select(selected.features) - target)^2)) / sqrt(sum(target^2)),
-      value = -sqrt(sum(( scalets(as.vector(x)) -
-                            scalets(as.vector(x0)))^2)),
+      value = -sqrt(sum((scalets(as.vector(x)) -
+        scalets(as.vector(x0)))^2)),
       x = x
     ))
   }
 }
-

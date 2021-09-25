@@ -1,7 +1,7 @@
 #' gratis: Generating Time Series with Diverse and Controllable Characteristics
 #'
 #' The gratis package generates synthetic time series data based on various
-#' univariate time series models including MAR and ARIMA processes.
+#' univariate time series models including MAR, ARIMA and ETS processes.
 #'
 #' @docType package
 #' @name gratis
@@ -28,5 +28,4 @@
 NULL
 # > NULL
 
-
-utils::globalVariables(c(".","x","Season2"))
+utils::globalVariables(c(".", "x", "Season2"))

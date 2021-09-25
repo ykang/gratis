@@ -58,7 +58,7 @@ The error component is chosen from \{A,M\}, the trend component is chosen from
 \{N,A,Ad\}, and the seasonal component is chosen from \{N,A,M\}. In all cases,
 the component is selected uniformly on the options. The parameters are selected
 uniformly on the forecastable parameter space. The noise variance sigma
-is uniformly sampled on (1,5) for additive errors, and on (0.0001,0.05) for 
+is uniformly sampled on (1,5) for additive errors, and on (0.0001,0.05) for
 multiplicative errors. The initial states are chosen uniformly on (-1,1)
 in all cases except for multiplicative seasonal states which are uniform on
 (0.5, 1.5), and models with multiplicative errors for which the level is uniform
@@ -68,8 +68,10 @@ on (2, 10). The parameterization is as specified in Hyndman & Athanasopoulos (20
 # An ETS(A,A,N) model with random parameters
 model1 <- ets_model(error = "A", trend = "A", seasonal = "N")
 # An ETS(A,A,N) model with specific parameters
-model2 <- ets_model(error = "A", trend = "A", seasonal = "N", 
-  alpha = 0.3, beta = 0.2, level = 0, slope = 1, sigma = 2)
+model2 <- ets_model(
+  error = "A", trend = "A", seasonal = "N",
+  alpha = 0.3, beta = 0.2, level = 0, slope = 1, sigma = 2
+)
 # A multiplicative quarterly seasonal ETS model with random parameters
 model3 <- ets_model(seasonal = "M", frequency = 4)
 # Simulate from each model and plot the results

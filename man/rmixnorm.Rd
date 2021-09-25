@@ -22,8 +22,10 @@ An n x q matrix (or a vector if q=1) containing the generated data.
 Random variables from a mixture of k multivariate normal distributions, each of dimension q.
 }
 \examples{
-out <- rmixnorm(n = 1000, means = c(-5,0,5), sigmas = c(1,1,3), 
-  weights=c(0.3,0.4,0.3))
+out <- rmixnorm(
+  n = 1000, means = c(-5, 0, 5), sigmas = c(1, 1, 3),
+  weights = c(0.3, 0.4, 0.3)
+)
 hist(out, breaks = 100, freq = FALSE)
 }
 \references{

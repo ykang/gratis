@@ -86,10 +86,9 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
                   parallel = FALSE,
                   monitor = if (interactive()) {
                     if (shiny::is.RStudio()) gaMonitor else FALSE
-                  }
-                  else {
+                  } else {
                     FALSE
-                  } ,
+                  },
                   seed = NULL) {
   call <- match.call()
 
@@ -121,8 +120,7 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
   if (is.numeric(pmutation)) {
     if (pmutation < 0 | pmutation > 1) {
       stop("If numeric probability of mutation must be between 0 and 1.")
-    }
-    else if (!is.function(population)) {
+    } else if (!is.function(population)) {
       stop("pmutation must be a numeric value in (0,1) or a function.")
     }
   }
@@ -132,41 +130,39 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
 
   # check GA search type
   switch(type,
-         "binary" = {
-           nBits <- as.vector(nBits)[1]
-           min <- max <- NA
-           nvars <- nBits
-         },
-         "real-valued" = {
-           min <- as.vector(min)
-           max <- as.vector(max)
-           nBits <- NA
-           if (length(min) != length(max)) {
-             stop("min and max must be vector of the same length!")
-           }
-           nvars <- length(max)
-         },
-         "permutation" = {
-           min <- as.vector(min)[1]
-           max <- as.vector(max)[1]
-           nBits <- NA
-           nvars <- length(seq(min, max))
-         }
+    "binary" = {
+      nBits <- as.vector(nBits)[1]
+      min <- max <- NA
+      nvars <- nBits
+    },
+    "real-valued" = {
+      min <- as.vector(min)
+      max <- as.vector(max)
+      nBits <- NA
+      if (length(min) != length(max)) {
+        stop("min and max must be vector of the same length!")
+      }
+      nvars <- length(max)
+    },
+    "permutation" = {
+      min <- as.vector(min)[1]
+      max <- as.vector(max)[1]
+      nBits <- NA
+      nvars <- length(seq(min, max))
+    }
   )
 
   # check suggestions
   if (is.null(suggestions)) {
     suggestions <- matrix(nrow = 0, ncol = nvars)
-  }
-  else {
+  } else {
     if (is.vector(suggestions)) {
       if (nvars > 1) {
         suggestions <- matrix(suggestions, nrow = 1)
       } else {
         suggestions <- matrix(suggestions, ncol = 1)
       }
-    }
-    else {
+    } else {
       suggestions <- as.matrix(suggestions)
     }
     if (nvars != ncol(suggestions)) {
@@ -191,8 +187,7 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
     if (any(optimArgs$method == c("L-BFGS-B", "Brent"))) {
       optimArgs$lower <- min
       optimArgs$upper <- max
-    }
-    else {
+    } else {
       optimArgs$lower <- -Inf
       optimArgs$upper <- Inf
     }
@@ -211,13 +206,12 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
   # Start parallel computing (if needed)
   parallel <- if (is.logical(parallel)) {
     if (parallel) startParallel(parallel) else FALSE
-  }
-  else {
+  } else {
     startParallel(parallel)
   }
   on.exit(if (parallel) {
     parallel::stopCluster(attr(parallel, "cluster"))
-  } )
+  })
   # define operator to use depending on parallel being TRUE or FALSE
   `%DO%` <- if (parallel && requireNamespace("doRNG", quietly = TRUE)) {
     doRNG::`%dorng%`
@@ -237,34 +231,34 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
   popTs <- matrix(NA, n, popSize)
 
   object <- new("ga",
-                call = call,
-                type = type,
-                min = min,
-                max = max,
-                nBits = nBits,
-                names = if (is.null(names)) character() else names,
-                popSize = popSize,
-                iter = 0,
-                run = 1,
-                maxiter = maxiter,
-                suggestions = suggestions,
-                population = matrix(),
-                popTs = matrix(),
-                elitism = elitism,
-                pcrossover = pcrossover,
-                pmutation = if (is.numeric(pmutation)) pmutation else NA,
-                fitness = Fitness,
-                summary = fitnessSummary,
-                bestSol = bestSol
+    call = call,
+    type = type,
+    min = min,
+    max = max,
+    nBits = nBits,
+    names = if (is.null(names)) character() else names,
+    popSize = popSize,
+    iter = 0,
+    run = 1,
+    maxiter = maxiter,
+    suggestions = suggestions,
+    population = matrix(),
+    popTs = matrix(),
+    elitism = elitism,
+    pcrossover = pcrossover,
+    pmutation = if (is.numeric(pmutation)) pmutation else NA,
+    fitness = Fitness,
+    summary = fitnessSummary,
+    bestSol = bestSol
   )
 
   # generate beginning population
   Pop <- matrix(as.double(NA), nrow = popSize, ncol = nvars)
   ng <- min(nrow(suggestions), popSize)
   if (ng > 0) # use suggestion if provided
-  {
-    Pop[1:ng, ] <- suggestions
-  }
+    {
+      Pop[1:ng, ] <- suggestions
+    }
   # fill the rest with a random population
   if (popSize > ng) {
     Pop[(ng + 1):popSize, ] <- population(object)[1:(popSize - ng), ]
@@ -278,7 +272,7 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
 
     # evalute fitness function (when needed)
     if (!parallel) {
-      for (i in seq_len(popSize))
+      for (i in seq_len(popSize)) {
         if (is.na(Fitness[i])) {
           fit <- fitness(Pop[i, ], ...)
           if (updatePop) {
@@ -287,8 +281,8 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
           Fitness[i] <- fit$value
           popTs[, i] <- fit$x
         }
-    }
-    else {
+      }
+    } else {
       Fitness0 <- foreach(i = seq_len(popSize)) %DO% {
         if (is.na(Fitness[i])) {
           fitness(Pop[i, ], ...)
@@ -321,8 +315,8 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
       if (optimArgs$poptim > runif(1)) { # perform local search from random selected solution
         # with prob proportional to fitness
         i <- sample(1:popSize,
-                    size = 1,
-                    prob = optimProbsel(Fitness, q = optimArgs$pressel)
+          size = 1,
+          prob = optimProbsel(Fitness, q = optimArgs$pressel)
         )
         # run local search
         opt <- try(suppressWarnings(
@@ -392,8 +386,7 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
       Pop <- sel$population
       Fitness <- sel$fitness
       popTs <- sel$popTs
-    }
-    else {
+    } else {
       sel <- sample(1:popSize, size = popSize, replace = TRUE)
       Pop <- object@population[sel, ]
       Fitness <- object@fitness[sel]
@@ -439,16 +432,16 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
 
     # elitism
     if (elitism > 0) # (elitism > 0 & iter > 1)
-    {
-      ord <- order(object@fitness, na.last = TRUE)
-      u <- which(!duplicated(PopSorted, MARGIN = 1))
-      Pop[ord[1:elitism], ] <- PopSorted[u[1:elitism], ]
-      Fitness[ord[1:elitism]] <- FitnessSorted[u[1:elitism]]
-      popTs[, ord[1:elitism]] <- popTsSorted[, u[1:elitism]]
-      object@population <- Pop
-      object@fitness <- Fitness
-      object@popTs <- popTs
-    }
+      {
+        ord <- order(object@fitness, na.last = TRUE)
+        u <- which(!duplicated(PopSorted, MARGIN = 1))
+        Pop[ord[1:elitism], ] <- PopSorted[u[1:elitism], ]
+        Fitness[ord[1:elitism]] <- FitnessSorted[u[1:elitism]]
+        popTs[, ord[1:elitism]] <- popTsSorted[, u[1:elitism]]
+        object@population <- Pop
+        object@fitness <- Fitness
+        object@popTs <- popTs
+      }
   }
 
   # if optim is required perform a local search from the best
@@ -629,8 +622,7 @@ print.summary.ga <- function(x, digits = getOption("digits"), ...) {
   message(paste("Fitness function value =", format(x$fitness, digits = digits), "\n"))
   if (nrow(x$solution) > 1) {
     message(paste("Solutions = \n"))
-  }
-  else {
+  } else {
     message(paste("Solution = \n"))
   }
   do.call(
@@ -665,37 +657,36 @@ plot.ga <- function(x, y, ylim, cex.points = 0.7,
   }
 
   plot(iters, summary[, 1],
-       type = "n", ylim = ylim,
-       xlab = "Generation", ylab = "Fitness value", ...
+    type = "n", ylim = ylim,
+    xlab = "Generation", ylab = "Fitness value", ...
   )
   if (is.final & is.function(grid)) {
     grid(equilogs = FALSE)
   }
   points(iters, summary[, 1],
-         type = ifelse(is.final, "o", "p"),
-         pch = pch[1], lty = lty[1], col = col[1], cex = cex.points
+    type = ifelse(is.final, "o", "p"),
+    pch = pch[1], lty = lty[1], col = col[1], cex = cex.points
   )
   points(iters, summary[, 2],
-         type = ifelse(is.final, "o", "p"),
-         pch = pch[2], lty = lty[2], col = col[2], cex = cex.points
+    type = ifelse(is.final, "o", "p"),
+    pch = pch[2], lty = lty[2], col = col[2], cex = cex.points
   )
   if (is.final) {
     polygon(c(iters, rev(iters)),
-            c(summary[, 4], rev(summary[, 1])),
-            border = FALSE, col = col[3]
+      c(summary[, 4], rev(summary[, 1])),
+      border = FALSE, col = col[3]
     )
-  }
-  else {
+  } else {
     title(paste("Iteration", object@iter), font.main = 1)
   }
   if (is.final & legend) {
     inc <- !is.na(col)
     legend("bottomright",
-           legend = c("Best", "Mean", "Median")[inc],
-           col = col[inc], pch = c(pch, NA)[inc],
-           lty = c(lty, 1)[inc], lwd = c(1, 1, 10)[inc],
-           pt.cex = c(rep(cex.points, 2), 2)[inc],
-           inset = 0.02
+      legend = c("Best", "Mean", "Median")[inc],
+      col = col[inc], pch = c(pch, NA)[inc],
+      lty = c(lty, 1)[inc], lwd = c(1, 1, 10)[inc],
+      pt.cex = c(rep(cex.points, 2), 2)[inc],
+      inset = 0.02
     )
   }
 

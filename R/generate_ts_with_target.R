@@ -14,12 +14,14 @@
 #' @author Yanfei Kang
 #' @examples
 #' library(tsfeatures)
-#' x <- generate_ts_with_target(n = 1, ts.length = 60, freq = 1, seasonal = 0,
-#'   features = c('entropy', 'stl_features'), selected.features = c('entropy', 'trend'),
-#'   target=c(0.6, 0.9),  parallel=FALSE)
+#' x <- generate_ts_with_target(
+#'   n = 1, ts.length = 60, freq = 1, seasonal = 0,
+#'   features = c("entropy", "stl_features"), selected.features = c("entropy", "trend"),
+#'   target = c(0.6, 0.9), parallel = FALSE
+#' )
 #' forecast::autoplot(x)
 #' @export
-generate_ts_with_target <- function(n, ts.length, freq, seasonal, features, selected.features, target, parallel=TRUE, output_format= "list") {
+generate_ts_with_target <- function(n, ts.length, freq, seasonal, features, selected.features, target, parallel = TRUE, output_format = "list") {
   ga_min <-
     if (seasonal == 0) {
       c(rep(0, 10))
@@ -45,7 +47,7 @@ generate_ts_with_target <- function(n, ts.length, freq, seasonal, features, sele
       min = ga_min,
       max = ga_max,
       parallel = parallel, popSize = 30, maxiter = 100,
-      pmutation = 0.3, pcrossover = 0.8, maxFitness = -sqrt(0.01*length(selected.features)),
+      pmutation = 0.3, pcrossover = 0.8, maxFitness = -sqrt(0.01 * length(selected.features)),
       run = 30, keepBest = TRUE, monitor = GA::gaMonitor
     )
     evolved.ts.new <-
@@ -60,7 +62,7 @@ generate_ts_with_target <- function(n, ts.length, freq, seasonal, features, sele
   } else {
     evolved.ts <- msts(evolved.ts[, 1:n], seasonal.periods = freq)
   }
-  # New content 
+  # New content
   output <- if (output_format == "list") {
     evolved.ts
   } else if (output_format == "tsibble") {

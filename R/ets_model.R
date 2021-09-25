@@ -7,7 +7,7 @@
 #' \{N,A,Ad\}, and the seasonal component is chosen from \{N,A,M\}. In all cases,
 #' the component is selected uniformly on the options. The parameters are selected
 #' uniformly on the forecastable parameter space. The noise variance sigma
-#' is uniformly sampled on (1,5) for additive errors, and on (0.0001,0.05) for 
+#' is uniformly sampled on (1,5) for additive errors, and on (0.0001,0.05) for
 #' multiplicative errors. The initial states are chosen uniformly on (-1,1)
 #' in all cases except for multiplicative seasonal states which are uniform on
 #' (0.5, 1.5), and models with multiplicative errors for which the level is uniform
@@ -33,8 +33,10 @@
 #' # An ETS(A,A,N) model with random parameters
 #' model1 <- ets_model(error = "A", trend = "A", seasonal = "N")
 #' # An ETS(A,A,N) model with specific parameters
-#' model2 <- ets_model(error = "A", trend = "A", seasonal = "N", 
-#'   alpha = 0.3, beta = 0.2, level = 0, slope = 1, sigma = 2)
+#' model2 <- ets_model(
+#'   error = "A", trend = "A", seasonal = "N",
+#'   alpha = 0.3, beta = 0.2, level = 0, slope = 1, sigma = 2
+#' )
 #' # A multiplicative quarterly seasonal ETS model with random parameters
 #' model3 <- ets_model(seasonal = "M", frequency = 4)
 #' # Simulate from each model and plot the results
@@ -53,10 +55,11 @@ ets_model <- function(frequency = 1, error = NULL, trend = NULL, seasonal = NULL
   }
   # sigma
   if (is.null(sigma)) {
-    if(error == "A") # Choose variance in [1,5]
+    if (error == "A") { # Choose variance in [1,5]
       sigma2 <- runif(1, 1, 5)
-    else
+    } else {
       sigma2 <- runif(1, 1e-4, 0.05)
+    }
   } else {
     sigma2 <- sigma^2
   }
@@ -112,10 +115,11 @@ ets_model <- function(frequency = 1, error = NULL, trend = NULL, seasonal = NULL
   }
   # Find initial states
   if (is.null(level)) {
-    if(error == "A")
+    if (error == "A") {
       level <- runif(1, -1, 1)
-    else
+    } else {
       level <- runif(1, 2, 10)
+    }
   }
   if (trend != "N" & is.null(slope)) {
     slope <- runif(1, -1, 1)
@@ -164,8 +168,7 @@ ets_admissible <- function(alpha, beta, gamma, phi, m) {
         return(FALSE)
       }
     }
-  }
-  else if (m > 1) { # Seasonal model
+  } else if (m > 1) { # Seasonal model
     if (is.null(beta)) {
       beta <- 0
     }
@@ -178,12 +181,14 @@ ets_admissible <- function(alpha, beta, gamma, phi, m) {
     if (beta < -(1 - phi) * (gamma / m + alpha)) {
       return(FALSE)
     }
-    
+
     # End of easy tests. Now use characteristic equation
-    P <- c(phi * (1 - alpha - gamma), alpha + beta - alpha * phi + gamma - 1, 
-           rep(alpha + beta - alpha * phi, m - 2), (alpha + beta - phi), 1)
+    P <- c(
+      phi * (1 - alpha - gamma), alpha + beta - alpha * phi + gamma - 1,
+      rep(alpha + beta - alpha * phi, m - 2), (alpha + beta - phi), 1
+    )
     roots <- polyroot(P)
-    
+
     if (max(abs(roots)) > 1 + 1e-10) {
       return(FALSE)
     }

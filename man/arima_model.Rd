@@ -39,13 +39,13 @@ arima_model(
 An `Arima` object as described in the \code{\link[stats]{arima}} function from the stats package.
 }
 \description{
-This function allows the parameters of a Gaussian \eqn{ARIMA(p,d,q)(P,D,Q)[m]} 
+This function allows the parameters of a Gaussian \eqn{ARIMA(p,d,q)(P,D,Q)[m]}
 process to be specified. The output can be used in \code{\link[forecast]{simulate.Arima}()}.
-If any argument is \code{NULL}, the corresponding parameters are randomly selected. 
+If any argument is \code{NULL}, the corresponding parameters are randomly selected.
 The AR and MA orders p and q are chosen from \{0,1,2,3\}, the seasonal AR and MA
-orders P and Q are from \{0,1,2\}, while the order of differencing, 
-d is in \{0,1,2\}, and the order of seasonal differencing D is in \{0,1\}, with the 
-restriction that \eqn{d+D \le 2}. If \code{constant} is \code{NULL}, it is set to 
+orders P and Q are from \{0,1,2\}, while the order of differencing,
+d is in \{0,1,2\}, and the order of seasonal differencing D is in \{0,1\}, with the
+restriction that \eqn{d+D \le 2}. If \code{constant} is \code{NULL}, it is set to
 0 if \eqn{d+D = 2}, otherwise it is uniformly sampled on (-3,3).
 The model orders and the parameters are uniformly sampled. The AR and MA parameters are selected
 to give stationary and invertible processes when \eqn{d=D=0}. The noise variance sigma
@@ -53,9 +53,9 @@ is uniformly sampled on (1,5). The parameterization is as specified in Hyndman &
 }
 \examples{
 # An AR(2) model with random parameters
-model1 <- arima_model(order=c(2,0,0))
+model1 <- arima_model(order = c(2, 0, 0))
 # An AR(2) model with specific parameters
-model2 <- arima_model(order=c(2, 0, 0), phi = c(1.34, -0.64), sigma = 15)
+model2 <- arima_model(order = c(2, 0, 0), phi = c(1.34, -0.64), sigma = 15)
 # Seasonal ARIMA model with randomly selected parameters
 model3 <- arima_model(frequency = 4)
 # Simulate from each model and plot the results
@@ -63,7 +63,6 @@ library(forecast)
 simulate(model1, 100) \%>\% plot()
 simulate(model2, 100) \%>\% plot()
 simulate(model3, 100) \%>\% plot()
-
 }
 \seealso{
 \code{\link[forecast]{simulate.Arima}}

@@ -9,71 +9,79 @@
 #' @references Villani et al 2009.
 #' @author Feng Li, Central University of Finance and Economics.
 #' @examples
-#' out <- rmixnorm(n = 1000, means = c(-5,0,5), sigmas = c(1,1,3), 
-#'   weights=c(0.3,0.4,0.3))
+#' out <- rmixnorm(
+#'   n = 1000, means = c(-5, 0, 5), sigmas = c(1, 1, 3),
+#'   weights = c(0.3, 0.4, 0.3)
+#' )
 #' hist(out, breaks = 100, freq = FALSE)
 #' @export
 rmixnorm <- function(n, means, sigmas, weights) {
   # Convert vector inputs to matrix or array
-  if(is.null(dim(means))) {
+  if (is.null(dim(means))) {
     means <- t(means)
-    sigmas <- array(sigmas, dim=c(1,1,length(sigmas)))
+    sigmas <- array(sigmas, dim = c(1, 1, length(sigmas)))
   }
   k <- length(weights) # k-components
   q <- NROW(means) # q-dimensional
-  if(!identical(dim(means), c(q,k)))
+  if (!identical(dim(means), c(q, k))) {
     stop("means must be a q x k matrix")
-  if(!identical(dim(sigmas), c(q,q,k)))
+  }
+  if (!identical(dim(sigmas), c(q, q, k))) {
     stop("sigmas must be a q x q x k array.")
+  }
 
   # Random draws for which component to use for each observation
-  idx <- sample(seq(k), size=n, prob=weights, replace=TRUE)
-  idx <- factor(idx, levels=seq(5))
+  idx <- sample(seq(k), size = n, prob = weights, replace = TRUE)
+  idx <- factor(idx, levels = seq(5))
   nsamp <- table(idx)
-  data <- matrix(NA_real_, nrow=n, ncol=q)
+  data <- matrix(NA_real_, nrow = n, ncol = q)
   # Generate draws from each component
-  for(i in seq(k)) {
-    if(nsamp[i] > 0) {
-        data[idx==i,] <- mvtnorm::rmvnorm(
-          n = nsamp[i], mean = means[, i], sigma = as.matrix(sigmas[, , i])
+  for (i in seq(k)) {
+    if (nsamp[i] > 0) {
+      data[idx == i, ] <- mvtnorm::rmvnorm(
+        n = nsamp[i], mean = means[, i], sigma = as.matrix(sigmas[, , i])
       )
     }
   }
   # Return a vector if q=1, or a matrix otherwise
-  if(q == 1)
+  if (q == 1) {
     data <- c(data)
+  }
   data
 }
 
 # Density of mixture of multivariate normals
 dmixnorm <- function(x, means, sigmas, weights, log = FALSE) {
   # Convert vector inputs to matrix or array
-  if(is.null(dim(means))) {
+  if (is.null(dim(means))) {
     means <- t(means)
-    sigmas <- array(sigmas, dim=c(1,1,length(sigmas)))
-    x <- as.matrix(x, ncol=NROW(means))
+    sigmas <- array(sigmas, dim = c(1, 1, length(sigmas)))
+    x <- as.matrix(x, ncol = NROW(means))
   }
   k <- length(weights) # k-components
   q <- NROW(means) # q-dimensional
-  if(!identical(dim(means), c(q,k)))
+  if (!identical(dim(means), c(q, k))) {
     stop("means must be a q x k matrix")
-  if(!identical(dim(sigmas), c(q,q,k)))
+  }
+  if (!identical(dim(sigmas), c(q, q, k))) {
     stop("sigmas must be a q x q x k array.")
-  
+  }
+
   # Compute density of each component
   component_density <- apply(
-    matrix(1:k), 1, 
+    matrix(1:k), 1,
     function(comp.i, x, means, sigmas, q) {
-      mvtnorm::dmvnorm(x = x, mean = means[, comp.i], 
-                       sigma = as.matrix(sigmas[, , comp.i]))
-    }, 
+      mvtnorm::dmvnorm(
+        x = x, mean = means[, comp.i],
+        sigma = as.matrix(sigmas[, , comp.i])
+      )
+    },
     x = x, means = means, sigmas = sigmas, q = q
   )
   density <- component_density %*% matrix(weights)
   if (log == TRUE) {
     return(log(density))
-  }
-  else {
+  } else {
     return(density)
   }
 }
@@ -103,16 +111,22 @@ dmixnorm <- function(x, means, sigmas, weights, log = FALSE) {
 #'     Journal of Statistical Planning and Inference, 140(12), pp. 3638-3654.
 #' @author Feng Li, Central University of Finance and Economics.
 #' @examples
-#' n = 1000
-#' means.ar.par.list = list(c(0, 0.8), c(0, 0.6, 0.3))
+#' n <- 1000
+#' means.ar.par.list <- list(c(0, 0.8), c(0, 0.6, 0.3))
 #' require("fGarch")
-#' sigmas.spec <- list(garchSpec(model = list(alpha = c(0.05, 0.06)), cond.dist = "norm"),
-#'                     garchSpec(model = list(alpha = c(0.05, 0.05)), cond.dist = "norm"))
-#' sigmas.list <- lapply(lapply(sigmas.spec, garchSim, extended = TRUE, n = n),
-#' function(x) x$sigma)
+#' sigmas.spec <- list(
+#'   garchSpec(model = list(alpha = c(0.05, 0.06)), cond.dist = "norm"),
+#'   garchSpec(model = list(alpha = c(0.05, 0.05)), cond.dist = "norm")
+#' )
+#' sigmas.list <- lapply(
+#'   lapply(sigmas.spec, garchSim, extended = TRUE, n = n),
+#'   function(x) x$sigma
+#' )
 #' weights <- c(0.8, 0.2)
-#' y = rmixnorm_ts(n = n, means.ar.par.list = means.ar.par.list, sigmas.list = sigmas.list,
-#'                 weights = weights)
+#' y <- rmixnorm_ts(
+#'   n = n, means.ar.par.list = means.ar.par.list, sigmas.list = sigmas.list,
+#'   weights = weights
+#' )
 #' plot(y)
 #' @export
 rmixnorm_ts <- function(n, means.ar.par.list, sigmas.list, weights, yinit = 0) {
@@ -178,8 +192,7 @@ dmixnorm_ts <- function(y, means.ar.par.list, sigmas.list, weights, log = FALSE)
 
   if (log == TRUE) {
     out <- out.log
-  }
-  else {
+  } else {
     out <- exp(log)
   }
   return(out)

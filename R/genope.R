@@ -85,12 +85,10 @@ ga_spCrossover <- function(object, parents, ...) {
   if (crossOverPoint == 0) {
     children[1:2, ] <- parents[2:1, ]
     fitnessChildren[1:2] <- fitness[2:1]
-  }
-  else if (crossOverPoint == n) {
+  } else if (crossOverPoint == n) {
     children <- parents
     fitnessChildren <- fitness
-  }
-  else {
+  } else {
     children[1, ] <- c(
       parents[1, 1:crossOverPoint],
       parents[2, (crossOverPoint + 1):n]
@@ -195,8 +193,7 @@ gareal_lsSelection <- function(object, ...) {
     delta <- fmax - fave
     a <- (sfactor - 1.0) * fave / delta
     b <- fave * (fmax - sfactor * fave) / delta
-  }
-  else { # ave(f) = ave(f')
+  } else { # ave(f) = ave(f')
     # min(f') = 0
     delta <- fave - fmin
     a <- fave / delta
@@ -336,8 +333,7 @@ gareal_nraMutation <- function(object, parent, ...) {
   u <- runif(1)
   if (u < 0.5) {
     mutate[j] <- parent[j] - sa(parent[j] - object@max[j])
-  }
-  else {
+  } else {
     mutate[j] <- parent[j] + sa(object@max[j] - parent[j])
   }
   return(mutate)
@@ -400,8 +396,9 @@ gaperm_Population <- function(object, ...) {
   min <- object@min
   max <- object@max
   population <- matrix(as.double(NA), nrow = object@popSize, ncol = max)
-  for (i in 1:object@popSize)
+  for (i in 1:object@popSize) {
     population[i, ] <- sample(min:max, size = max, replace = FALSE)
+  }
   return(population)
 }
 
