@@ -29,13 +29,17 @@ This function simulates multiple random sample paths from a mixture of k Gaussia
 The model is of the form
 \deqn{y_t = \phi_{0,i} + \phi_{1,i}y_{t-1} + \dots + \phi_{p,i}y_{t-p} + \sigma_{i,t}\epsilon_t}
 with probability \eqn{\alpha_i}, where \eqn{\epsilon_t} is a N(0,1) variate.
+The index of the tsibble is guessed from the MAR model seasonal periods.
 }
 \examples{
 # MAR model with constant variances
 ar <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
 weights <- c(0.8, 0.2)
 model1 <- mar_model(ar = ar, sigmas = c(1, 2), weights = weights)
-df <- generate(model1, nseries = 5)
+generate(model1, nseries = 5)
+# MAR model for hourly data with daily and weekly periods
+hourly_model <- mar_model(seasonal_periods = c(24, 24*7))
+generate(hourly_model)
 }
 \references{
 Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
