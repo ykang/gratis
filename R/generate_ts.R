@@ -151,7 +151,7 @@ generate_msts <- function(seasonal.periods = c(7, 365), n = 800, nComp = NULL, o
   output <- if (output_format == "list") {
     res
   } else if (output_format == "tsibble") {
-    as_tsibble(res)
+    tsibble::as_tsibble(res)
   }
   return(output)
 }

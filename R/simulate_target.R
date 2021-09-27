@@ -55,7 +55,8 @@ simulate_target <- function(length, seasonal_periods = 1, feature_function, targ
     pmutation = 0.3, pcrossover = 0.8, maxFitness = 0,
     run = 30, keepBest = TRUE, monitor = NULL
   )
-  forecast::msts(as.matrix(tail(GA@bestSol, 1)[[1]])[, 1], seasonal.periods = seasonal_periods)
+  forecast::msts(as.matrix(utils::tail(GA@bestSol, 1)[[1]])[, 1], 
+                 seasonal.periods = seasonal_periods)
 }
 
 fitness_mar <- function(pars, length, seasonal_periods, ncomponents, feature_function, target) {

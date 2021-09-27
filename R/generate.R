@@ -81,3 +81,5 @@ generate_gratis <- function(x, length = 100, nseries = 10, ...) {
   # Return
   tsibble::as_tsibble(out, index=index, key=key)
 }
+
+utils::globalVariables(c("index","key"))

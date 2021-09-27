@@ -66,7 +66,7 @@ generate_ts_with_target <- function(n, ts.length, freq, seasonal, features, sele
   output <- if (output_format == "list") {
     evolved.ts
   } else if (output_format == "tsibble") {
-    as_tsibble(evolved.ts)
+    tsibble::as_tsibble(evolved.ts)
   }
   return(output)
 }

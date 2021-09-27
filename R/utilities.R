@@ -22,11 +22,11 @@ Smoothing_ts2 <- function(x, spanw, fh) {
     ST <- FALSE
   }
   if (ST) {
-    lambda <- BoxCox.lambda(x, lower = 0, upper = 1)
-    bc.x <- as.numeric(BoxCox(x, lambda))
-    seasonal <- stl(ts(bc.x, frequency = ppy), s.window = "periodic")$time.series[, 1]
+    lambda <- forecast::BoxCox.lambda(x, lower = 0, upper = 1)
+    bc.x <- as.numeric(forecast::BoxCox(x, lambda))
+    seasonal <- stats::stl(ts(bc.x, frequency = ppy), s.window = "periodic")$time.series[, 1]
     bc.x <- bc.x - as.numeric(seasonal)
-    x <- as.numeric(InvBoxCox(bc.x, lambda)) + x - x
+    x <- as.numeric(forecast::InvBoxCox(bc.x, lambda)) + x - x
     suppressWarnings(x.loess <- loess(x ~ trend, span = spanw / length(x), degree = 1))
     x <- as.numeric(x.loess$fitted) + x - x
     SIin <- seasonal
