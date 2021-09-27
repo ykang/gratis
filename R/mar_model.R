@@ -62,14 +62,17 @@ mar_model <- function(ar = NULL, sigmas = NULL, weights = NULL, seasonal_periods
 
   # weights
   if (is.null(weights)) {
-    # Choose a random set of weights that sum to 1
+    # Choose a random set of weights in (0,1)
     weights <- runif(k)
-    weights <- weights / sum(weights)
   } else {
     if (length(weights) != k) {
       stop("Dimension of weights does not match other components")
+    } else if (any(weights <= 0)) {
+      stop("weights must be positive")
     }
   }
+  # Rescale weights so they sum to 1
+  weights <- weights / sum(weights)
   # sigmas
   if (is.null(sigmas)) {
     # Choose k variances in [1,5]
@@ -77,8 +80,11 @@ mar_model <- function(ar = NULL, sigmas = NULL, weights = NULL, seasonal_periods
   } else {
     if (length(sigmas) != k) {
       stop("Dimension of sigmas does not match other components")
+    } else if(any(sigmas <= 0)) {
+      stop("sigmas must be positive")
     }
   }
+  # one seasonal period for each component
   if (length(seasonal_periods) == 1L) {
     seasonal_periods <- rep(seasonal_periods, k)
   }
