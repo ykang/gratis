@@ -125,25 +125,3 @@ mar_model <- function(ar = NULL, sigmas = NULL, weights = NULL, seasonal_periods
     class = "mar"
   )
 }
-
-# Function to return random coefficients from a stationary AR(p) process
-stationary_ar <- function(p) {
-  p <- as.integer(p)
-  if (p < 1) {
-    stop("p must be a positive integer")
-  } else if (p == 1L) {
-    phi <- runif(1, -1, 1)
-  } else if (p == 2L) {
-    phi2 <- runif(1, -1, 1)
-    phi1 <- runif(1, phi2 - 1, 1 - phi2)
-    phi <- c(phi1, phi2)
-  } else {
-    unit_root <- TRUE
-    while (unit_root) {
-      phi <- runif(p, c(-3, -3, -1), c(3, 1, 1))
-      roots <- polyroot(c(1, -phi))
-      unit_root <- min(abs(roots)) < 1
-    }
-  }
-  return(phi)
-}

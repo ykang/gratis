@@ -6,8 +6,12 @@
 \usage{
 arima_model(
   frequency = 1,
-  order = NULL,
-  seasonal = NULL,
+  p = NULL,
+  d = NULL,
+  q = NULL,
+  P = NULL,
+  D = NULL,
+  Q = NULL,
   constant = NULL,
   phi = NULL,
   theta = NULL,
@@ -19,9 +23,17 @@ arima_model(
 \arguments{
 \item{frequency}{The length of the seasonal period (e.g., 12 for monthly data).}
 
-\item{order}{A numeric vector specifying the non-seasonal part of the ARIMA model: the three components \code{(p, d, q)}.}
+\item{p}{An integer equal to the non-seasonal autoregressive order}
 
-\item{seasonal}{A numeric vector specifying the seasonal part of the ARIMA model: the three components \code{(P, D, Q)}.}
+\item{d}{An integer equal to the non-seasonal order of differencing}
+
+\item{q}{An integer equal to the non-seasonal moving average order}
+
+\item{P}{An integer equal to the seasonal autoregressive order}
+
+\item{D}{An integer equal to the seasonal order of differencing}
+
+\item{Q}{An integer equal to the seasonal moving average order}
 
 \item{constant}{The intercept term}
 
@@ -53,9 +65,9 @@ is uniformly sampled on (1,5). The parameterization is as specified in Hyndman &
 }
 \examples{
 # An AR(2) model with random parameters
-model1 <- arima_model(order = c(2, 0, 0))
+model1 <- arima_model(p = 2, d = 0, q = 0)
 # An AR(2) model with specific parameters
-model2 <- arima_model(order = c(2, 0, 0), phi = c(1.34, -0.64), sigma = 15)
+model2 <- arima_model(p = 2, d = 0, q = 0, phi = c(1.34, -0.64), sigma = 15)
 # Seasonal ARIMA model with randomly selected parameters
 model3 <- arima_model(frequency = 4)
 # Simulate from each model and plot the results

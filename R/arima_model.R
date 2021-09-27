@@ -13,8 +13,12 @@
 #' is uniformly sampled on (1,5). The parameterization is as specified in Hyndman & Athanasopoulos (2021).
 #'
 #' @param frequency The length of the seasonal period (e.g., 12 for monthly data).
-#' @param order A numeric vector specifying the non-seasonal part of the ARIMA model: the three components \code{(p, d, q)}.
-#' @param seasonal A numeric vector specifying the seasonal part of the ARIMA model: the three components \code{(P, D, Q)}.
+#' @param p An integer equal to the non-seasonal autoregressive order
+#' @param d An integer equal to the non-seasonal order of differencing
+#' @param q An integer equal to the non-seasonal moving average order
+#' @param P An integer equal to the seasonal autoregressive order
+#' @param D An integer equal to the seasonal order of differencing
+#' @param Q An integer equal to the seasonal moving average order
 #' @param constant The intercept term
 #' @param phi A numeric p-vector containing the AR parameters.
 #' @param theta A numeric p-vector containing the MA parameters.
@@ -26,9 +30,9 @@
 #' @seealso \code{\link[forecast]{simulate.Arima}}
 #' @examples
 #' # An AR(2) model with random parameters
-#' model1 <- arima_model(order = c(2, 0, 0))
+#' model1 <- arima_model(p = 2, d = 0, q = 0)
 #' # An AR(2) model with specific parameters
-#' model2 <- arima_model(order = c(2, 0, 0), phi = c(1.34, -0.64), sigma = 15)
+#' model2 <- arima_model(p = 2, d = 0, q = 0, phi = c(1.34, -0.64), sigma = 15)
 #' # Seasonal ARIMA model with randomly selected parameters
 #' model3 <- arima_model(frequency = 4)
 #' # Simulate from each model and plot the results
@@ -37,7 +41,8 @@
 #' simulate(model2, 100) %>% plot()
 #' simulate(model3, 100) %>% plot()
 #' @export
-arima_model <- function(frequency = 1, order = NULL, seasonal = NULL, constant = NULL,
+arima_model <- function(frequency = 1, p = NULL, d = NULL, q = NULL,
+                        P = NULL, D = NULL, Q = NULL, constant = NULL,
                         phi = NULL, theta = NULL, Phi = NULL, Theta = NULL,
                         sigma = NULL) {
   # sigma
@@ -46,33 +51,30 @@ arima_model <- function(frequency = 1, order = NULL, seasonal = NULL, constant =
     sigma <- runif(1, 1, 5)
   }
   # Model orders
-  if (!is.null(order)) {
-    p <- order[1]
-    d <- order[2]
-    q <- order[3]
-  } else {
+  if (!is.null(p)) {
     p <- sample(c(0, 1, 2, 3), 1)
+  }
+  if (!is.null(d)) {
     d <- sample(c(0, 1, 2), 1)
+  }
+  if (!is.null(q)) {
     q <- sample(c(0, 1, 2, 3), 1)
   }
   if (frequency > 1) {
-    if (!is.null(seasonal)) {
-      P <- seasonal[1]
-      D <- seasonal[2]
-      Q <- seasonal[3]
-    } else {
+    if (!is.null(P)) {
       P <- sample(c(0, 1, 2), 1)
+    }
+    if (!is.null(D)) {
       if (d == 2) {
         D <- 0
       } else {
         D <- sample(c(0, 1), 1)
       }
+    }
+    if (!is.null(Q)) {
       Q <- sample(c(0, 1, 2), 1)
     }
   } else {
-    if (!is.null(seasonal)) {
-      stop("frequency must be greater than 1 for seasonal models")
-    }
     P <- D <- Q <- 0
   }
   # phi
@@ -132,4 +134,96 @@ arima_model <- function(frequency = 1, order = NULL, seasonal = NULL, constant =
   model$loglik <- model$aic <- NA
 
   return(model)
+}
+
+# Function to return random coefficients from a stationary AR(p) process
+stationary_ar <- function(p) {
+  p <- as.integer(p)
+  if (p < 1) {
+    stop("p must be a positive integer")
+  } else if (p == 1L) {
+    phi <- runif(1, -1, 1)
+  } else if (p == 2L) {
+    phi2 <- runif(1, -1, 1)
+    phi1 <- runif(1, phi2 - 1, 1 - phi2)
+    phi <- c(phi1, phi2)
+  } else {
+    unit_root <- TRUE
+    while (unit_root) {
+      phi <- runif(p, c(-3, -3, -1), c(3, 1, 1))
+      roots <- polyroot(c(1, -phi))
+      unit_root <- min(abs(roots)) < 1
+    }
+  }
+  return(phi)
+}
+
+#' Compute pi coefficients of an AR process from SARIMA coefficients.
+#'
+#' Convert SARIMA coefficients to pi coefficients of an AR process.
+#' @param ar AR coefficients in the SARIMA model.
+#' @param d number of differences in the SARIMA model.
+#' @param ma MA coefficients in the SARIMA model.
+#' @param sar seasonal AR coefficients in the SARIMA model.
+#' @param D number of seasonal differences in the SARIMA model.
+#' @param sma seasonal MA coefficients in the SARIMA model.
+#' @param m seasonal period in the SARIMA model.
+#' @param tol tolerance value used. Only return up to last element greater than tolerance.
+#'
+#' @return A vector of AR coefficients.
+#' @author Rob J Hyndman
+#' @export
+#' @importFrom stats dist
+#' @importFrom stats tsp
+#' @importFrom stats tsp<-
+#' @importFrom stats acf
+#' @importFrom forecast BoxCox.lambda
+#' @importFrom stats loess
+#'
+#' @examples
+#' # Not Run
+pi_coefficients <- function(ar = 0, d = 0L, ma = 0, sar = 0, D = 0L, sma = 0, m = 1L, tol = 1e-07) {
+  # non-seasonal AR
+  ar <- polynomial(c(1, -ar)) * polynomial(c(1, -1))^d
+
+  # seasonal AR
+  if (m > 1) {
+    P <- length(sar)
+    seasonal_poly <- numeric(m * P)
+    seasonal_poly[m * seq(P)] <- sar
+    sar <- polynomial(c(1, -seasonal_poly)) * polynomial(c(1, rep(0, m - 1), -1))^D
+  } else {
+    sar <- 1
+  }
+
+  # non-seasonal MA
+  ma <- polynomial(c(1, ma))
+
+  # seasonal MA
+  if (m > 1) {
+    Q <- length(sma)
+    seasonal_poly <- numeric(m * Q)
+    seasonal_poly[m * seq(Q)] <- sma
+    sma <- polynomial(c(1, seasonal_poly))
+  } else {
+    sma <- 1
+  }
+
+  n <- 500L
+  theta <- -c(coef(ma * sma))[-1]
+  if (length(theta) == 0L) {
+    theta <- 0
+  }
+  phi <- -c(coef(ar * sar)[-1], numeric(n))
+  q <- length(theta)
+  pie <- c(numeric(q), 1, numeric(n))
+  for (j in seq(n)) {
+    pie[j + q + 1L] <- -phi[j] - sum(theta * pie[(q:1L) + j])
+  }
+  pie <- pie[(0L:n) + q + 1L]
+
+  # Return up to last element greater than tol
+  maxj <- max(which(abs(pie) > tol))
+  pie <- head(pie, maxj)
+  return(-pie[-1])
 }
