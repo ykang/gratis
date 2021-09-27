@@ -13,6 +13,7 @@
 #' @return A time-series object of class "ts" or "msts".
 #' @author Yanfei Kang and Rob J Hyndman
 #' @examples
+#' \dontrun{
 #' my_features <- function(y) {
 #'   c(tsfeatures::entropy(y), acf = acf(y, plot = FALSE)$acf[2:3, 1, 1])
 #' }
@@ -21,7 +22,7 @@
 #'   target = c(0.5, 0.9, 0.8)
 #' )
 #' my_features(y)
-#' plot(y)
+#' plot(y)}
 #' @export
 #'
 simulate_target <- function(length, seasonal_periods = 1, feature_function, target, parallel = FALSE) {

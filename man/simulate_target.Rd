@@ -32,6 +32,7 @@ A time-series object of class "ts" or "msts".
 Generating time series with controllable features.
 }
 \examples{
+\dontrun{
 my_features <- function(y) {
   c(tsfeatures::entropy(y), acf = acf(y, plot = FALSE)$acf[2:3, 1, 1])
 }
@@ -40,7 +41,7 @@ y <- simulate_target(
   target = c(0.5, 0.9, 0.8)
 )
 my_features(y)
-plot(y)
+plot(y)}
 }
 \author{
 Yanfei Kang and Rob J Hyndman

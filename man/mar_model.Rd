@@ -42,21 +42,23 @@ uniformly sampled on \{1,2,3,4,5\}.
 \examples{
 n <- 100
 # Quarterly MAR model with randomly selected parameters
-mar_model(seasonal_periods = 4)
+model1 <- mar_model(seasonal_periods = 4)
+
 # Daily MAR model with randomly selected parameters
-mar_model(seasonal_periods = c(7, 365))
+model2 <- mar_model(seasonal_periods = c(7, 365))
+
 # MAR model with constant variances
 # containing an AR(1) component and an AR(2) component
 ar <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
 weights <- c(0.8, 0.2)
-model1 <- mar_model(ar = ar, sigmas = c(1, 2), weights = weights)
+model3 <- mar_model(ar = ar, sigmas = c(1, 2), weights = weights)
 
 # MAR model with heteroskedastic errors
 sigmas.spec <- list(
   fGarch::garchSpec(model = list(alpha = c(0.05, 0.06))),
   fGarch::garchSpec(model = list(alpha = c(0.05, 0.05)))
 )
-model2 <- mar_model(ar = ar, sigmas = sigmas.spec, weights = weights)
+model4 <- mar_model(ar = ar, sigmas = sigmas.spec, weights = weights)
 }
 \seealso{
 \code{\link{simulate.mar}}
