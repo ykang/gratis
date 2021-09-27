@@ -51,27 +51,27 @@ arima_model <- function(frequency = 1, p = NULL, d = NULL, q = NULL,
     sigma <- runif(1, 1, 5)
   }
   # Model orders
-  if (!is.null(p)) {
+  if (is.null(p)) {
     p <- sample(c(0, 1, 2, 3), 1)
   }
-  if (!is.null(d)) {
+  if (is.null(d)) {
     d <- sample(c(0, 1, 2), 1)
   }
-  if (!is.null(q)) {
+  if (is.null(q)) {
     q <- sample(c(0, 1, 2, 3), 1)
   }
   if (frequency > 1) {
-    if (!is.null(P)) {
+    if (is.null(P)) {
       P <- sample(c(0, 1, 2), 1)
     }
-    if (!is.null(D)) {
+    if (is.null(D)) {
       if (d == 2) {
         D <- 0
       } else {
         D <- sample(c(0, 1), 1)
       }
     }
-    if (!is.null(Q)) {
+    if (is.null(Q)) {
       Q <- sample(c(0, 1, 2), 1)
     }
   } else {

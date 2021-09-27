@@ -80,8 +80,10 @@ mar_model <- function(ar = NULL, sigmas = NULL, weights = NULL, seasonal_periods
   } else {
     if (length(sigmas) != k) {
       stop("Dimension of sigmas does not match other components")
-    } else if(any(sigmas <= 0)) {
-      stop("sigmas must be positive")
+    } else if(is.numeric(sigmas)) {
+      if(any(sigmas <= 0)) {
+        stop("sigmas must be positive")
+      }
     }
   }
   # one seasonal period for each component
