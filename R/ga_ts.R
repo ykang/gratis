@@ -55,8 +55,6 @@
 #' @return An object of class `ga-class`.
 #' @export
 #'
-#' @examples
-#' # Not Run
 ga_ts <- function(type = c("binary", "real-valued", "permutation"),
                   fitness, ..., n,
                   min, max, nBits,

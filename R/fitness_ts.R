@@ -13,8 +13,6 @@
 #' @export
 #' @importFrom forecast ndiffs
 #'
-#' @examples
-#' # Not Run
 fitness_ts <- function(pars, features, seasonal, n = 120, freq = 12, target, nComp, selected.features) {
   pars <- pars2list(pars, seasonal, nComp)
   if (seasonal < 2) {

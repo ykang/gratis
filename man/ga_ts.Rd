@@ -124,6 +124,3 @@ An object of class `ga-class`.
 A revised version of genetic algorithms (R package `GA`) to allow for time series
 generation.
 }
-\examples{
-# Not Run
-}

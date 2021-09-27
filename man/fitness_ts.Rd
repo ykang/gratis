@@ -38,6 +38,3 @@ NA
 \description{
 Fitness function for time series generation.
 }
-\examples{
-# Not Run
-}
