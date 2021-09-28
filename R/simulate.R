@@ -81,5 +81,5 @@ simulate.mar <- function(object, nsim = 100, seed = NULL, n.start = 100, ...) {
   for (i in (p + 1L):n) {
     y[i] <- sum(object$ar[, components[i]] * c(1, y[i - seq(p)])) + epsilon[i]
   }
-  return(forecast::msts(y[-seq(n.start + p)], seasonal.periods = object$m))
+  return(forecast::msts(y[-seq(n.start + p)], seasonal.periods = unique(object$m)))
 }
