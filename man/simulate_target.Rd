@@ -2,13 +2,15 @@
 % Please edit documentation in R/simulate_target.R
 \name{simulate_target}
 \alias{simulate_target}
-\title{Generating time series with controllable features.}
+\title{Generating time series with controllable features using MAR models}
 \usage{
 simulate_target(
   length,
   seasonal_periods = 1,
   feature_function,
   target,
+  p = 2,
+  k = ifelse(length(seasonal_periods) == 1, 3, length(seasonal_periods)),
   parallel = FALSE
 )
 }
@@ -18,30 +20,56 @@ simulate_target(
 \item{seasonal_periods}{Either a scalar or a numeric vector of length k containing
 the number of seasonal periods for each component.}
 
-\item{feature_function}{a function that returns a vector of features from a time series}
+\item{feature_function}{a function that returns a vector of features from a time series.}
 
-\item{target}{target feature values of the same length as that returned by \code{feature_function()}}
+\item{target}{target feature values of the same length as that returned by \code{feature_function()}.}
+
+\item{p}{integer specifying order of autoregression to use for MAR models. Default is 2.}
+
+\item{k}{integer specifying number of components to use for MAR models. Default is 3
+unless there are multiple seasonal periods specified.}
 
 \item{parallel}{An optional argument which allows to specify if the Genetic Algorithm
 should be run sequentially or in parallel.}
+
+\item{model}{character string indicating what model should be used to generate the data.}
 }
 \value{
 A time-series object of class "ts" or "msts".
 }
 \description{
-Generating time series with controllable features.
+Simulate one time series of length `length` from a MAR model with target features.
+\code{feature_function} is a function that returns a vector of features from a time series,
+while \code{target} is a vector of features of the same length as that returned by
+\code{feature_function}.
 }
 \examples{
 \dontrun{
+set.seed(3)
+library(tsfeatures)
 my_features <- function(y) {
-  c(tsfeatures::entropy(y), acf = acf(y, plot = FALSE)$acf[2:3, 1, 1])
+  c(entropy(y), acf = acf(y, plot = FALSE)$acf[2:3, 1, 1], max = max(abs(y)))
 }
+# Specify target features
 y <- simulate_target(
-  length = 60, feature_function = my_features,
-  target = c(0.5, 0.9, 0.8)
+  length = 60, p = 1, 
+  feature_function = my_features, target = c(0.5, 0.9, 0.8, 1)
 )
 my_features(y)
-plot(y)}
+plot(y)
+# Simulate a time series similar to an existing series
+my_features <- function(y) {
+  c(min(y)/7000, sd(y)/1000, stl_features(y)[c("trend", "seasonal_strength")])
+}
+y <- simulate_target(
+  length = length(USAccDeaths),
+  seasonal_periods = frequency(USAccDeaths),
+  feature_function = my_features, target = my_features(USAccDeaths)
+)
+tsp(y) <- tsp(USAccDeaths)
+plot(cbind(USAccDeaths, y))
+cbind(my_features(USAccDeaths), my_features(y))
+}
 }
 \author{
 Yanfei Kang and Rob J Hyndman
