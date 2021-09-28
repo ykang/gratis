@@ -39,7 +39,9 @@ rmixnorm <- function(n, means, sigmas, weights) {
   for (i in seq(k)) {
     if (nsamp[i] > 0) {
       data[idx == i, ] <- mvtnorm::rmvnorm(
-        n = nsamp[i], mean = means[, i], sigma = as.matrix(sigmas[, , i])
+        n = nsamp[i], mean = means[, i], 
+        sigma = as.matrix(sigmas[, , i]), 
+        checkSymmetry = FALSE
       )
     }
   }
@@ -73,7 +75,8 @@ dmixnorm <- function(x, means, sigmas, weights, log = FALSE) {
     function(comp.i, x, means, sigmas, q) {
       mvtnorm::dmvnorm(
         x = x, mean = means[, comp.i],
-        sigma = as.matrix(sigmas[, , comp.i])
+        sigma = as.matrix(sigmas[, , comp.i]),
+        checkSymmetry = FALSE
       )
     },
     x = x, means = means, sigmas = sigmas, q = q
