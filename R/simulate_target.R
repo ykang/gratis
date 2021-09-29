@@ -10,7 +10,6 @@
 #' the number of seasonal periods for each component.
 #' @param feature_function a function that returns a vector of features from a time series.
 #' @param target target feature values of the same length as that returned by \code{feature_function()}.
-#' @param model character string indicating what model should be used to generate the data.
 #' @param k integer specifying number of components to use for MAR models. Default is 3
 #' unless there are multiple seasonal periods specified.
 #' @param tolerance average tolerance per feature. The genetic algorithm will attempt
@@ -30,7 +29,7 @@
 #' }
 #' # Specify target features
 #' y <- simulate_target(
-#'   length = 60, feature_function = my_features, target = c(0.5, 0.9, .8)
+#'   length = 60, feature_function = my_features, target = c(0.5, 0.9, 0.8)
 #' )
 #' my_features(y)
 #' plot(y)

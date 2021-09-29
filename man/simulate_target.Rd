@@ -34,8 +34,6 @@ solution.}
 
 \item{parallel}{An optional argument which allows to specify if the Genetic Algorithm
 should be run sequentially or in parallel.}
-
-\item{model}{character string indicating what model should be used to generate the data.}
 }
 \value{
 A time series object of class "ts" or "msts".
@@ -56,7 +54,7 @@ my_features <- function(y) {
 }
 # Specify target features
 y <- simulate_target(
-  length = 60, feature_function = my_features, target = c(0.5, 0.9, .8)
+  length = 60, feature_function = my_features, target = c(0.5, 0.9, 0.8)
 )
 my_features(y)
 plot(y)
