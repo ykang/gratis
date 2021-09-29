@@ -9,8 +9,8 @@ simulate_target(
   seasonal_periods = 1,
   feature_function,
   target,
-  p = 2,
   k = ifelse(length(seasonal_periods) == 1, 3, length(seasonal_periods)),
+  tolerance = 0.1,
   parallel = FALSE
 )
 }
@@ -24,10 +24,13 @@ the number of seasonal periods for each component.}
 
 \item{target}{target feature values of the same length as that returned by \code{feature_function()}.}
 
-\item{p}{integer specifying order of autoregression to use for MAR models. Default is 2.}
-
 \item{k}{integer specifying number of components to use for MAR models. Default is 3
 unless there are multiple seasonal periods specified.}
+
+\item{tolerance}{average tolerance per feature. The genetic algorithm will attempt
+to find a solution where the average difference between the series features and target
+is less than \code{tolerance}. A larger value will give a faster but less precise
+solution.}
 
 \item{parallel}{An optional argument which allows to specify if the Genetic Algorithm
 should be run sequentially or in parallel.}
@@ -35,31 +38,31 @@ should be run sequentially or in parallel.}
 \item{model}{character string indicating what model should be used to generate the data.}
 }
 \value{
-A time-series object of class "ts" or "msts".
+A time series object of class "ts" or "msts".
 }
 \description{
 Simulate one time series of length `length` from a MAR model with target features.
 \code{feature_function} is a function that returns a vector of features from a time series,
 while \code{target} is a vector of features of the same length as that returned by
-\code{feature_function}.
+\code{feature_function}. The features should not depend on the scale of the time
+series as the series is scaled during simulation.
 }
 \examples{
 \dontrun{
-set.seed(3)
+set.seed(1)
 library(tsfeatures)
 my_features <- function(y) {
-  c(entropy(y), acf = acf(y, plot = FALSE)$acf[2:3, 1, 1], max = max(abs(y)))
+  c(entropy(y), acf = acf(y, plot = FALSE)$acf[2:3, 1, 1])
 }
 # Specify target features
 y <- simulate_target(
-  length = 60, p = 1, 
-  feature_function = my_features, target = c(0.5, 0.9, 0.8, 1)
+  length = 60, feature_function = my_features, target = c(0.5, 0.9, .8)
 )
 my_features(y)
 plot(y)
 # Simulate a time series similar to an existing series
 my_features <- function(y) {
-  c(min(y)/7000, sd(y)/1000, stl_features(y)[c("trend", "seasonal_strength")])
+  c(stl_features(y)[c("trend", "seasonal_strength", "peak", "trough")])
 }
 y <- simulate_target(
   length = length(USAccDeaths),
