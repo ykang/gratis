@@ -16,12 +16,12 @@
 #' to find a solution where the average difference between the series features and target
 #' is less than \code{tolerance}. A larger value will give a faster but less precise
 #' solution.
+#' @param trace logical indicating if details of the search should be shown.
 #' @param parallel An optional argument which allows to specify if the Genetic Algorithm
 #'     should be run sequentially or in parallel.
 #' @return A time series object of class "ts" or "msts".
 #' @author Yanfei Kang and Rob J Hyndman
 #' @examples
-#' \dontrun{
 #' set.seed(1)
 #' library(tsfeatures)
 #' my_features <- function(y) {
@@ -33,6 +33,7 @@
 #' )
 #' my_features(y)
 #' plot(y)
+#' \dontrun{
 #' # Simulate a time series similar to an existing series
 #' my_features <- function(y) {
 #'   c(stl_features(y)[c("trend", "seasonal_strength", "peak", "trough")])
@@ -44,13 +45,12 @@
 #' )
 #' tsp(y) <- tsp(USAccDeaths)
 #' plot(cbind(USAccDeaths, y))
-#' cbind(my_features(USAccDeaths), my_features(y))
-#' }
+#' cbind(my_features(USAccDeaths), my_features(y))}
 #' @export
 #'
 simulate_target <- function(length, seasonal_periods = 1, feature_function, target,
                             k = ifelse(length(seasonal_periods) == 1, 3, length(seasonal_periods)),
-                            tolerance = 0.1, parallel = FALSE) {
+                            tolerance = 0.1, trace = FALSE, parallel = FALSE) {
   # Test lengths
   feature_length <- length(feature_function(forecast::msts(rnorm(length),
     seasonal.periods = unique(seasonal_periods)
@@ -79,6 +79,10 @@ simulate_target <- function(length, seasonal_periods = 1, feature_function, targ
   # Sigmas
   ga_max[(p + 1) * k + seq(k)] <- 5
 
+  if(trace)
+    monitor <- GA::gaMonitor
+  else
+    monitor <- NULL
   GA <- ga_ts(
     type = "real-valued", fitness = fitness_mar,
     length = length, seasonal_periods = seasonal_periods, ncomponents = k,
@@ -88,14 +92,14 @@ simulate_target <- function(length, seasonal_periods = 1, feature_function, targ
     max = ga_max,
     parallel = parallel, popSize = 100, maxiter = 200,
     pmutation = 0.1, pcrossover = 0.8, maxFitness = -length(target) * (tolerance^2),
-    run = 50, keepBest = TRUE, monitor = GA::gaMonitor
+    run = 50, keepBest = TRUE, monitor = monitor
   )
   # Final iteration from GA algorithm
   best <- forecast::msts(utils::tail(GA@bestSol, 1)[[1]],
     seasonal.periods = unique(seasonal_periods)
   )
   # Find best solution
-  if (!is.null(dim(best))) {
+  if (NCOL(best) > 1) {
     best_features <- matrix(0, ncol=NCOL(best), nrow=feature_length)
     for(i in seq(NCOL(best))) {
       best_features[,i] <- feature_function(best[,i])

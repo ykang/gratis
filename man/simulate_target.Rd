@@ -11,6 +11,7 @@ simulate_target(
   target,
   k = ifelse(length(seasonal_periods) == 1, 3, length(seasonal_periods)),
   tolerance = 0.1,
+  trace = FALSE,
   parallel = FALSE
 )
 }
@@ -32,6 +33,8 @@ to find a solution where the average difference between the series features and 
 is less than \code{tolerance}. A larger value will give a faster but less precise
 solution.}
 
+\item{trace}{logical indicating if details of the search should be shown.}
+
 \item{parallel}{An optional argument which allows to specify if the Genetic Algorithm
 should be run sequentially or in parallel.}
 }
@@ -46,7 +49,6 @@ while \code{target} is a vector of features of the same length as that returned 
 series as the series is scaled during simulation.
 }
 \examples{
-\dontrun{
 set.seed(1)
 library(tsfeatures)
 my_features <- function(y) {
@@ -58,6 +60,7 @@ y <- simulate_target(
 )
 my_features(y)
 plot(y)
+\dontrun{
 # Simulate a time series similar to an existing series
 my_features <- function(y) {
   c(stl_features(y)[c("trend", "seasonal_strength", "peak", "trough")])
@@ -69,8 +72,7 @@ y <- simulate_target(
 )
 tsp(y) <- tsp(USAccDeaths)
 plot(cbind(USAccDeaths, y))
-cbind(my_features(USAccDeaths), my_features(y))
-}
+cbind(my_features(USAccDeaths), my_features(y))}
 }
 \author{
 Yanfei Kang and Rob J Hyndman
