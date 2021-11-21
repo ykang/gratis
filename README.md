@@ -41,22 +41,24 @@ Watch [this Youtube video](https://www.youtube.com/watch?v=F3lWECtFa44) provided
 ### Load the package
 
 ``` r
-require("gratis")
+library(gratis)
+library(feasts)
 ```
 
 ### Generate diverse time series
 
 ``` r
-x <- generate_ts(n.ts = 2, freq = 12, nComp = 2, n = 120)
-x$N1$pars
-autoplot(x$N1$x)
+mar_model(seasonal_periods=12) %>%
+  generate(length=120, nseries=2) %>%
+  autoplot(value)
 ```
 
 ### Generate mutiple seasonal time series
 
 ``` r
-x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2)
-autoplot(x)
+mar_model(seasonal_periods=c(24, 24*7)) %>%
+  generate(length=24*7*10, nseries=12) %>%
+  autoplot(value)
 ```
 
 ### Generate time series with controllable features
