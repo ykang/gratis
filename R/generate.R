@@ -47,7 +47,9 @@ generate.Arima <- function(x, length = 100, nseries = 10, ...) {
 
 # Generic generate function for models in gratis package
 generate_gratis <- function(x, length = 100, nseries = 10, ...) {
-  if (!is.null(x$m)) {
+  if("ARIMA" %in% class(x)) {
+    m <- x$arma[5]
+  } else if (!is.null(x$m)) {
     m <- x$m
   } else if (!is.null(x$frequency)) {
     m <- x$frequency
@@ -63,23 +65,26 @@ generate_gratis <- function(x, length = 100, nseries = 10, ...) {
   freq <- min(m)
   if(abs(freq - 365.25/7) < 1e-4 | freq == 52) {
     # Weekly data (which doesn't convert properly in tsibble)
-    out$index <- seq(as.POSIXlt("01-01-01", tz="UTC"), by="7 days", length=NROW(out))
+    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="7 days", length=length),nseries)
     out$index <- tsibble::yearweek(out$index)
   } else if(freq == 24) {
     # Hourly data
-    out$index <- seq(as.POSIXlt("01-01-01", tz="UTC"), by="1 hour", length=NROW(out))
+    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="1 hour", length=length),nseries)
   } else if(freq == 48) {
     # Half hourly data
-    out$index <- seq(as.POSIXlt("01-01-01", tz="UTC"), by="30 min", length=NROW(out))
+    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="30 min", length=length),nseries)
   } else if(freq == 96) {
     # Quarter hour data
-    out$index <- seq(as.POSIXlt("01-01-01", tz="UTC"), by="15 min", length=NROW(out))
+    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="15 min", length=length),nseries)
   } else if(freq == 60) {
     # Minute data
-    out$index <- seq(as.POSIXlt("01-01-01", tz="UTC"), by="1 min", length=NROW(out))
+    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="1 min", length=length),nseries)
   }
   # Return
-  tsibble::as_tsibble(out, index=index, key=key)
+  if("key" %in% colnames(out))
+    return(tsibble::as_tsibble(out, index=index, key=key))
+  else
+   return(tsibble::as_tsibble(out, index=index))
 }
 
 utils::globalVariables(c("index","key"))
