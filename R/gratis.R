@@ -29,3 +29,6 @@ NULL
 # > NULL
 
 utils::globalVariables(c(".", "x", "Season2"))
+
+#' @export
+magrittr::`%>%`
