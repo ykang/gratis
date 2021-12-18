@@ -61,30 +61,39 @@ generate_gratis <- function(x, length = 100, nseries = 10, ...) {
   for (i in seq(nseries)) {
     tsmatrix[, i] <- simulate(x, nsim = length, ...)
   }
+  make_tsibble(tsmatrix, m)
+}
+
+# Create tsibble from ts matrix
+make_tsibble <- function(tsmatrix, seasonal_periods) {
+  if(!("ts" %in% class(tsmatrix)))
+    tsmatrix <- ts(tsmatrix)
   out <- tsibble::as_tsibble(tsmatrix)
-  freq <- min(m)
+  nseries <- length(unique(out$key))
+  length <- NROW(out)/nseries
+  freq <- min(seasonal_periods)
   if(abs(freq - 365.25/7) < 1e-4 | freq == 52) {
     # Weekly data (which doesn't convert properly in tsibble)
-    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="7 days", length=length),nseries)
+    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="7 days", length=length), nseries)
     out$index <- tsibble::yearweek(out$index)
   } else if(freq == 24) {
     # Hourly data
-    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="1 hour", length=length),nseries)
+    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="1 hour", length=length), nseries)
   } else if(freq == 48) {
     # Half hourly data
-    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="30 min", length=length),nseries)
+    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="30 min", length=length), nseries)
   } else if(freq == 96) {
     # Quarter hour data
-    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="15 min", length=length),nseries)
+    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="15 min", length=length), nseries)
   } else if(freq == 60) {
     # Minute data
-    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="1 min", length=length),nseries)
+    out$index <- rep(seq(as.POSIXlt("01-01-01", tz="UTC"), by="1 min", length=length), nseries)
   }
   # Return
   if("key" %in% colnames(out))
     return(tsibble::as_tsibble(out, index=index, key=key))
   else
-   return(tsibble::as_tsibble(out, index=index))
+    return(tsibble::as_tsibble(out, index=index))
 }
 
 utils::globalVariables(c("index","key"))

@@ -2,10 +2,23 @@
 % Please edit documentation in R/simulate_target.R
 \name{simulate_target}
 \alias{simulate_target}
+\alias{generate_target}
 \title{Generating time series with controllable features using MAR models}
 \usage{
 simulate_target(
-  length,
+  length = 100,
+  seasonal_periods = 1,
+  feature_function,
+  target,
+  k = ifelse(length(seasonal_periods) == 1, 3, length(seasonal_periods)),
+  tolerance = 0.1,
+  trace = FALSE,
+  parallel = FALSE
+)
+
+generate_target(
+  length = 100,
+  nseries = 10,
   seasonal_periods = 1,
   feature_function,
   target,
@@ -37,16 +50,18 @@ solution.}
 
 \item{parallel}{An optional argument which allows to specify if the Genetic Algorithm
 should be run sequentially or in parallel.}
+
+\item{nseries}{Number of series to generate}
 }
 \value{
 A time series object of class "ts" or "msts".
 }
 \description{
-Simulate one time series of length `length` from a MAR model with target features.
-\code{feature_function} is a function that returns a vector of features from a time series,
-while \code{target} is a vector of features of the same length as that returned by
-\code{feature_function}. The features should not depend on the scale of the time
-series as the series is scaled during simulation.
+\code{simulate_target} simulate one time series of length `length` from a MAR model with target features 
+and returns a \code{ts} or \code{msts} object.
+\code{generate_target} simulate multiple time series of length `length` from a MAR model with target features 
+and returns a \code{tsibble} object. The index of the tsibble is guessed from the seasonal periods.
+The specified features should not depend on the scale of the time series as the series is scaled during simulation.
 }
 \examples{
 set.seed(1)
@@ -54,14 +69,25 @@ library(tsfeatures)
 my_features <- function(y) {
   c(entropy(y), acf = acf(y, plot = FALSE)$acf[2:3, 1, 1])
 }
-# Specify target features
+# Simulate a ts with specified target features
 y <- simulate_target(
   length = 60, feature_function = my_features, target = c(0.5, 0.9, 0.8)
 )
 my_features(y)
 plot(y)
 \dontrun{
-# Simulate a time series similar to an existing series
+# Generate a tsibble with specified target features
+df <- generate_target(
+  length = 60, feature_function = my_features, target = c(0.5, 0.9, 0.8)
+)
+df \%>\% 
+ as_tibble() \%>\%
+ group_by(key) \%>\%
+ dplyr::summarise(value = my_features(value), 
+           feature=c("entropy","acf1", "acf2"),
+           .groups = "drop")
+autoplot(df)
+# Simulate time series similar to an existing series
 my_features <- function(y) {
   c(stl_features(y)[c("trend", "seasonal_strength", "peak", "trough")])
 }

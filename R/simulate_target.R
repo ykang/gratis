@@ -1,10 +1,11 @@
 #' Generating time series with controllable features using MAR models
 #'
-#' Simulate one time series of length `length` from a MAR model with target features.
-#' \code{feature_function} is a function that returns a vector of features from a time series,
-#' while \code{target} is a vector of features of the same length as that returned by
-#' \code{feature_function}. The features should not depend on the scale of the time
-#' series as the series is scaled during simulation.
+#' \code{simulate_target} simulate one time series of length `length` from a MAR model with target features 
+#' and returns a \code{ts} or \code{msts} object.
+#' \code{generate_target} simulate multiple time series of length `length` from a MAR model with target features 
+#' and returns a \code{tsibble} object. The index of the tsibble is guessed from the seasonal periods.
+#' The specified features should not depend on the scale of the time series as the series is scaled during simulation.
+#'
 #' @param length length of the time series to be generated.
 #' @param seasonal_periods Either a scalar or a numeric vector of length k containing
 #' the number of seasonal periods for each component.
@@ -27,14 +28,25 @@
 #' my_features <- function(y) {
 #'   c(entropy(y), acf = acf(y, plot = FALSE)$acf[2:3, 1, 1])
 #' }
-#' # Specify target features
+#' # Simulate a ts with specified target features
 #' y <- simulate_target(
 #'   length = 60, feature_function = my_features, target = c(0.5, 0.9, 0.8)
 #' )
 #' my_features(y)
 #' plot(y)
 #' \dontrun{
-#' # Simulate a time series similar to an existing series
+#' # Generate a tsibble with specified target features
+#' df <- generate_target(
+#'   length = 60, feature_function = my_features, target = c(0.5, 0.9, 0.8)
+#' )
+#' df %>% 
+#'  as_tibble() %>%
+#'  group_by(key) %>%
+#'  dplyr::summarise(value = my_features(value), 
+#'            feature=c("entropy","acf1", "acf2"),
+#'            .groups = "drop")
+#' autoplot(df)
+#' # Simulate time series similar to an existing series
 #' my_features <- function(y) {
 #'   c(stl_features(y)[c("trend", "seasonal_strength", "peak", "trough")])
 #' }
@@ -48,16 +60,16 @@
 #' cbind(my_features(USAccDeaths), my_features(y))}
 #' @export
 #'
-simulate_target <- function(length, seasonal_periods = 1, feature_function, target,
+simulate_target <- function(length=100, seasonal_periods = 1, feature_function, target,
                             k = ifelse(length(seasonal_periods) == 1, 3, length(seasonal_periods)),
                             tolerance = 0.1, trace = FALSE, parallel = FALSE) {
   # Test lengths
-  feature_length <- length(feature_function(forecast::msts(rnorm(length),
-    seasonal.periods = unique(seasonal_periods)
-  )))
-  if (length(target) != feature_length) {
-    stop(paste("target should be of length", feature_length))
-  }
+  #feature_length <- length(feature_function(forecast::msts(rnorm(length),
+  #  seasonal.periods = unique(seasonal_periods)
+  #)))
+  #if (length(target) != feature_length) {
+  #  stop(paste("target should be of length", feature_length))
+  #}
 
   # How many components to use?
   if (length(seasonal_periods) == 1L) {
@@ -100,7 +112,7 @@ simulate_target <- function(length, seasonal_periods = 1, feature_function, targ
   )
   # Find best solution
   if (NCOL(best) > 1) {
-    best_features <- matrix(0, ncol=NCOL(best), nrow=feature_length)
+    best_features <- matrix(0, ncol=NCOL(best), nrow=length(target))
     for(i in seq(NCOL(best))) {
       best_features[,i] <- feature_function(best[,i])
     }
@@ -109,6 +121,29 @@ simulate_target <- function(length, seasonal_periods = 1, feature_function, targ
   }
   # Return as msts or ts object
   best
+}
+
+#' @rdname simulate_target
+#' @param nseries Number of series to generate
+#' @export
+#'
+generate_target <-  function(length=100, nseries=10, seasonal_periods = 1, feature_function, target,
+                             k = ifelse(length(seasonal_periods) == 1, 3, length(seasonal_periods)),
+                             tolerance = 0.1, trace = FALSE, parallel = FALSE) {
+  tsmatrix <- matrix(NA_real_, nrow=length, ncol=nseries)
+  for(i in seq(nseries)) {
+    tsmatrix[,i] <- simulate_target(
+      length=length, 
+      seasonal_periods = seasonal_periods, 
+      feature_function = feature_function, 
+      target = target,
+      k=k, 
+      tolerance=tolerance, 
+      trace=trace, 
+      parallel=parallel
+    )
+  }
+  make_tsibble(tsmatrix, seasonal_periods)
 }
 
 fitness_mar <- function(pars, length, seasonal_periods, ncomponents, feature_function, target) {
