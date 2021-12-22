@@ -1,19 +1,33 @@
 #' Specify parameters for a Mixture Autoregressive model
 #'
-#' This function allows the parameters of a mixture of k Gaussian AR processes
-#' to be specified. The output is used in \code{\link{simulate.mar}()}.
+#' This function allows the parameters of a mixture of k Gaussian ARIMA(p,d,0)(P,D,0) processes
+#' to be specified. The output is used in \code{\link{simulate.mar}()} and \code{\link{generate.mar}}.
 #' The model is of the form
-#' \deqn{y_t = \phi_{0,i} + \phi_{1,i}y_{t-1} + \cdots + \phi_{p,i}y_{t-p} + \sigma_{i,t}\epsilon_t}
-#' with probability \eqn{\alpha_i}, where \eqn{\epsilon_t} is a N(0,1) variate.
+#' \deqn{(1-B)^{d_i}(1-B^{m_i})^{D_i} (1-\phi_i(B))(1-\Phi_i(B)) y_t = c_i + \sigma_{i,t}\epsilon_t}
+#' with probability \eqn{\alpha_i}, where \eqn{B} is the backshift operator,
+#' \eqn{m_i} is the seasonal period, \eqn{\epsilon_t} is a N(0,1) variate, and
+#' \eqn{\phi_i(B)} and \eqn{\Phi_i(B)} are polynomials in B of
+#' order \eqn{d_i} and \eqn{D_i} respectively.
 #' If any argument is \code{NULL}, the corresponding parameters are randomly selected.
-#' The AR parameters may be non-stationary. When randomly selected, they are chosen
-#' to be the pi weights of an ARIMA(p,d,0)(P,D,0) process where p is in \{0,1,2,3\},
-#' d is in \{0,1,2\}, P is in \{0,1,2\} and D is in \{0,1\}. The model orders and the
-#' parameters are uniformly sampled. The sigmas are uniformly sampled on (1,5)
-#' and the weights are uniformly sampled on (0,1). The number of components is
-#' uniformly sampled on \{1,2,3,4,5\}.
-#' @param ar A (p+1) x k numeric matrix containing the AR parameters
-#' (\eqn{\phi_{0,i}, \phi_{1,i},\dots,\phi_{p,i}}), \eqn{i=1,\dots,k} for each component.
+#' When randomly selected, the AR parameters are uniformly sampled from the stationary region,
+#' p is in \{0,1,2,3\}, d is in \{0,1,2\}, P is in \{0,1,2\} and D is in \{0,1\}.
+#' The model orders are uniformly sampled. The constants are uniformly sampled on (-3,3).
+#' The sigmas are uniformly sampled on (1,5) and the weights are uniformly sampled on (0,1).
+#' The number of components is uniformly sampled on \{1,2,3,4,5\}.
+#' @param k Number of components.
+#' @param p Non-negative integer vector giving the orders of non-seasonal AR polynomials \eqn{\phi_i(B)}.
+#' Ignored if \code{phi} provided.
+#' @param d Non-negative integer vector giving the orders of non-seasonal differencing.
+#' @param phi A max(p) x k numeric matrix containing the non-seasonal AR parameters
+#' (\eqn{\phi_{1,i},\dots,\phi_{p,i}}), \eqn{i=1,\dots,k} for each component.
+#' @param P Non-negative integer giving the orders of seasonal AR polynomiasl \eqn{\Phi_i(B)}.
+#' Ignored if \code{seasonal.periods==1} or \code{Phi} provided.
+#' @param D Non-negative integer giving the orders of seasonal differencing.
+#' Ignored if \code{seasonal.periods==1}.
+#' @param Phi A max(P) x k numeric matrix containing the seasonal AR parameters
+#' (\eqn{\Phi_{1,i},\dots,\phi_{P,i}}), \eqn{i=1,\dots,k} for each component.
+#' Ignored if \code{seasonal.periods==1}.
+#' @param constants A numeric vector of length k containing \eqn{c_1,\dots,c_k}.
 #' @param sigmas A numeric vector of length k or a list of k GARCH specifications.
 #' If it is a vector, it is assumed \eqn{\sigma_{i,t} = \sigma_i} and
 #' \code{sigmas} = \eqn{\sigma_1,\dots,\sigma_k}.
@@ -21,9 +35,10 @@
 #' @param weights A numeric vector of length k containing the probability of
 #' each of the component processes, \eqn{\alpha_1,\dots,\alpha_k}.
 #' @param seasonal_periods Either a scalar or a numeric vector of length k containing
-#' the number of seasonal periods for each component.
-#' @return A `mar` object containing a list of \code{k}, \code{p}, \code{ar},
-#' \code{sigmas} and \code{weights}.
+#' the seasonal period of each component.
+#' @return A `mar` object containing a list of \code{k}, \code{m},
+#' \code{p}, \code{d}, \code{P}, \code{D},
+#' \code{phi}, \code{Phi}, \code{sigmas} and \code{weights}.
 #' @author Rob J Hyndman
 #' @seealso \code{\link{simulate.mar}}
 #' @examples
@@ -36,30 +51,40 @@
 #'
 #' # MAR model with constant variances
 #' # containing an AR(1) component and an AR(2) component
-#' ar <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
+#' phi <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
 #' weights <- c(0.8, 0.2)
-#' model3 <- mar_model(ar = ar, sigmas = c(1, 2), weights = weights)
+#' model3 <- mar_model(phi = phi, d = 0, sigmas = c(1, 2), weights = weights)
 #'
 #' # MAR model with heteroskedastic errors
 #' sigmas.spec <- list(
 #'   fGarch::garchSpec(model = list(alpha = c(0.05, 0.06))),
 #'   fGarch::garchSpec(model = list(alpha = c(0.05, 0.05)))
 #' )
-#' model4 <- mar_model(ar = ar, sigmas = sigmas.spec, weights = weights)
+#' model4 <- mar_model(phi = phi, sigmas = sigmas.spec, weights = weights)
 #' @export
-mar_model <- function(ar = NULL, sigmas = NULL, weights = NULL, seasonal_periods = 1L) {
+mar_model <- function(k = NULL,
+                      p = NULL, d = NULL, phi = NULL,
+                      P = NULL, D = NULL, Phi = NULL,
+                      constants = NULL, sigmas = NULL, weights = NULL,
+                      seasonal_periods = 1L) {
   # How many components?
-  if (is.null(ar) & is.null(sigmas) & is.null(weights) & length(seasonal_periods) == 1L) {
-    # choose a random number of components between 1 and 5
-    k <- sample(seq(5), 1, replace = TRUE)
-  } else if (!is.null(weights)) {
-    k <- length(weights)
-  } else if (!is.null(sigmas)) {
-    k <- length(sigmas)
-  } else if (length(seasonal_periods) > 1L) {
-    k <- length(seasonal_periods)
-  } else {
-    k <- NCOL(ar)
+  if (is.null(k)) {
+    if (!is.null(weights)) {
+      k <- length(weights)
+    } else if (!is.null(phi)) {
+      k <- NCOL(phi)
+    } else if (!is.null(Phi)) {
+      k <- NCOL(Phi)
+    } else if (!is.null(sigmas)) {
+      k <- length(sigmas)
+    } else if (!is.null(constants)) {
+      k <- length(constants)
+    } else if (length(seasonal_periods) == 1L) {
+      # choose a random number of components between 1 and 5
+      k <- sample(seq(5), 1)
+    } else {
+      k <- length(seasonal_periods)
+    }
   }
 
   # weights
@@ -75,6 +100,15 @@ mar_model <- function(ar = NULL, sigmas = NULL, weights = NULL, seasonal_periods
   }
   # Rescale weights so they sum to 1
   weights <- weights / sum(weights)
+
+  # constants
+  if (is.null(constants)) {
+    # Choose k constants in [-3,3]
+    constants <- runif(k, -3, 3)
+  } else if (length(constants) != k) {
+    stop("Dimension of sigmas does not match other components")
+  }
+
   # sigmas
   if (is.null(sigmas)) {
     # Choose k variances in [1,5]
@@ -82,8 +116,8 @@ mar_model <- function(ar = NULL, sigmas = NULL, weights = NULL, seasonal_periods
   } else {
     if (length(sigmas) != k) {
       stop("Dimension of sigmas does not match other components")
-    } else if(is.numeric(sigmas)) {
-      if(any(sigmas <= 0)) {
+    } else if (is.numeric(sigmas)) {
+      if (any(sigmas <= 0)) {
         stop("sigmas must be positive")
       }
     }
@@ -92,46 +126,84 @@ mar_model <- function(ar = NULL, sigmas = NULL, weights = NULL, seasonal_periods
   if (length(seasonal_periods) == 1L) {
     seasonal_periods <- rep(seasonal_periods, k)
   }
-  # AR parameters
-  if (!is.null(ar)) {
-    if (NCOL(ar) != k) {
-      stop("Dimension of ar does not match other components")
-    }
-  } else {
-    ar <- matrix(0, ncol = k, nrow = 4 * max(seasonal_periods) + 4)
+  # Non-seasonal AR parameters
+  if (is.null(p) & is.null(phi)) {
     p <- sample(c(0, 1, 2, 3), k, replace = TRUE)
-    for (i in seq(k)) {
-      if (seasonal_periods[i] > 1) {
-        d <- sample(c(0, 1), 1, replace = TRUE)
-        D <- sample(c(0, 1), 1, replace = TRUE)
-        P <- sample(c(0, 1, 2), 1, replace = TRUE)
-      } else {
-        D <- P <-
-          d <- sample(c(0, 1, 2), 1, replace = TRUE)
-      }
-      phi0 <- phi <- Phi <- 0
-      if (d + D <= 1) {
-        phi0 <- runif(1, -3, 3)
-      }
-      if (p[i] > 0) {
-        phi <- stationary_ar(p[i])
-      }
-      if (seasonal_periods[i] > 1 & P > 0) {
-        Phi <- stationary_ar(P)
-      }
-      pi_weights <- c(
-        phi0,
-        pi_coefficients(ar = phi, sar = Phi, d = d, D = D, m = seasonal_periods[i])
-      )
-      ar[seq_along(pi_weights), i] <- pi_weights
+  } else if (!is.null(phi)) {
+    if (NCOL(phi) != k) {
+      stop("Dimension of phi does not match other components")
     }
+    p <- rep(NROW(phi), k)
+  }
+  if (is.null(phi)) {
+    if (length(p) == 1L) {
+      p <- rep(p, k)
+    }
+    phi <- matrix(0, ncol = k, nrow = max(p))
+    for (i in seq(k)) {
+      if (p[i] > 0) {
+        phi[seq(p[i]), i] <- stationary_ar(p[i])
+      }
+    }
+  }
+  if (is.null(d)) {
+    d <- sample(c(0, 1, 2), k, replace = TRUE)
+  } else if (length(d) == 1L) {
+    d <- rep(d, k)
+  }
+  # Seasonal AR parameters
+  if (any(seasonal_periods > 1)) {
+    if (is.null(P) & is.null(Phi)) {
+      P <- sample(c(0,1,2), k, replace=TRUE)
+    } else if (!is.null(Phi)) {
+      if (NCOL(Phi) != k) {
+        stop("Dimension of Phi does not match other components")
+      }
+      P <- rep(NROW(phi), k)
+    }
+    if (is.null(Phi)) {
+      if (length(P) == 1L) {
+        P <- rep(P, k)
+      }
+      P[seasonal_periods == 1] <- 0
+      Phi <- matrix(0, ncol = k, nrow = max(P))
+      for (i in seq(k)) {
+        if (P[i] > 0) {
+          Phi[seq(P[i]), i] <- stationary_ar(P[i])
+        }
+      }
+    }
+    if (is.null(D)) {
+      D <- sample(c(0, 1), k, replace = TRUE)
+    } else if (length(D) == 1L) {
+      D <- rep(D, k)
+    }
+    D[seasonal_periods == 1 | d == 2] <- 0
+  } else {
+    D <- P <- rep(0, k)
+    Phi <- matrix(0, ncol = k, nrow = 0)
+  }
+  constants[d + D > 1] <- 0
+  # Compute pi weights
+  max_order <- max(d + seasonal_periods * D + p + seasonal_periods * P)
+  ar <- matrix(0, ncol = k, nrow = max_order + 1)
+  for (i in seq(k)) {
+    pi_weights <- c(
+      constants[i],
+      pi_coefficients(ar = phi[, i], sar = Phi[, i], d = d[i], D = D[i], m = seasonal_periods[i])
+    )
+    ar[seq_along(pi_weights), i] <- pi_weights
   }
   # Trim redundant zeros
   nonzero <- which(rowSums(abs(ar)) > 0)
   ar <- ar[seq(max(nonzero)), , drop = FALSE]
 
   # Return mar object
-  structure(list(ar = ar, sigmas = sigmas, weights = weights, m = seasonal_periods),
-    class = "mar"
+  structure(list(
+    k = k, p = p, d = d, phi = phi, P = P, D = D, Phi = Phi,
+    constants = constants, ar = ar,
+    sigmas = sigmas, weights = weights, m = seasonal_periods
+  ),
+  class = "mar"
   )
 }

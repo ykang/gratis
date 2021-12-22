@@ -19,9 +19,9 @@
 #' @seealso \code{\link{mar_model}}
 #' @examples
 #' # MAR model with constant variances
-#' ar <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
+#' phi <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
 #' weights <- c(0.8, 0.2)
-#' model1 <- mar_model(ar = ar, sigmas = c(1, 2), weights = weights)
+#' model1 <- mar_model(phi = phi, sigmas = c(1, 2), weights = weights)
 #' y <- simulate(model1, 100)
 #' plot(y)
 #'
@@ -30,7 +30,7 @@
 #'   fGarch::garchSpec(model = list(alpha = c(0.05, 0.06))),
 #'   fGarch::garchSpec(model = list(alpha = c(0.05, 0.05)))
 #' )
-#' model2 <- mar_model(ar = ar, sigmas = sigmas.spec, weights = weights)
+#' model2 <- mar_model(phi = phi, sigmas = sigmas.spec, weights = weights)
 #' y <- simulate(model2, 100)
 #' plot(y)
 #' @export

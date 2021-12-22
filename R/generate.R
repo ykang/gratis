@@ -21,9 +21,9 @@ generics::generate
 #' @seealso \code{\link{mar_model}}, \code{\link{simulate.mar}}
 #' @examples
 #' # MAR model with constant variances
-#' ar <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
+#' phi <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
 #' weights <- c(0.8, 0.2)
-#' model1 <- mar_model(ar = ar, sigmas = c(1, 2), weights = weights)
+#' model1 <- mar_model(phi = phi, sigmas = c(1, 2), weights = weights)
 #' generate(model1, nseries = 5)
 #' # MAR model for hourly data with daily and weekly periods
 #' hourly_model <- mar_model(seasonal_periods = c(24, 24*7))
