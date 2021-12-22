@@ -1,7 +1,8 @@
 #' Specify parameters for an ARIMA model
 #'
 #' This function allows the parameters of a Gaussian \eqn{ARIMA(p,d,q)(P,D,Q)[m]}
-#' process to be specified. The output can be used in \code{\link[forecast]{simulate.Arima}()}.
+#' process to be specified. The output can be used in \code{\link[forecast]{simulate.Arima}()}
+#' and \code{\link{generate.Arima}}.
 #' If any argument is \code{NULL}, the corresponding parameters are randomly selected.
 #' The AR and MA orders p and q are chosen from \{0,1,2,3\}, the seasonal AR and MA
 #' orders P and Q are from \{0,1,2\}, while the order of differencing,

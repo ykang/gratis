@@ -1,5 +1,7 @@
 #' Generating time series with controllable features.
 #'
+#' Deprecated function. Please use \code{\link{generate_target}()} instead.
+#'
 #' @param n number of time series to be generated.
 #' @param ts.length length of the time series to be generated.
 #' @param freq frequency of the time series to be generated.

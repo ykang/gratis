@@ -1,5 +1,6 @@
 #' Generate time series from random parameter spaces of the mixture autoregressive (MAR) models.
 #'
+#' Deprecated function. Please use \code{\link{mar_model}()} and \code{\link{generate.mar}()} instead.
 #' Generate time series from random parameter spaces of the mixture autoregressive (MAR)
 #' models.
 #' @param n.ts number of time series to be generated.
@@ -121,7 +122,8 @@ generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120, output_format
 
 #' Generate multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
 #'
-#' Generate multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
+#' Deprecated function. Please use \code{\link{mar_model}()} and \code{\link{generate.mar}()} instead.
+#' Generates multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
 #' @param seasonal.periods a vector of seasonal periods of the time series to be generated.
 #' @param n length of the generated time series.
 #' @param nComp number of mixing components when simulating time series using MAR models.
