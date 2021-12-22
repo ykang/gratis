@@ -16,7 +16,7 @@ opts_chunk$set(
   echo = TRUE,
   cache = TRUE,
   fig.width = 7,
-  fig.height = 6,
+  fig.height = 4,
   fig.align = 'centre',
   comment = "#>"
 )
@@ -55,7 +55,7 @@ qmar
 
 This shows $k=`r ncol(qmar$ar)`$ components with weights `r sprintf("%.2f",qmar$weights)`. Now we can generate time series from this model.
 
-```{r marplot, fig.height = 6, fig.width = 7}
+```{r marplot}
 qmar %>%
   generate(nseries = 9, length = 20) %>%
   autoplot(value)
@@ -67,7 +67,7 @@ Each of these series comes from the same MAR model, but with different stochasti
 
 Time series can exhibit multiple seasonal pattern of different length, especially when series observed at a high frequency such as daily or hourly data. Here is an example in which we generate 1 hourly time series of length 2 weeks.
 
-```{r hmarmodel, fig.height = 6, fig.width = 7}
+```{r hmarmodel}
 hmar <- mar_model(seasonal_periods = c(24, 7*24))
 hmar %>%
   generate(nseries = 1, length= 2*7*24) %>%
@@ -80,7 +80,7 @@ This particular example shows strong time-of-day seasonality but no obvious day-
 
 The functions `generate_target()` and `simulate_target()` can efficiently generate time series with targetted features. These use a  genetic algorithm to tune the MAR parameters until the distance between the target feature vector and the feature vector of the synthetic time series is as small as possible. As before, the `generate...` function returns a `tsibble` while the `simulate...` function returns a `ts` or `msts` object.
 
-Suppose we want to use generate a time series with the same level of trend and seasonality as the `USAccDeaths` data. First we create a function to measure the features we want to target. This time we will use a `simulate` rather than a `generate` function so the resulting time series is the same class as the `USAccDeaths` data.
+Suppose we want to use generate a time series with the same level of trend and seasonality as the `USAccDeaths` data. First we create a function to measure the features we want to target. This time we will use `simulate()` rather than `generate()` so that the resulting time series has the same class as the `USAccDeaths` data.
 
 ```{r myfeatures}
 library(tsfeatures)
@@ -92,14 +92,16 @@ y <- simulate_target(
   seasonal_periods = frequency(USAccDeaths),
   feature_function = my_features, target = my_features(USAccDeaths)
 )
+# Make new series same scale and frequency as USAccDeaths
+y <- ts(scale(y) * sd(USAccDeaths) + mean(USAccDeaths))
 tsp(y) <- tsp(USAccDeaths)
-plot(cbind(USAccDeaths, y))
+cbind(USAccDeaths, y) %>% autoplot()
 cbind(my_features(USAccDeaths), my_features(y))
 ```
 
 Next we will demonstrate the `generate_target()` function with target features specified by the spectral entropy and the first two autocorrelation coefficients.
 
-```{r fig.height = 6, fig.width = 7}
+```{r}
 library(dplyr)
 my_features <- function(y) {
   c(entropy(y), acf = acf(y, plot = FALSE)$acf[2:3, 1, 1])
@@ -112,8 +114,8 @@ df %>%
  group_by(key) %>%
  summarise(value = my_features(value), 
            feature=c("entropy","acf1", "acf2"),
-           .groups = "drop")
-autoplot(df)
+           .groups = "drop") 
+df %>% autoplot(value)
 ```
 
 # ARIMA and ETS models
