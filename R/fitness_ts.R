@@ -1,17 +1,17 @@
-#' Fitness function for time series generation.
-#'
-#' @param pars Parameters
-#' @param features Time series features.
-#' @param seasonal Seasonal effects.
-#' @param n Length of time series
-#' @param freq Frequence of time series
-#' @param target Target time series features
-#' @param nComp No. of components used in mixture models.
-#' @param selected.features Selected features.
-#'
-#' @return NA
+# Fitness function for time series generation.
+#
+# @param pars Parameters
+# @param features Time series features.
+# @param seasonal Seasonal effects.
+# @param n Length of time series
+# @param freq Frequence of time series
+# @param target Target time series features
+# @param nComp No. of components used in mixture models.
+# @param selected.features Selected features.
+#
+# @return NA
 #' @importFrom forecast ndiffs
-#'
+
 fitness_ts <- function(pars, features, seasonal, n = 120, freq = 12, target, nComp, selected.features) {
   pars <- pars2list(pars, seasonal, nComp)
   if (seasonal < 2) {
