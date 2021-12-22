@@ -11,8 +11,13 @@ vignette: >
 ```{r initial, echo = FALSE, cache = FALSE, results = 'hide'}
 library(knitr)
 opts_chunk$set(
-  warning = FALSE, message = FALSE, echo = TRUE,
-  fig.width = 7, fig.height = 6, fig.align = 'centre',
+  warning = TRUE,
+  message = TRUE,
+  echo = TRUE,
+  cache = TRUE,
+  fig.width = 7,
+  fig.height = 6,
+  fig.align = 'centre',
   comment = "#>"
 )
 ```
@@ -43,7 +48,7 @@ The resulting model object can be passed to `generate()` to return a `tsibble` o
 
 Suppose we want to generate a random MAR model, and then generate 9 quarterly time series from it, each of length 5 years.
 
-```{r marmodel, fig.height = 6, fig.width = 7}
+```{r marmodel}
 qmar <- mar_model(seasonal_periods = 4)
 qmar
 ```
@@ -110,3 +115,15 @@ df %>%
            .groups = "drop")
 autoplot(df)
 ```
+
+# ARIMA and ETS models
+
+Just as `mar_model()` returns a MAR model, `arima_model()` and `ets_model()` will return ARIMA and ETS models. In all cases, elements will be selected randomly if the corresponding argument is omitted. For example,
+
+```{r arimamodel}
+mod <- arima_model(frequency = 4)
+mod
+```
+
+This can then be passed to `generate()` or `simulate()` to obtain synthetic data from the model. The `simulate` methods for ARIMA and ETS models are actually from the forecast package rather than the gratis package.
+

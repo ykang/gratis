@@ -17,7 +17,7 @@ LazyLoad: yes
 Repository: CRAN
 URL: https://github.com/ykang/gratis
 BugReports: https://github.com/ykang/gratis/issues/
-Depends: R (>= 3.4.0)
+Depends: R (>= 3.5.0)
 Imports: 
   doRNG,
   dplyr,
