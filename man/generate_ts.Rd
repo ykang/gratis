@@ -22,6 +22,7 @@ A list of time series together with the SARIMA coefficients used in each mixing
     component and the corresponding mixing weights.
 }
 \description{
+Deprecated function. Please use \code{\link{mar_model}()} and \code{\link{generate.mar}()} instead.
 Generate time series from random parameter spaces of the mixture autoregressive (MAR)
 models.
 }

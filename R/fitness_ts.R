@@ -10,7 +10,6 @@
 #' @param selected.features Selected features.
 #'
 #' @return NA
-#' @export
 #' @importFrom forecast ndiffs
 #'
 fitness_ts <- function(pars, features, seasonal, n = 120, freq = 12, target, nComp, selected.features) {

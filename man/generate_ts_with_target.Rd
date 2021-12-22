@@ -40,7 +40,7 @@ should be run sequentially or in parallel.}
 A time-series object of class "ts" or "msts".
 }
 \description{
-Generating time series with controllable features.
+Deprecated function. Please use \code{\link{generate_target}()} instead.
 }
 \examples{
 library(tsfeatures)

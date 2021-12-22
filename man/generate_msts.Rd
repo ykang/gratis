@@ -24,7 +24,8 @@ generate_msts(
 a time series with multiple seasonal periods.
 }
 \description{
-Generate multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
+Deprecated function. Please use \code{\link{mar_model}()} and \code{\link{generate.mar}()} instead.
+Generates multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
 }
 \examples{
 x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2, output_format = "list")

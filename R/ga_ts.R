@@ -53,7 +53,6 @@
 #' @param seed an integer value containing the random number generator state.
 #'
 #' @return An object of class `ga-class`.
-#' @export
 #'
 ga_ts <- function(type = c("binary", "real-valued", "permutation"),
                   fitness, ..., n,

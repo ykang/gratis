@@ -52,7 +52,8 @@ An `ets` object as described in the \code{\link[forecast]{ets}} function from th
 }
 \description{
 This function allows the parameters of a ETS state space model to be specified.
-The output can be used in \code{\link[forecast]{simulate.ets}()}.
+The output can be used in \code{\link[forecast]{simulate.ets}()}
+and \code{\link{generate.ets}}.
 If any argument is \code{NULL}, the corresponding parameters are randomly selected.
 The error component is chosen from \{A,M\}, the trend component is chosen from
 \{N,A,Ad\}, and the seasonal component is chosen from \{N,A,M\}. In all cases,
