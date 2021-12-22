@@ -62,34 +62,27 @@
 #'
 simulate_target <- function(length=100, seasonal_periods = 1, feature_function, target,
                             k = ifelse(length(seasonal_periods) == 1, 3, length(seasonal_periods)),
-                            tolerance = 0.1, trace = FALSE, parallel = FALSE) {
-  # Test lengths
-  #feature_length <- length(feature_function(forecast::msts(rnorm(length),
-  #  seasonal.periods = unique(seasonal_periods)
-  #)))
-  #if (length(target) != feature_length) {
-  #  stop(paste("target should be of length", feature_length))
-  #}
-
+                            tolerance = 0.05, trace = FALSE, parallel = FALSE) {
   # How many components to use?
-  if (length(seasonal_periods) == 1L) {
-    k <- 3
-  } else {
-    k <- length(seasonal_periods)
-  }
-  p <- 2 + max(seasonal_periods)
+  k <- ifelse(length(seasonal_periods) == 1L, 3, length(seasonal_periods))
+  # Set AR orders
+  p <- 3
+  P <- ifelse(max(seasonal_periods) > 1, 2, 0)
+  # Parameter vector: d, D, phi, Phi, constants, sigmas, weights
+  par_length <- (2+p+P+3)*k - 1
   # Set min and max for all parameters
-  # Order of parameters: phi, sigmas, weights
-  ga_min <- rep(0, (p + 3) * k - 1)
-  ga_max <- rep(1, (p + 3) * k - 1)
-  # AR parameters (allow for nonstationary processes)
-  ga_min[seq((p + 1) * k)] <- -min(1.5, p)
-  ga_max[seq((p + 1) * k)] <- min(1.5, p)
-  # phi0
-  ga_min[seq(k) * (p + 1) - p] <- -10
-  ga_max[seq(k) * (p + 1) - p] <- 10
-  # Sigmas
-  ga_max[(p + 1) * k + seq(k)] <- 5
+  ga_min <- rep(0, par_length)
+  ga_max <- rep(1, par_length)
+  # d
+  ga_max[seq(k)] <- 2
+  # phi and Phi
+  ga_min[seq(p*k + P*k) + 2*k] <- -1.5
+  ga_max[seq(p*k + P*k) + 2*k] <- 1.5
+  # constants
+  ga_min[seq(k) + (p+P+2)*k] <- -3
+  ga_max[seq(k) + (p+P+2)*k] <- 3
+  # sigmas
+  ga_max[seq(k) + (p+P+3)*k] <- 5
 
   if(trace)
     monitor <- GA::gaMonitor
@@ -103,7 +96,7 @@ simulate_target <- function(length=100, seasonal_periods = 1, feature_function, 
     min = ga_min,
     max = ga_max,
     parallel = parallel, popSize = 100, maxiter = 200,
-    pmutation = 0.1, pcrossover = 0.8, maxFitness = -length(target) * (tolerance^2),
+    pmutation = 0.1, pcrossover = 0.8, maxFitness = -tolerance,
     run = 50, keepBest = TRUE, monitor = monitor
   )
   # Final iteration from GA algorithm
@@ -129,7 +122,8 @@ simulate_target <- function(length=100, seasonal_periods = 1, feature_function, 
 #'
 generate_target <-  function(length=100, nseries=10, seasonal_periods = 1, feature_function, target,
                              k = ifelse(length(seasonal_periods) == 1, 3, length(seasonal_periods)),
-                             tolerance = 0.1, trace = FALSE, parallel = FALSE) {
+                             tolerance = 0.05, trace = FALSE, parallel = FALSE) {
+
   tsmatrix <- matrix(NA_real_, nrow=length, ncol=nseries)
   for(i in seq(nseries)) {
     tsmatrix[,i] <- simulate_target(
@@ -149,15 +143,25 @@ generate_target <-  function(length=100, nseries=10, seasonal_periods = 1, featu
 fitness_mar <- function(pars, length, seasonal_periods, ncomponents, feature_function, target) {
   npar <- length(pars)
   k <- ncomponents
-  # Order of parameters: phi, sigmas, weights
-  p <- (npar + 1) / k - 3
-  ar <- matrix(pars[seq((p + 1) * k)], ncol = k)
-  sigmas <- pars[(p + 1) * k + seq(k)]
-  weights <- pars[(p + 2) * k + seq(k - 1)]
+  # AR orders
+  p <- 3
+  P <- ifelse(max(seasonal_periods) > 1, 2, 0)
+  # Parameter vector: d, D, phi, Phi, constants, sigmas, weights
+  d <- round(pars[seq(k)])
+  D <- round(pars[k+seq(k)])
+  phi <- matrix(pars[2*k + seq(p*k)], ncol=k, nrow=p)
+  if(P > 0)
+    Phi <- matrix(pars[(2+p)*k + seq(P*k)], ncol=k, nrow=P)
+  else
+    Phi <- matrix(0, ncol=k, nrow=0)
+  constants <- pars[(2+p+P)*k + seq(k)]
+  sigmas <- pars[(3+p+P)*k + seq(k)]
+  weights <- pars[(4+p+P)*k + seq(k-1)]
   weights <- exp(c(weights, 1 - sum(weights)))
   weights <- weights / sum(weights)
   x <- simulate(
-    mar_model(ar = ar, sigmas = sigmas, weights = weights, 
+    mar_model(d=d, D=D, p=p, P=P, phi=phi, Phi=Phi, constants=constants, 
+              sigmas = sigmas, weights = weights, 
               seasonal_periods = seasonal_periods),
     nsim = length
   )
@@ -167,7 +171,7 @@ fitness_mar <- function(pars, length, seasonal_periods, ncomponents, feature_fun
     value <- -Inf
     warning("try error")
   } else {
-    value <- -sum((features - target)^2)
+    value <- -mean(abs(features - target))
   }
   return(list(value = value, x = x))
 }
