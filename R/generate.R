@@ -69,7 +69,10 @@ make_tsibble <- function(tsmatrix, seasonal_periods) {
   if(!("ts" %in% class(tsmatrix)))
     tsmatrix <- ts(tsmatrix)
   out <- tsibble::as_tsibble(tsmatrix)
-  nseries <- length(unique(out$key))
+  if("key" %in% colnames(out))
+    nseries <- length(unique(out$key))
+  else
+    nseries <- 1
   length <- NROW(out)/nseries
   freq <- min(seasonal_periods)
   if(abs(freq - 365.25/7) < 1e-4 | freq == 52) {
