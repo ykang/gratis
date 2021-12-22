@@ -1,6 +1,6 @@
 ---
 title: "Introduction to gratis"
-author: "Bocong Zhao"
+author: "Bocong Zhao and Rob J Hyndman"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to gratis}
@@ -15,179 +15,98 @@ opts_chunk$set(
   fig.width = 7, fig.height = 6, fig.align = 'centre',
   comment = "#>"
 )
-
-
-#original <- options("tibble.print_min")
-#options(tibble.print_min = 5)
-
-# <---- Do stuff with changed option, e.g. print some tibbles ----> 
-
-#options(tibble.print_min = original)
-
 ```
 
-```{r, message=FALSE, include = FALSE}
-library(forecast)
-library(tsibble)
-```
+# About gratis
 
-## About gratis
+The gratis package generates synthetic time series data with diverse and controllable characteristics. It uses Gaussian mixture autoregressive (MAR) models to generate a wide range of non-Gaussian and nonlinear time series. The theory and methods are described in [Kang, Li and Hyndman (2020)](https://robjhyndman.com/publications/gratis/).
 
-The gratis package indicates generating time series with diverse and controllable characteristic. It is a new efficient and general approach, based on gaussian mixture autoregressive (MAR) models to generate a wide range of non-gaussian and nonlinear time series.
+Synthetic time series data can be used to train or evaluate new algorithms for tasks such as time series forecasting, clustering and classification, with limited input of human effort or computational resources. The gratis package can generate data that mimics and expands real data sets, or which is more diverse than existing real data.
 
-Our generated dataset can be used as diversifiable and controllable benchmarking data in the time series domain. And it can apply as an algorithm evaluation tool for tasks such as time series forecasting and classification with a minimal input of human efforts and computational resources.
-
-## Introduction of gratis mechanism
-
-Based on simulate time series data with mixture autoregressive model, gratis can coverage generalise time series and investigate the diversity in a time series feature space.
-
-Furthermore, by tuning parameters of mixture autoregressive model, gratis can also efficiently generate new time series and controllable features.
+# Generate diverse time series
 
 ```{r setup}
-# load package
 library(gratis)
+library(feasts)
+set.seed(5)
 ```
 
-## Generate diverse time series
+A MAR model is a mixture of $k$ Gaussian ARIMA$(p,d,0)(P,D,0)_m$ processes of the form
+$$
+  (1-B)^{d_i}(1-B^{m_i})^{D_i} (1-\phi_i(B))(1-\Phi_i(B)) y_t = c_i + \sigma_{i,t}\epsilon_t
+$$
+with probability $\alpha_i$, where $B$ is the backshift operator, $m_i$ is the seasonal period, $\epsilon_t$ is a N(0,1) variate, and $\phi_i(B)$ and $\Phi_i(B)$ are polynomials in $B$ of order $p_i$ and $P_i$ respectively.
 
-We use function **generate_ts()** to generate diverse time series
+The function `mar_model()` generates a MAR model with randomly selected parameters. The orders are uniformly sampled such that $p \in \{0,1,2,3\}$, $d \in  \{0,1,2\}$, $P\in \{0,1,2\}$ and $D \in\{0,1\}$ (with the restriction that $d+D \le 2$). The parameters $\phi_{j,i}$ and $\Phi_{j,i}$ are uniformly sampled from the stationary parameter space, while the $\sigma_{i}$ values are uniformly sampled on $(1,5)$ and the mixture weights are uniformly sampled on $(0,1)$. The number of components is uniformly sampled on $\{1,2,3,4,5\}$. If required, each of these parameters can be specified by the user, rather than randomly selected.
 
-Our generation process use **distributions** instead of fixed parameter values in underlying models to allow generate diverse time series instances. The diversity of the generated time series should not rely on the parameter settings.
+The resulting model object can be passed to `generate()` to return a `tsibble` of time series generated from the model. Alternatively, it can be passed to `simulate()` to return one time series using either the `ts` or `msts` class (depending on whether there is more than one seasonal period).
 
-**Definitions**
+Suppose we want to generate a random MAR model, and then generate 9 quarterly time series from it, each of length 5 years.
 
-Here are the definitions of parameter settings in function generate_ts():
+```{r marmodel, fig.height = 6, fig.width = 7}
+qmar <- mar_model(seasonal_periods = 4)
+qmar
+```
 
-|parameter settings | Definition|
-|:----|:-----|
-|n.ts | number of time series to be generated|
-|freq |seasonal period of the time series to be generated|
-|nComp|number of mixing components when simulating time series using MAR models|
-|n    |length of the generated time series|
+This shows $k=`r ncol(qmar$ar)`$ components with weights `r sprintf("%.2f",qmar$weights)`. Now we can generate time series from this model.
 
-**Example**
+```{r marplot, fig.height = 6, fig.width = 7}
+qmar %>%
+  generate(nseries = 9, length = 20) %>%
+  autoplot(value)
+```
 
-Suppose we want to use MAR model to generate **3** time series from random parameter spaces. Each time series has **12** seasonal periods, **2** mixing components and the length **120**.
+Each of these series comes from the same MAR model, but with different stochastic inputs. Although the two ARIMA models are seasonal, the seasonality is too weak to been in the plots.
 
-By setting the parameter **output_format**, **generate_ts** now has an option to transform their time series output into a tsibble format. Without setting the parameter, it would keep output as default setting, list format.
+# Generate mutiple seasonal time series
 
-**1.Generate diverse time series with 'tsibble' output format**
+Time series can exhibit multiple seasonal pattern of different length, especially when series observed at a high frequency such as daily or hourly data. Here is an example in which we generate 1 hourly time series of length 2 weeks.
+
+```{r hmarmodel, fig.height = 6, fig.width = 7}
+hmar <- mar_model(seasonal_periods = c(24, 7*24))
+hmar %>%
+  generate(nseries = 1, length= 2*7*24) %>%
+  autoplot(value)
+```
+
+This particular example shows strong time-of-day seasonality but no obvious day-of-week seasonality. In the next section we will see how to generate series with specific characteristics such as seasonality and trend.
+
+# Generate time series with targetted features
+
+The functions `generate_target()` and `simulate_target()` can efficiently generate time series with targetted features. These use a  genetic algorithm to tune the MAR parameters until the distance between the target feature vector and the feature vector of the synthetic time series is as small as possible. As before, the `generate...` function returns a `tsibble` while the `simulate...` function returns a `ts` or `msts` object.
+
+Suppose we want to use generate a time series with the same level of trend and seasonality as the `USAccDeaths` data. First we create a function to measure the features we want to target. This time we will use a `simulate` rather than a `generate` function so the resulting time series is the same class as the `USAccDeaths` data.
+
+```{r myfeatures}
+library(tsfeatures)
+my_features <- function(y) {
+  c(stl_features(y)[c("trend", "seasonal_strength", "peak", "trough")])
+}
+y <- simulate_target(
+  length = length(USAccDeaths),
+  seasonal_periods = frequency(USAccDeaths),
+  feature_function = my_features, target = my_features(USAccDeaths)
+)
+tsp(y) <- tsp(USAccDeaths)
+plot(cbind(USAccDeaths, y))
+cbind(my_features(USAccDeaths), my_features(y))
+```
+
+Next we will demonstrate the `generate_target()` function with target features specified by the spectral entropy and the first two autocorrelation coefficients.
+
 ```{r fig.height = 6, fig.width = 7}
-generate_ts(n.ts = 3, freq = 12, nComp = 2, n = 120, output_format = "tsibble")
-```
-
-*Output*
-
-We can see **3** different time series be simulated, which are **N1**, **N2** and **N3**. In this example we use time series **N1** for further analysis.
-
-As required, there are **2** mixing components when simulating time series using MAR models, which are **pars1** and **pars2**
-
-Each component stands for different weight.
-
-**2. Generate diverse time series with 'list' output format**
-```{r fig.height = 6, fig.width = 7}
-x <- generate_ts(n.ts = 3, freq = 12, nComp = 2, n = 120,output_format = "list")
-# N1 time series
-x$N1$pars
-```
-
-*Plot time series*
-```{r fig.height = 6, fig.width = 7}
-# plot N1 time series
-autoplot(x$N1$x)
-```
-
-## Generate mutiple seasonal time series
-
-Time series can exhibit multiple seasonal pattern of different length, especially when series observed at a high frequency such as daily or hourly data.
-
-We use function **generate_msts()** to generate mutiple seasonal time series.
-
-**Definitions**
-
-Here are the definitions of parameter settings in function generate_msts():
-
-|parameter settings | Definition|
-|:----|:-----|
-|seasonal.periods | a vector of seasonal periods of the time series to be generated|
-|nComp|number of mixing components when simulating time series using MAR models|
-|n    |length of the generated time series|
-
-**Example**
-
-Suppose we want to use MAR model to generate a time series with **2** mixing components and the length **800** from random parameter spaces. Particularly, this time series has two seasonal periods **7** and **365**.
-
-By setting the parameter **output_format**, **generate_msts** now has an option to transform their time series output into a tsibble format.  Without setting the parameter, it would keep output as default setting, list format.
-
-**1. Generate mutiple seasonal time series with 'tsibble' output format**
-```{r fig.height = 6, fig.width = 7}
-generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2,output_format="tsibble")
-```
-
-**2. Generate mutiple seasonal time series with 'list' output format**
-```{r fig.height = 6, fig.width = 7}
-x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2,output_format="list")
-```
-
-*Plot time series*
-```{r}
-autoplot(x)
-```
-
-## Generate time series with controllable features
-
-Time series analysis with particular focus may only interested in a certain area of feature space or a subset of features.
-
-Our function **generate_ts_with_target()** can efficiently generate time series with target features.
-
-The principle behind is that we use genetic algorithms to tune MAR parameters until the distance between target feature vector and feature vector of a sample of time series simulated from MAR is approximately equal to 0.
-
-**Definitions**
-
-Here are the definitions of parameter settings in function generate_ts_with_target ():
-
-|parameter settings | Definition|
-|:----|:-----|
-|n    |number of time series to be generated|
-|ts.length|length of the time series to be generated|
-|freq|frequency of the time series to be generated|
-|seasonal|0 for non-seasonal data, 1 for single-seasonal data, and 2 for multiple seasonal data|
-|features|a vector of function names|
-|selected.features|selected features to be controlled|
-|target|target feature values|
-|parallel|An optional argument which allows to specify if the Genetic Algorithm should be run sequentially or in parallel|
-
-**Example**
-
-Suppose we want to use MAR model to generate **1 non-seasonal data** time series with frequency **1** and the length **60**. Particularly, this time series has two selected features, **entropy** and **trend** with target value between **0.6** to **0.9**
-
-By setting the parameter **output_format**, **generate_ts_with_target** now has an option to transform their time series output into a tsibble format.  Without setting the parameter, it would keep output as default setting, list format.
-
-**1. Generate mutiple seasonal time series with 'tsibble' output format**
-```{r fig.height = 6, fig.width = 7}
-generate_ts_with_target(
-  n = 1, ts.length = 60, freq = 1, seasonal = 0,
-                        features = c('entropy', 'stl_features'),
-                      selected.features = c('entropy', 'trend'),
-                        target = c(0.6, 0.9),  
-                        parallel=FALSE,
-                        output_format = "tsibble"
-                        )
-```
-
-**2. Generate mutiple seasonal time series with 'list' output format**
-```{r fig.height = 6, fig.width = 7}
-x <- generate_ts_with_target(
-  n = 1, ts.length = 60, freq = 1, seasonal = 0,
-                        features = c('entropy', 'stl_features'),
-                      selected.features = c('entropy', 'trend'),
-                        target = c(0.6, 0.9),  
-                        parallel=FALSE,
-                        output_format = "list"
-                        )
-```
-
-*Plot time series*
-```{r}
-autoplot(x)
+library(dplyr)
+my_features <- function(y) {
+  c(entropy(y), acf = acf(y, plot = FALSE)$acf[2:3, 1, 1])
+}
+df <- generate_target(
+  length = 60, feature_function = my_features, target = c(0.5, 0.9, 0.8)
+)
+df %>% 
+ as_tibble() %>%
+ group_by(key) %>%
+ summarise(value = my_features(value), 
+           feature=c("entropy","acf1", "acf2"),
+           .groups = "drop")
+autoplot(df)
 ```

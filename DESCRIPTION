@@ -37,6 +37,7 @@ Imports:
   tsibble,
   utils
 Suggests: 
+    feasts,
     fGarch,
     knitr,
     rmarkdown,
