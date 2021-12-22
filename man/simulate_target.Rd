@@ -34,7 +34,7 @@ generate_target(
 \item{seasonal_periods}{Either a scalar or a numeric vector of length k containing
 the number of seasonal periods for each component.}
 
-\item{feature_function}{a function that returns a named vector of features from a time series.}
+\item{feature_function}{a function that returns a vector of features from a time series.}
 
 \item{target}{target feature values of the same length as that returned by \code{feature_function()}.}
 

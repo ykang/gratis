@@ -1,6 +1,6 @@
 #' Specify parameters for a Mixture Autoregressive model
 #'
-#' This function allows the parameters of a mixture of k Gaussian ARIMA(p,d,0)(P,D,0) processes
+#' This function allows the parameters of a mixture of k Gaussian ARIMA(p,d,0)(P,D,0)[m] processes
 #' to be specified. The output is used in \code{\link{simulate.mar}()} and \code{\link{generate.mar}}.
 #' The model is of the form
 #' \deqn{(1-B)^{d_i}(1-B^{m_i})^{D_i} (1-\phi_i(B))(1-\Phi_i(B)) y_t = c_i + \sigma_{i,t}\epsilon_t}
@@ -206,4 +206,19 @@ mar_model <- function(k = NULL,
   ),
   class = "mar"
   )
+}
+
+#' @method print mar
+#' @export
+print.mar <- function(x, ...) {
+  cat(paste("Mixture AR model with",x$k,"components:\n"))
+  for(i in seq(x$k)) {
+    cat(paste0("    ARIMA(",x$p[i],",",x$d[i],",","0)"))
+    if(x$P[i] > 0 | x$D[i] > 0) {
+      cat(paste0("(",x$P[i],",",x$D[i],",","0)[",x$m[i],"]"))
+    }
+    cat(" with weight ")
+    cat(sprintf("%.2f",round(x$weights[i],2)))
+    cat("\n")
+  }
 }

@@ -58,7 +58,7 @@ A `mar` object containing a list of \code{k}, \code{m},
 \code{phi}, \code{Phi}, \code{sigmas} and \code{weights}.
 }
 \description{
-This function allows the parameters of a mixture of k Gaussian ARIMA(p,d,0)(P,D,0) processes
+This function allows the parameters of a mixture of k Gaussian ARIMA(p,d,0)(P,D,0)[m] processes
 to be specified. The output is used in \code{\link{simulate.mar}()} and \code{\link{generate.mar}}.
 The model is of the form
 \deqn{(1-B)^{d_i}(1-B^{m_i})^{D_i} (1-\phi_i(B))(1-\Phi_i(B)) y_t = c_i + \sigma_{i,t}\epsilon_t}

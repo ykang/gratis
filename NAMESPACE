@@ -3,6 +3,7 @@
 S3method(generate,Arima)
 S3method(generate,ets)
 S3method(generate,mar)
+S3method(print,mar)
 S3method(simulate,mar)
 export("%>%")
 export(app_gratis)
