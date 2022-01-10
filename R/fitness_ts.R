@@ -201,10 +201,8 @@ pars2list <- function(pars, seasonal, nComp) {
   return(parslist)
 }
 
-#  scalets(), scale time series function is adapted from tsfeatures packages
-#  Rob Hyndman, Yanfei Kang, Pablo Montero-Manso, Thiyanga Talagala, Earo Wang,
-#  Yangzhuoran Yang and Mitchell O'Hara-Wild (2020). tsfeatures: Time Series Feature
-#  Extraction. R package version 1.0.2.
+#  scalets(), scale time series function is adapted from tsfeatures package:
+#  tsfeatures: Time Series Feature Extraction. R package version 1.0.2.
 #  https://CRAN.R-project.org/package=tsfeatures
 scalets <- function(x) {
   n <- length(x)

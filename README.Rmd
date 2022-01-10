@@ -108,7 +108,7 @@ Or visit our [online Shiny APP](https://ebsmonash.shinyapps.io/tsgeneration/)
 
 ## References
 
-- Kang, Y., Hyndman, R., and Li, F. (2020). **GRATIS**: **G**ene**RA**ting **TI**me **S**eries with
+- Kang, Y., Hyndman, R.J, and Li, F. (2020). **GRATIS**: **G**ene**RA**ting **TI**me **S**eries with
 diverse and controllable characteristics. [Statistical Analysis and Data Mining](https://doi.org/10.1002/sam.11461).
 
 ## License

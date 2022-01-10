@@ -1,8 +1,8 @@
 Package: gratis
 Type: Package
 Title: Generating Time Series with Diverse and Controllable Characteristics
-Version: 0.9.9.9000
-Date: 2021-09-11
+Version: 1.0.0
+Date: 2022-01-10
 Authors@R: c(
     person("Yanfei", "Kang", role = c("aut", "cre"), email = "yanfeikang@buaa.edu.cn", comment = c(ORCID = "0000-0001-8769-6650")),
     person("Feng", "Li", role = "aut", email = "feng.li@cufe.edu.cn", comment = c(ORCID = "0000-0002-4248-9778")),
@@ -12,7 +12,7 @@ Authors@R: c(
     )
 Description: 
   Generates synthetic time series based on various univariate time series models 
-  including MAR and ARIMA processes. Kang,Y., Hyndman,R.J., Li,F.(2020) <doi:10.1002/sam.11461>.
+  including MAR and ARIMA processes. Kang, Y., Hyndman, R.J., Li, F.(2020) <doi:10.1002/sam.11461>.
 LazyLoad: yes
 Repository: CRAN
 URL: https://github.com/ykang/gratis
@@ -22,7 +22,7 @@ Imports:
   doRNG,
   dplyr,
   foreach,
-  forecast (>= 8.15.0.9000),
+  forecast (>= 8.16),
   GA,
   generics,
   magrittr,
