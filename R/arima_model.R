@@ -149,12 +149,20 @@ stationary_ar <- function(p) {
     phi1 <- runif(1, phi2 - 1, 1 - phi2)
     phi <- c(phi1, phi2)
   } else {
-    unit_root <- TRUE
-    while (unit_root) {
-      phi <- runif(p, c(-3, -3, -1), c(3, 1, 1))
-      roots <- polyroot(c(1, -phi))
-      unit_root <- min(abs(roots)) < 1
-    }
+    # Generate inverse real roots
+    n_real_roots <- p %% 2
+    inv_real_roots <- runif(n_real_roots, -1, 1)
+    # Generate inverse complex roots in conjugate pairs
+    n_complex_roots <- (p - n_real_roots) / 2
+    r <- runif(n_complex_roots, -1, 1)
+    angle <- runif(n_complex_roots, -pi, pi)
+    inv_complex_roots <- c(complex(argument = angle, modulus = r), 
+                           complex(argument = -angle, modulus = r))
+    # Find polynomial with these as roots
+    poly <- suppressWarnings(polynom::poly.calc(1/c(inv_real_roots, inv_complex_roots)))
+    # Scale to have constant 1
+    poly <- poly / poly[1]
+    phi <- -as.numeric(poly)[-1]
   }
   return(phi)
 }
