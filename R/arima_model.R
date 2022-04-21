@@ -133,6 +133,7 @@ arima_model <- function(frequency = 1, p = NULL, d = NULL, q = NULL,
   model$sigma2 <- sigma^2
   model$frequency <- frequency
   model$loglik <- model$aic <- NA
+  class(model) <- c("forecast_ARIMA", "Arima", "ARIMA")
 
   return(model)
 }
@@ -156,7 +157,7 @@ stationary_ar <- function(p) {
     n_complex_roots <- (p - n_real_roots) / 2
     r <- runif(n_complex_roots, -1, 1)
     angle <- runif(n_complex_roots, -pi, pi)
-    inv_complex_roots <- c(complex(argument = angle, modulus = r), 
+    inv_complex_roots <- c(complex(argument = angle, modulus = r),
                            complex(argument = -angle, modulus = r))
     # Find polynomial with these as roots
     poly <- suppressWarnings(polynom::poly.calc(1/c(inv_real_roots, inv_complex_roots)))
