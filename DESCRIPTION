@@ -1,7 +1,7 @@
 Package: gratis
 Type: Package
 Title: Generating Time Series with Diverse and Controllable Characteristics
-Version: 1.0.0
+Version: 1.0.1
 Date: 2022-01-10
 Authors@R: c(
     person("Yanfei", "Kang", role = c("aut", "cre"), email = "yanfeikang@buaa.edu.cn", comment = c(ORCID = "0000-0001-8769-6650")),
