@@ -82,7 +82,7 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
                   keepBest = FALSE,
                   parallel = FALSE,
                   monitor = if (interactive()) {
-                    if (shiny::is.RStudio()) gaMonitor else FALSE
+                    if (commandArgs()[[1L]] == "RStudio") gaMonitor else FALSE
                   } else {
                     FALSE
                   },
