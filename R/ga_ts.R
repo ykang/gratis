@@ -53,7 +53,7 @@
 # @param seed an integer value containing the random number generator state.
 #
 # @return An object of class `ga-class`.
-#
+# @export
 ga_ts <- function(type = c("binary", "real-valued", "permutation"),
                   fitness, ..., n,
                   min, max, nBits,
@@ -638,7 +638,7 @@ print.summary.ga <- function(x, digits = getOption("digits"), ...) {
 plot.ga <- function(x, y, ylim, cex.points = 0.7,
                     col = c("green3", "dodgerblue3", adjustcolor("green3", alpha.f = 0.1)),
                     pch = c(16, 1), lty = c(1, 2), legend = TRUE,
-                    grid = graphics:::grid, ...) {
+                    grid = graphics::grid, ...) {
   object <- x # Argh.  Really want to use 'object' anyway
   is.final <- !(any(is.na(object@summary[, 1])))
   iters <- if (is.final) 1:object@iter else 1:object@maxiter

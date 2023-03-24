@@ -4,21 +4,21 @@ Title: Generating Time Series with Diverse and Controllable Characteristics
 Version: 1.0.1
 Date: 2022-09-23
 Authors@R: c(
-    person("Yanfei", "Kang", role = c("aut", "cre"), email = "yanfeikang@buaa.edu.cn", comment = c(ORCID = "0000-0001-8769-6650")),
-    person("Feng", "Li", role = "aut", email = "feng.li@cufe.edu.cn", comment = c(ORCID = "0000-0002-4248-9778")),
-    person("Rob", "Hyndman", role = "ctb", email = "rob.hyndman@monash.edu", comment = c(ORCID = "0000-0002-2140-5352")),
+    person("Yanfei", "Kang", role = c("aut"), email = "yanfeikang@buaa.edu.cn", comment = c(ORCID = "0000-0001-8769-6650")),
+    person("Feng", "Li", role = c("aut", "cre"), email = "feng.li@cufe.edu.cn", comment = c(ORCID = "0000-0002-4248-9778")),
+    person("Rob", "Hyndman", role = c("aut"), email = "rob.hyndman@monash.edu", comment = c(ORCID = "0000-0002-2140-5352")),
     person("Mitchell", "O'Hara-Wild", role = "ctb", email = "mail@mitchelloharawild.com", comment = c(ORCID = "0000-0001-6729-7695")),
     person("Bocong", "Zhao", role = "ctb", email = "bocongzhao@163.com", comment = c(ORCID = "0000-0001-8434-9047"))
     )
-Description: 
-  Generates synthetic time series based on various univariate time series models 
+Description:
+  Generates synthetic time series based on various univariate time series models
   including MAR and ARIMA processes. Kang, Y., Hyndman, R.J., Li, F.(2020) <doi:10.1002/sam.11461>.
 LazyLoad: yes
 Repository: CRAN
 URL: https://github.com/ykang/gratis
 BugReports: https://github.com/ykang/gratis/issues/
 Depends: R (>= 3.5.0)
-Imports: 
+Imports:
   doRNG,
   dplyr,
   foreach,
@@ -30,21 +30,21 @@ Imports:
   mvtnorm,
   polynom,
   purrr,
-  shiny,
   stats,
   tibble,
   tsfeatures,
   tsibble,
-  utils
-Suggests: 
-    feasts,
-    fGarch,
-    knitr,
-    rmarkdown,
-    rlang,
-    shinydashboard
+  utils,
+  shiny
+Suggests:
+  feasts,
+  fGarch,
+  knitr,
+  rmarkdown,
+  rlang,
+  shinydashboard
 NeedsCompilation: no
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr

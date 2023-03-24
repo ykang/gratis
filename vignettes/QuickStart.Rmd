@@ -24,9 +24,10 @@ opts_chunk$set(
 
 # About gratis
 
-The gratis package generates synthetic time series data with diverse and controllable characteristics. It uses Gaussian mixture autoregressive (MAR) models to generate a wide range of non-Gaussian and nonlinear time series. The theory and methods are described in [Kang, Li and Hyndman (2020)](https://robjhyndman.com/publications/gratis/).
+The gratis package generates synthetic time series data with diverse and controllable characteristics. It uses Gaussian mixture autoregressive (MAR) models to generate a wide range of non-Gaussian and nonlinear time series. The theory and methods are described in [Kang, Li and Hyndman (2020)](https://doi.org/10.1002/sam.11461).
 
-Synthetic time series data can be used to train or evaluate new algorithms for tasks such as time series forecasting, clustering and classification, with limited input of human effort or computational resources. The gratis package can generate data that mimics and expands real data sets, or which is more diverse than existing real data.
+Synthetic time series data can be used to train or evaluate new algorithms for tasks such as time series forecasting, clustering and classification, with limited input of human effort or computational resources. The gratis package can generate data that mimics and expands real data sets, or which is more diverse than existing real data. Prof. Rob Hyndman also provided [a video tutorial available on YouTube]( https://www.youtube.com/watch?v=F3lWECtFa44).
+
 
 # Generate diverse time series
 
@@ -109,12 +110,12 @@ my_features <- function(y) {
 df <- generate_target(
   length = 60, feature_function = my_features, target = c(0.5, 0.9, 0.8)
 )
-df %>% 
+df %>%
  as_tibble() %>%
  group_by(key) %>%
- summarise(value = my_features(value), 
+ summarise(value = my_features(value),
            feature=c("entropy","acf1", "acf2"),
-           .groups = "drop") 
+           .groups = "drop")
 df %>% autoplot(value)
 ```
 
@@ -128,4 +129,3 @@ mod
 ```
 
 This can then be passed to `generate()` or `simulate()` to obtain synthetic data from the model. The `simulate` methods for ARIMA and ETS models are actually from the forecast package rather than the gratis package.
-
