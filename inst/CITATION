@@ -1,5 +1,11 @@
-year <- format(Sys.Date(), "%Y")
-vers <- paste("R package version", packageVersion("gratis"))
+year <- sub("-.*", "", meta$Date)
+if(!length(year))
+    year <- format(Sys.Date(), "%Y")
+
+vers <- meta$Version
+if(is.null(vers))
+  vers <- packageVersion("gratis")
+vers <- paste("R package version", vers)
 
 citHeader("To cite the gratis package in publications, please use:")
 bibentry(bibtype = "Manual",
