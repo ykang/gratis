@@ -1,3 +1,7 @@
+# gratis 1.0.3
+
+* Fixed CRAN checking issues.
+
 # gratis 1.0.0
 
 * Improved documentation
@@ -12,8 +16,8 @@
 
 ## Improvements
 
-* Added new parameter 'output_format', give users an option to transform time series output data into a tsibble format. 
-* Update vignette content 
+* Added new parameter 'output_format', give users an option to transform time series output data into a tsibble format.
+* Update vignette content
 
 ## Bug fixes
 
