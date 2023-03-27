@@ -29,5 +29,4 @@ bibentry(bibtype = "Article",
          volume   = 13,
          number   = 4,
          pages    = "354--376",
-         doi      = "10.1002/sam.11461"
-)
+         doi      = "10.1002/sam.11461")
