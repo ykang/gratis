@@ -35,7 +35,7 @@ devtools::install_github("ykang/gratis")
 
 ### Tutorial video
 
-Watch [this Youtube video](https://www.youtube.com/watch?v=F3lWECtFa44)
+Watch [this YouTube video](https://www.youtube.com/watch?v=F3lWECtFa44)
 provided by [Prof. Rob Hyndman](https://robjhyndman.com/).
 
 ### Load the package
@@ -79,24 +79,24 @@ my_features <- function(y) {
 df <- generate_target(
   length = 60, feature_function = my_features, target = c(0.5, 0.9, 0.8)
 )
-df %>% 
+df %>%
  as_tibble() %>%
  group_by(key) %>%
- summarise(value = my_features(value), 
+ summarise(value = my_features(value),
            feature=c("entropy","acf1", "acf2"),
            .groups = "drop")
 #> # A tibble: 30 × 3
 #>    key       value feature
-#>    <chr>     <dbl> <chr>  
+#>    <chr>     <dbl> <chr>
 #>  1 Series 1  0.533 entropy
-#>  2 Series 1  0.850 acf1   
-#>  3 Series 1  0.735 acf2   
+#>  2 Series 1  0.850 acf1
+#>  3 Series 1  0.735 acf2
 #>  4 Series 10 0.478 entropy
-#>  5 Series 10 0.880 acf1   
-#>  6 Series 10 0.764 acf2   
+#>  5 Series 10 0.880 acf1
+#>  6 Series 10 0.764 acf2
 #>  7 Series 2  0.507 entropy
-#>  8 Series 2  0.890 acf1   
-#>  9 Series 2  0.899 acf2   
+#>  8 Series 2  0.890 acf1
+#>  9 Series 2  0.899 acf2
 #> 10 Series 3  0.454 entropy
 #> # … with 20 more rows
 autoplot(df)

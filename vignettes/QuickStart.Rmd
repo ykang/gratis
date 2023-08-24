@@ -79,7 +79,7 @@ This particular example shows strong time-of-day seasonality but no obvious day-
 
 # Generate time series with targetted features
 
-The functions `generate_target()` and `simulate_target()` can efficiently generate time series with targetted features. These use a  genetic algorithm to tune the MAR parameters until the distance between the target feature vector and the feature vector of the synthetic time series is as small as possible. As before, the `generate...` function returns a `tsibble` while the `simulate...` function returns a `ts` or `msts` object.
+The functions `generate_target()` and `simulate_target()` can efficiently generate time series with targetted features. These use a genetic algorithm to tune the MAR parameters until the distance between the target feature vector and the feature vector of the synthetic time series is as small as possible. As before, the `generate...` function returns a `tsibble` while the `simulate...` function returns a `ts` or `msts` object.
 
 Suppose we want to use generate a time series with the same level of trend and seasonality as the `USAccDeaths` data. First we create a function to measure the features we want to target. This time we will use `simulate()` rather than `generate()` so that the resulting time series has the same class as the `USAccDeaths` data.
 

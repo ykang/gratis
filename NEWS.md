@@ -1,3 +1,7 @@
+# gratis 1.0.4
+
+* Fixed the 'docType' issue.
+
 # gratis 1.0.3
 
 * Fixed CRAN checking issues.
