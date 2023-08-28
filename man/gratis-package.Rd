@@ -4,7 +4,7 @@
 \name{gratis-package}
 \alias{gratis-package}
 \alias{_PACKAGE}
-\title{gratis: Generating Time Series with Diverse and Controllable Characteristics}
+\title{gratis: GeneRAting TIme Series with diverse and controllable characteristics}
 \description{
 The gratis package generates synthetic time series data based on various
 univariate time series models including MAR, ARIMA and ETS processes.
@@ -33,3 +33,4 @@ Other contributors:
 }
 
 }
+\keyword{internal}

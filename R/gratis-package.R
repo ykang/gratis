@@ -1,4 +1,4 @@
-#' gratis: Generating Time Series with Diverse and Controllable Characteristics
+#' gratis: GeneRAting TIme Series with diverse and controllable characteristics
 #'
 #' The gratis package generates synthetic time series data based on various
 #' univariate time series models including MAR, ARIMA and ETS processes.
@@ -24,12 +24,11 @@
 #' @importFrom tsfeatures tsfeatures
 #' @importFrom doRNG "%dorng%"
 #' @import shiny
+#' @keywords internal
+
 "_PACKAGE"
 
 NULL
-# > NULL
 
-utils::globalVariables(c(".", "x", "Season2"))
-
-#' @export
-magrittr::`%>%`
+# utils::globalVariables(c(".", "x", "Season2"))
+# magrittr::`%>%`
