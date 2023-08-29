@@ -269,3 +269,5 @@ fitness_ts1 <- function(pars, x0, seasonal, n = 60, freq = 12, nComp, h = 18) {
     ))
   }
 }
+
+utils::globalVariables(c(".", "x", "Season2"))

@@ -166,3 +166,4 @@ msts_weights <- function(n.periods) {
   weights <- gamma / sum(gamma)
   return(weights)
 }
+utils::globalVariables(c(".", "x", "Season2"))

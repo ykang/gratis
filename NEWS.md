@@ -1,4 +1,4 @@
-# gratis 1.0.4
+# gratis 1.0.5
 
 * Fixed the 'docType' issue.
 
