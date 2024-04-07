@@ -2,8 +2,8 @@
 % Please edit documentation in R/gratis-package.R
 \docType{package}
 \name{gratis-package}
+\alias{gratis}
 \alias{gratis-package}
-\alias{_PACKAGE}
 \title{gratis: GeneRAting TIme Series with diverse and controllable characteristics}
 \description{
 The gratis package generates synthetic time series data based on various

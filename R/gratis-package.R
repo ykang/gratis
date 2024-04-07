@@ -23,12 +23,11 @@
 #' @importFrom GA startParallel garun
 #' @importFrom tsfeatures tsfeatures
 #' @importFrom doRNG "%dorng%"
+#' @import fGarch
 #' @import shiny
+#' @import feasts
 #' @keywords internal
 
 "_PACKAGE"
 
 NULL
-
-# utils::globalVariables(c(".", "x", "Season2"))
-# magrittr::`%>%`

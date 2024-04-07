@@ -39,8 +39,8 @@ rmixnorm <- function(n, means, sigmas, weights) {
   for (i in seq(k)) {
     if (nsamp[i] > 0) {
       data[idx == i, ] <- mvtnorm::rmvnorm(
-        n = nsamp[i], mean = means[, i], 
-        sigma = as.matrix(sigmas[, , i]), 
+        n = nsamp[i], mean = means[, i],
+        sigma = as.matrix(sigmas[, , i]),
         checkSymmetry = FALSE
       )
     }
@@ -113,7 +113,7 @@ dmixnorm <- function(x, means, sigmas, weights, log = FALSE) {
 #'     Conditional Distributions using Smooth Mixtures of Asymmetric Student T Densities,
 #'     Journal of Statistical Planning and Inference, 140(12), pp. 3638-3654.
 #' @author Feng Li, Central University of Finance and Economics.
-#' @examples
+#' @examplesIf require("fGarch", quietly=TRUE)
 #' n <- 1000
 #' means.ar.par.list <- list(c(0, 0.8), c(0, 0.6, 0.3))
 #' require("fGarch")

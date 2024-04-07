@@ -220,11 +220,11 @@ pi_coefficients <- function(ar = 0, d = 0L, ma = 0, sar = 0, D = 0L, sma = 0, m 
   }
 
   n <- 500L
-  theta <- -c(coef(ma * sma))[-1]
+  theta <- -c(stats::coef(ma * sma))[-1]
   if (length(theta) == 0L) {
     theta <- 0
   }
-  phi <- -c(coef(ar * sar)[-1], numeric(n))
+  phi <- -c(stats::coef(ar * sar)[-1], numeric(n))
   q <- length(theta)
   pie <- c(numeric(q), 1, numeric(n))
   for (j in seq(n)) {

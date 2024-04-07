@@ -5,6 +5,7 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to gratis}
   %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteDepends{feasts}
   %\VignetteEncoding{UTF-8}
 ---
 
@@ -62,11 +63,11 @@ qmar %>%
   autoplot(value)
 ```
 
-Each of these series comes from the same MAR model, but with different stochastic inputs. Although the two ARIMA models are seasonal, the seasonality is too weak to been in the plots.
+Each of these series comes from the same MAR model but with different stochastic inputs. Although the two ARIMA models are seasonal, the seasonality is too weak to been in the plots.
 
-# Generate mutiple seasonal time series
+# Generate multiple seasonal time series
 
-Time series can exhibit multiple seasonal pattern of different length, especially when series observed at a high frequency such as daily or hourly data. Here is an example in which we generate 1 hourly time series of length 2 weeks.
+Time series can exhibit multiple seasonal patterns of different lengths, especially when series are observed at a high frequency such as daily or hourly data. Here is an example in which we generate 1 hourly time series of length 2 weeks.
 
 ```{r hmarmodel}
 hmar <- mar_model(seasonal_periods = c(24, 7*24))

@@ -41,7 +41,7 @@
 #' \code{phi}, \code{Phi}, \code{sigmas} and \code{weights}.
 #' @author Rob J Hyndman
 #' @seealso \code{\link{simulate.mar}}
-#' @examples
+#' @examplesIf require("fGarch", quietly=TRUE)
 #' n <- 100
 #' # Quarterly MAR model with randomly selected parameters
 #' model1 <- mar_model(seasonal_periods = 4)

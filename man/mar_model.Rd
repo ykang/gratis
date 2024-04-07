@@ -74,6 +74,7 @@ The sigmas are uniformly sampled on (1,5) and the weights are uniformly sampled 
 The number of components is uniformly sampled on \{1,2,3,4,5\}.
 }
 \examples{
+\dontshow{if (require("fGarch", quietly=TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 n <- 100
 # Quarterly MAR model with randomly selected parameters
 model1 <- mar_model(seasonal_periods = 4)
@@ -93,6 +94,7 @@ sigmas.spec <- list(
   fGarch::garchSpec(model = list(alpha = c(0.05, 0.05)))
 )
 model4 <- mar_model(phi = phi, sigmas = sigmas.spec, weights = weights)
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{simulate.mar}}

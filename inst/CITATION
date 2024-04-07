@@ -9,7 +9,7 @@ vers <- paste("R package version", vers)
 
 citHeader("To cite the gratis package in publications, please use:")
 bibentry(bibtype = "Manual",
-         title    = "{gratis}: {GeneRAting TIme Series} with diverse and controllable characteristics",
+         title    = "{gratis}: An R package for {GeneRAting TIme Series} with diverse and controllable characteristics",
          author   = c(as.person("Yanfei Kang"),
                       as.person("Feng Li"),
                       as.person("Rob J Hyndman"),
