@@ -23,7 +23,7 @@
 #' @importFrom GA startParallel garun
 #' @importFrom tsfeatures tsfeatures
 #' @importFrom doRNG "%dorng%"
-#' @import fGarch
+#' @importFrom fGarch garchSpec garchSim
 #' @import shiny
 #' @import feasts
 #' @keywords internal

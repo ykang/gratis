@@ -30,11 +30,11 @@ n <- 1000
 means.ar.par.list <- list(c(0, 0.8), c(0, 0.6, 0.3))
 require("fGarch")
 sigmas.spec <- list(
-  garchSpec(model = list(alpha = c(0.05, 0.06)), cond.dist = "norm"),
-  garchSpec(model = list(alpha = c(0.05, 0.05)), cond.dist = "norm")
+  fGarch::garchSpec(model = list(alpha = c(0.05, 0.06)), cond.dist = "norm"),
+  fGarch::garchSpec(model = list(alpha = c(0.05, 0.05)), cond.dist = "norm")
 )
 sigmas.list <- lapply(
-  lapply(sigmas.spec, garchSim, extended = TRUE, n = n),
+  lapply(sigmas.spec, fGarch::garchSim, extended = TRUE, n = n),
   function(x) x$sigma
 )
 weights <- c(0.8, 0.2)

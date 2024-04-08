@@ -1,3 +1,7 @@
+# gratis 1.0.7
+
+* Fixed dependency issue on CRAN.
+
 # gratis 1.0.5
 
 * Fixed the 'docType' issue.
@@ -20,7 +24,7 @@
 
 ## Improvements
 
-* Added new parameter 'output_format', give users an option to transform time series output data into a tsibble format.
+* Added new parameter `output_format`, giving users an option to transform time series output data into a `tsibble` format.
 * Update vignette content
 
 ## Bug fixes
@@ -33,4 +37,4 @@
 
 ## New features
 
-* The R package gratis (previously known as tsgeneration) provides efficient algorithms for generating time series with diverse and controllable characteristics.
+* The R package `gratis` (previously known as tsgeneration) provides efficient algorithms for generating time series with diverse and controllable characteristics.
