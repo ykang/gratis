@@ -1,3 +1,8 @@
+# gratis 1.0.8
+
+* simulate_target(): examples updated to use dplyr::reframe() instead of summarise()
+  to comply with dplyr 1.2.0.
+
 # gratis 1.0.7
 
 * Fixed dependency issue on CRAN.
