@@ -48,7 +48,7 @@ library(feasts)
 ### Generate diverse time series
 
 ``` r
-set.seed(1)
+set.seed(27)
 mar_model(seasonal_periods=12) %>%
   generate(length=120, nseries=2) %>%
   autoplot(value)
@@ -88,16 +88,16 @@ df %>%
 #> # A tibble: 30 × 3
 #>    key       value feature
 #>    <chr>     <dbl> <chr>  
-#>  1 Series 1  0.497 entropy
-#>  2 Series 1  0.895 acf1   
-#>  3 Series 1  0.752 acf2   
-#>  4 Series 10 0.526 entropy
-#>  5 Series 10 0.905 acf1   
-#>  6 Series 10 0.772 acf2   
-#>  7 Series 2  0.472 entropy
-#>  8 Series 2  0.921 acf1   
-#>  9 Series 2  0.792 acf2   
-#> 10 Series 3  0.505 entropy
+#>  1 Series 1  0.509 entropy
+#>  2 Series 1  0.906 acf1   
+#>  3 Series 1  0.787 acf2   
+#>  4 Series 10 0.465 entropy
+#>  5 Series 10 0.896 acf1   
+#>  6 Series 10 0.775 acf2   
+#>  7 Series 2  0.483 entropy
+#>  8 Series 2  0.901 acf1   
+#>  9 Series 2  0.812 acf2   
+#> 10 Series 3  0.504 entropy
 #> # ℹ 20 more rows
 autoplot(df)
 ```
@@ -117,15 +117,15 @@ APP](https://ebsmonash.shinyapps.io/tsgeneration/)
 
 ## See also
 
--   R package `tsfeatures` from [GitHub
-    Repository](https://github.com/robjhyndman/tsfeatures).
+- R package `tsfeatures` from [GitHub
+  Repository](https://github.com/robjhyndman/tsfeatures).
 
 ## References
 
--   Kang, Y., Hyndman, R., and Li, F. (2020). **GRATIS**:
-    **G**ene**RA**ting **TI**me **S**eries with diverse and controllable
-    characteristics. [Statistical Analysis and Data
-    Mining](https://doi.org/10.1002/sam.11461).
+- Kang, Y., Hyndman, R.J, and Li, F. (2020). **GRATIS**:
+  **G**ene**RA**ting **TI**me **S**eries with diverse and controllable
+  characteristics. [Statistical Analysis and Data
+  Mining](https://doi.org/10.1002/sam.11461).
 
 ## License
 

@@ -54,4 +54,4 @@ Encoding: UTF-8
 LazyLoad: yes
 NeedsCompilation: no
 Repository: CRAN
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
