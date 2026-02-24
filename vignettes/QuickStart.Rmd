@@ -114,9 +114,9 @@ df <- generate_target(
 df %>%
  as_tibble() %>%
  group_by(key) %>%
- summarise(value = my_features(value),
-           feature=c("entropy","acf1", "acf2"),
-           .groups = "drop")
+ reframe(value = my_features(value),
+           feature=c("entropy","acf1", "acf2")
+        )
 df %>% autoplot(value)
 ```
 

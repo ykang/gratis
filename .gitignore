@@ -7,3 +7,6 @@ data/
 *.Rproj
 *.rda
 inst/doc
+/doc/
+/Meta/
+.DS_Store

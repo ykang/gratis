@@ -42,9 +42,10 @@
 #' df %>% 
 #'  as_tibble() %>%
 #'  group_by(key) %>%
-#'  dplyr::summarise(value = my_features(value), 
-#'            feature=c("entropy","acf1", "acf2"),
-#'            .groups = "drop")
+#'  dplyr::reframe(
+#'            value = my_features(value), 
+#'            feature=c("entropy","acf1", "acf2")
+#'            )
 #' autoplot(df)
 #' # Simulate time series similar to an existing series
 #' my_features <- function(y) {

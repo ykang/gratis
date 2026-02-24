@@ -7,3 +7,5 @@
 README.Rmd
 vignettes/*_cache*
 vignettes/*_files*
+^doc$
+^Meta$
