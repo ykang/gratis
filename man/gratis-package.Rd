@@ -18,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Feng Li \email{feng.li@cufe.edu.cn} (\href{https://orcid.org/0000-0002-4248-9778}{ORCID})
+\strong{Maintainer}: Feng Li \email{feng.li@gsm.pku.edu.cn} (\href{https://orcid.org/0000-0002-4248-9778}{ORCID})
 
 Authors:
 \itemize{

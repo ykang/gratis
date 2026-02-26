@@ -25,7 +25,7 @@ This function simulates random samples from a finite mixture of Gaussian distrib
     where the mean from each components are AR(p) process.
 }
 \examples{
-\dontshow{if (require("fGarch", quietly=TRUE)) withAutoprint(\{ # examplesIf}
+\dontshow{if (require("fGarch", quietly=TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 n <- 1000
 means.ar.par.list <- list(c(0, 0.8), c(0, 0.6, 0.3))
 require("fGarch")
