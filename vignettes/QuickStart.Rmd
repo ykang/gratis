@@ -35,6 +35,7 @@ Synthetic time series data can be used to train or evaluate new algorithms for t
 ```{r setup}
 library(gratis)
 library(feasts)
+library(ggtime)
 set.seed(5)
 ```
 
