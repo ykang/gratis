@@ -21,6 +21,9 @@ dependencies = [
 dev = [
   "pytest>=7"
 ]
+plot = [
+  "matplotlib>=3.8"
+]
 
 [tool.setuptools]
 packages = ["gratis"]

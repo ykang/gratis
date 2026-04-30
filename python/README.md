@@ -18,6 +18,7 @@ The Python implementation currently provides the main simulation workflows:
 - `gratis.mar`: mixture autoregressive model construction and simulation.
 - `gratis.ets`: ETS model construction and simulation backed by `statsmodels`.
 - `gratis.generate`: common `simulate()` and `generate()` helpers.
+- `gratis.plotting`: plotting helpers for generated arrays and models.
 - `gratis.target`: target-feature generation using an evolutionary search over
   MAR parameters.
 
@@ -37,6 +38,12 @@ For development and tests:
 
 ```sh
 python -m pip install -e "./python[dev]"
+```
+
+For plotting:
+
+```sh
+python -m pip install -e "./python[plot]"
 ```
 
 You can also work directly from the repository without installing:
@@ -60,6 +67,13 @@ model = gratis.mar_model(
 
 series = gratis.simulate(model, n=100, rng=1)
 many = gratis.generate(model, length=100, nseries=5, rng=1)
+```
+
+Plot generated arrays or generate and plot in one step:
+
+```python
+gratis.plot_series(many, title="Generated MAR series")
+gratis.plot_generated(model, length=100, nseries=5, rng=1)
 ```
 
 ## Model Examples

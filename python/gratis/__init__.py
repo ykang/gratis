@@ -6,6 +6,7 @@ from .ets import ETSModel, ets_admissible, ets_model
 from .generate import generate, simulate
 from .mar import MARModel, mar_model
 from .mixture import dmixnorm, dmixnorm_ts, rmixnorm, rmixnorm_ts
+from .plotting import plot_generated, plot_series
 from .target import generate_target, scalets, simulate_target
 
 __all__ = [
@@ -22,6 +23,8 @@ __all__ = [
     "generate_target",
     "mar_model",
     "pi_coefficients",
+    "plot_generated",
+    "plot_series",
     "rmixnorm",
     "rmixnorm_ts",
     "scalets",

@@ -52,6 +52,12 @@ simulation. The Python source is intentionally excluded from
 `R CMD build`; see `python/README.md` for Python-specific usage and
 testing notes.
 
+Install plotting support when using the Python plotting helpers:
+
+``` sh
+python -m pip install -e "./python[plot]"
+```
+
 ## R Usage
 
 ### Tutorial video for R users
@@ -154,6 +160,7 @@ model = gratis.mar_model(
 
 series = gratis.simulate(model, n=100, rng=1)
 many = gratis.generate(model, length=100, nseries=5, rng=1)
+gratis.plot_series(many, title="Generated MAR series")
 ```
 
 Python ARIMA and ETS models use `statsmodels` by default. Local NumPy
