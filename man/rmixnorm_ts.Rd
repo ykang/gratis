@@ -2,33 +2,35 @@
 % Please edit documentation in R/rmixmorm.R
 \name{rmixnorm_ts}
 \alias{rmixnorm_ts}
-\title{Simulate autoregressive random variables from mixture of normal}
+\title{Simulate a mixture-normal autoregressive process}
 \usage{
 rmixnorm_ts(n, means.ar.par.list, sigmas.list, weights, yinit = 0)
 }
 \arguments{
-\item{n}{number of samples.}
+\item{n}{Number of observations to generate.}
 
-\item{means.ar.par.list}{parameters in AR(p) within each mixing compoment.}
+\item{means.ar.par.list}{List of component AR parameter vectors. The first
+element of each vector is the intercept, followed by lag coefficients.}
 
-\item{sigmas.list}{variance list.}
+\item{sigmas.list}{List of component variance or volatility vectors, each of
+length \code{n}.}
 
-\item{weights}{weight in each list.}
+\item{weights}{Numeric vector of component probabilities.}
 
-\item{yinit}{initial values.}
+\item{yinit}{Initial value used to seed the recursion.}
 }
 \value{
-vector of length n follows a mixture distribution.
+A \code{\link[stats]{ts}} object of length \code{n}.
 }
 \description{
-This function simulates random samples from a finite mixture of Gaussian distribution
-    where the mean from each components are AR(p) process.
+Simulate a univariate process whose conditional distribution is a finite
+mixture of Gaussian distributions. The conditional mean of each component is
+an autoregressive process with its own parameter vector.
 }
 \examples{
-\dontshow{if (require("fGarch", quietly=TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+if (requireNamespace("fGarch", quietly = TRUE)) {
 n <- 1000
 means.ar.par.list <- list(c(0, 0.8), c(0, 0.6, 0.3))
-require("fGarch")
 sigmas.spec <- list(
   fGarch::garchSpec(model = list(alpha = c(0.05, 0.06)), cond.dist = "norm"),
   fGarch::garchSpec(model = list(alpha = c(0.05, 0.05)), cond.dist = "norm")
@@ -43,7 +45,7 @@ y <- rmixnorm_ts(
   weights = weights
 )
 plot(y)
-\dontshow{\}) # examplesIf}
+}
 }
 \references{
 Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of

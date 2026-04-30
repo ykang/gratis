@@ -2,24 +2,30 @@
 % Please edit documentation in R/rmixmorm.R
 \name{rmixnorm}
 \alias{rmixnorm}
-\title{Generate random variables from a mixture of multivariate normal distributions}
+\title{Generate random values from a mixture of multivariate normal distributions}
 \usage{
 rmixnorm(n, means, sigmas, weights)
 }
 \arguments{
-\item{n}{an integer for the number of samples to be generated.}
+\item{n}{Number of observations to generate.}
 
-\item{means}{a q x k matrix (or a vector of length k if q=1) containing the means for each component.}
+\item{means}{A \eqn{q \times k} matrix of component means, or a vector of
+length \eqn{k} for univariate mixtures.}
 
-\item{sigmas}{a q x q x k covariance array (or a vector of length k if q=1) for each component.}
+\item{sigmas}{A \eqn{q \times q \times k} array of component covariance
+matrices, or a vector of length \eqn{k} for univariate mixtures.}
 
-\item{weights}{a vector of length k containing the weights for each component.}
+\item{weights}{Numeric vector of component probabilities. Values are used as
+sampling probabilities for the mixture components.}
 }
 \value{
-An n x q matrix (or a vector if q=1) containing the generated data.
+An \eqn{n \times q} matrix of generated data, or a numeric vector
+  when \eqn{q = 1}.
 }
 \description{
-Random variables from a mixture of k multivariate normal distributions, each of dimension q.
+Draw random values from a finite mixture of \eqn{k} multivariate normal
+distributions, each with dimension \eqn{q}. For univariate mixtures,
+\code{means} and \code{sigmas} may be supplied as vectors.
 }
 \examples{
 out <- rmixnorm(

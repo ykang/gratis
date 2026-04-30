@@ -2,7 +2,7 @@
 % Please edit documentation in R/generate_ts_with_target.R
 \name{generate_ts_with_target}
 \alias{generate_ts_with_target}
-\title{Generating time series with controllable features.}
+\title{Generate time series with target features}
 \usage{
 generate_ts_with_target(
   n,
@@ -17,32 +17,38 @@ generate_ts_with_target(
 )
 }
 \arguments{
-\item{n}{number of time series to be generated.}
+\item{n}{Number of time series to generate.}
 
-\item{ts.length}{length of the time series to be generated.}
+\item{ts.length}{Length of each generated time series.}
 
-\item{freq}{frequency of the time series to be generated.}
+\item{freq}{Seasonal frequency, or seasonal periods for
+multiple-seasonal data.}
 
-\item{seasonal}{0 for non-seasonal data, 1 for single-seasonal data, and 2 for multiple seasonal data.}
+\item{seasonal}{Integer seasonality flag: 0 for non-seasonal data, 1 for
+single-seasonal data, and 2 for multiple-seasonal data.}
 
-\item{features}{a vector of function names.}
+\item{features}{Character vector of feature function names passed to
+\code{\link[tsfeatures]{tsfeatures}()}.}
 
-\item{selected.features}{selected features to be controlled.}
+\item{selected.features}{Character vector naming the features to match.}
 
-\item{target}{target feature values.}
+\item{target}{Numeric vector of target feature values in the same order as
+\code{selected.features}.}
 
-\item{parallel}{An optional argument which allows to specify if the Genetic Algorithm
-should be run sequentially or in parallel.}
+\item{parallel}{Logical value or parallel backend specification indicating
+whether the genetic algorithm should evaluate candidates in parallel.}
 
-\item{output_format}{An optional argument which allows to choose output format between 'list' and 'tsibble'}
+\item{output_format}{Output format: \code{"list"} for a \code{ts} or
+\code{msts} object, or \code{"tsibble"} for a tsibble.}
 }
 \value{
-A time-series object of class "ts" or "msts".
+Generated time series in the requested \code{output_format}.
 }
 \description{
-Deprecated function. Please use \code{\link{generate_target}()} instead.
+This function is deprecated. Use \code{\link{generate_target}()} instead.
 }
 \examples{
+\dontrun{
 library(tsfeatures)
 x <- generate_ts_with_target(
   n = 1, ts.length = 60, freq = 1, seasonal = 0,
@@ -50,6 +56,7 @@ x <- generate_ts_with_target(
   target = c(0.6, 0.9), parallel = FALSE
 )
 forecast::autoplot(x)
+}
 }
 \author{
 Yanfei Kang

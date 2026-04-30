@@ -1,20 +1,26 @@
-#' Generating time series with controllable features.
+#' Generate time series with target features
 #'
-#' Deprecated function. Please use \code{\link{generate_target}()} instead.
+#' This function is deprecated. Use \code{\link{generate_target}()} instead.
 #'
-#' @param n number of time series to be generated.
-#' @param ts.length length of the time series to be generated.
-#' @param freq frequency of the time series to be generated.
-#' @param seasonal 0 for non-seasonal data, 1 for single-seasonal data, and 2 for multiple seasonal data.
-#' @param features a vector of function names.
-#' @param selected.features selected features to be controlled.
-#' @param target target feature values.
-#' @param parallel An optional argument which allows to specify if the Genetic Algorithm
-#'     should be run sequentially or in parallel.
-#' @param output_format An optional argument which allows to choose output format between 'list' and 'tsibble'
-#' @return A time-series object of class "ts" or "msts".
+#' @param n Number of time series to generate.
+#' @param ts.length Length of each generated time series.
+#' @param freq Seasonal frequency, or seasonal periods for
+#'   multiple-seasonal data.
+#' @param seasonal Integer seasonality flag: 0 for non-seasonal data, 1 for
+#'   single-seasonal data, and 2 for multiple-seasonal data.
+#' @param features Character vector of feature function names passed to
+#'   \code{\link[tsfeatures]{tsfeatures}()}.
+#' @param selected.features Character vector naming the features to match.
+#' @param target Numeric vector of target feature values in the same order as
+#'   \code{selected.features}.
+#' @param parallel Logical value or parallel backend specification indicating
+#'   whether the genetic algorithm should evaluate candidates in parallel.
+#' @param output_format Output format: \code{"list"} for a \code{ts} or
+#'   \code{msts} object, or \code{"tsibble"} for a tsibble.
+#' @return Generated time series in the requested \code{output_format}.
 #' @author Yanfei Kang
 #' @examples
+#' \dontrun{
 #' library(tsfeatures)
 #' x <- generate_ts_with_target(
 #'   n = 1, ts.length = 60, freq = 1, seasonal = 0,
@@ -22,6 +28,7 @@
 #'   target = c(0.6, 0.9), parallel = FALSE
 #' )
 #' forecast::autoplot(x)
+#' }
 #' @export
 generate_ts_with_target <- function(n, ts.length, freq, seasonal, features, selected.features, target, parallel = TRUE, output_format = "list") {
   ga_min <-

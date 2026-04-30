@@ -1,28 +1,38 @@
-#' Generating time series with controllable features using MAR models
+#' Generate time series with target features
 #'
-#' \code{simulate_target} simulate one time series of length `length` from a MAR model with target features 
-#' and returns a \code{ts} or \code{msts} object.
-#' \code{generate_target} simulate multiple time series of length `length` from a MAR model with target features 
-#' and returns a \code{tsibble} object. The index of the tsibble is guessed from the seasonal periods.
-#' The specified features should not depend on the scale of the time series as the series is scaled during simulation.
+#' Search for MAR model parameters that produce time series with feature values
+#' close to a user-specified target. \code{simulate_target()} returns one
+#' generated series, while \code{generate_target()} repeats the search to return
+#' several generated series in a tsibble.
 #'
-#' @param length length of the time series to be generated.
-#' @param seasonal_periods Either a scalar or a numeric vector of length k containing
-#' the number of seasonal periods for each component.
-#' @param feature_function a function that returns a vector of features from a time series.
-#' @param target target feature values of the same length as that returned by \code{feature_function()}.
-#' @param k integer specifying number of components to use for MAR models. Default is 3
-#' unless there are multiple seasonal periods specified.
-#' @param tolerance average tolerance per feature. The genetic algorithm will attempt
-#' to find a solution where the average difference between the series features and target
-#' is less than \code{tolerance}. A larger value will give a faster but less precise
-#' solution.
-#' @param trace logical indicating if details of the search should be shown.
-#' @param parallel An optional argument which allows to specify if the Genetic Algorithm
-#'     should be run sequentially or in parallel.
-#' @return A time series object of class "ts" or "msts".
+#' A genetic algorithm evaluates candidate MAR parameter vectors by simulating a
+#' series, scaling it, computing \code{feature_function()}, and comparing those
+#' features to \code{target}. Because each candidate series is scaled before
+#' feature evaluation, the target features should not depend on the absolute
+#' scale of the series.
+#'
+#' @param length Length of each generated time series.
+#' @param seasonal_periods Scalar seasonal period, or a numeric vector of
+#'   seasonal periods for multiple-seasonal data.
+#' @param feature_function Function that accepts a time series and returns a
+#'   numeric vector of features.
+#' @param target Numeric vector of target feature values. It must have the same
+#'   length and order as the vector returned by \code{feature_function()}.
+#' @param k Number of MAR components to use. The default is 3 for single-seasonal
+#'   or non-seasonal data, and the number of seasonal periods for
+#'   multiple-seasonal data.
+#' @param tolerance Average absolute feature tolerance. Larger values usually
+#'   return faster but less precise results.
+#' @param trace Logical value indicating whether to show genetic algorithm
+#'   progress.
+#' @param parallel Logical value or parallel backend specification passed to the
+#'   genetic algorithm. Use \code{TRUE} to run fitness evaluations in parallel.
+#' @return \code{simulate_target()} returns a \code{\link[forecast]{msts}}
+#'   object of length \code{length}. \code{generate_target()} returns a tsibble
+#'   containing \code{nseries} generated series.
 #' @author Yanfei Kang and Rob J Hyndman
 #' @examples
+#' \dontrun{
 #' set.seed(1)
 #' library(tsfeatures)
 #' my_features <- function(y) {
@@ -34,7 +44,7 @@
 #' )
 #' my_features(y)
 #' plot(y)
-#' \dontrun{
+#'
 #' # Generate a tsibble with specified target features
 #' df <- generate_target(
 #'   length = 60, feature_function = my_features, target = c(0.5, 0.9, 0.8)
@@ -58,7 +68,8 @@
 #' )
 #' tsp(y) <- tsp(USAccDeaths)
 #' plot(cbind(USAccDeaths, y))
-#' cbind(my_features(USAccDeaths), my_features(y))}
+#' cbind(my_features(USAccDeaths), my_features(y))
+#' }
 #' @export
 #'
 simulate_target <- function(length=100, seasonal_periods = 1, feature_function, target,

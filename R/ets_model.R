@@ -1,33 +1,37 @@
-#' Specify parameters for an ETS model
+#' Specify an ETS model
 #'
-#' This function allows the parameters of a ETS state space model to be specified.
-#' The output can be used in \code{\link[forecast]{simulate.ets}()}
-#' and \code{\link{generate.ets}}.
-#' If any argument is \code{NULL}, the corresponding parameters are randomly selected.
-#' The error component is chosen from \{A,M\}, the trend component is chosen from
-#' \{N,A,Ad\}, and the seasonal component is chosen from \{N,A,M\}. In all cases,
-#' the component is selected uniformly on the options. The parameters are selected
-#' uniformly on the forecastable parameter space. The noise variance sigma
-#' is uniformly sampled on (1,5) for additive errors, and on (0.0001,0.05) for
-#' multiplicative errors. The initial states are chosen uniformly on (-1,1)
-#' in all cases except for multiplicative seasonal states which are uniform on
-#' (0.5, 1.5), and models with multiplicative errors for which the level is uniform
-#' on (2, 10). The parameterization is as specified in Hyndman & Athanasopoulos (2021).
+#' Construct an ETS state space model that can be used with
+#' \code{\link[forecast]{simulate.ets}()} or \code{\link{generate.ets}()}.
+#' Any omitted argument is randomly selected from the supported parameter space.
+#'
+#' The error component is sampled from \code{"A"} and \code{"M"}, the trend
+#' component from \code{"N"} and \code{"A"}, and the seasonal component from
+#' \code{"N"}, \code{"A"}, and \code{"M"} when \code{frequency > 1}. Smoothing
+#' parameters are sampled until they satisfy the ETS admissibility conditions.
+#' The innovation variance is sampled from \eqn{(1,5)} for additive errors and
+#' from \eqn{(0.0001,0.05)} for multiplicative errors. Initial states are sampled
+#' from ranges appropriate to the selected components.
 #'
 #' @param frequency The length of the seasonal period (e.g., 12 for monthly data).
-#' @param error A character string specifying the error part of the ETS model: either "A" or "M".
-#' @param trend A character string specifying the trend part of the ETS model: either "N", "A" or "Ad".
-#' @param seasonal A character string specifying the seasonal part of the ETS model: either "N", "A" or "M".
-#' @param damped A logical value indicating if the trend is damped or not.
-#' @param alpha A numeric value for the smoothing parameter controlling the level.
-#' @param beta A numeric value for the smoothing parameter controlling the trend.
-#' @param gamma A numeric value for the smoothing parameter controlling the seasonality.
-#' @param phi A numeric value specifying the damping parameter.
-#' @param level A numeric value specifying the initial level \eqn{\ell_0}.
-#' @param slope A numeric value specifying the initial slope \eqn{b_0}
-#' @param season A numeric vector specifying the initial states \eqn{s_{1-m},...,s_0}.
+#' @param error Character string specifying the error component: \code{"A"} for
+#'   additive or \code{"M"} for multiplicative.
+#' @param trend Character string specifying the trend component: \code{"N"} for
+#'   none or \code{"A"} for additive.
+#' @param seasonal Character string specifying the seasonal component:
+#'   \code{"N"} for none, \code{"A"} for additive, or \code{"M"} for
+#'   multiplicative.
+#' @param damped Logical value indicating whether an additive trend is damped.
+#' @param alpha Smoothing parameter for the level.
+#' @param beta Smoothing parameter for the trend.
+#' @param gamma Smoothing parameter for seasonality.
+#' @param phi Damping parameter.
+#' @param level Initial level \eqn{\ell_0}.
+#' @param slope Initial slope \eqn{b_0}.
+#' @param season Numeric vector of initial seasonal states
+#'   \eqn{s_{1-m},\dots,s_0}.
 #' @param sigma The standard deviation of the noise.
-#' @return An `ets` object as described in the \code{\link[forecast]{ets}} function from the forecast package.
+#' @return An \code{ets} object compatible with the \pkg{forecast} package's
+#'   simulation methods.
 #' @author Rob J Hyndman
 #' @seealso \code{\link[forecast]{simulate.ets}}
 #' @examples
@@ -38,13 +42,12 @@
 #'   error = "A", trend = "A", seasonal = "N",
 #'   alpha = 0.3, beta = 0.2, level = 0, slope = 1, sigma = 2
 #' )
-#' # A multiplicative quarterly seasonal ETS model with random parameters
-#' model3 <- ets_model(seasonal = "M", frequency = 4)
+#' # A quarterly seasonal ETS model with random admissible parameters
+#' model3 <- ets_model(error = "A", trend = "N", seasonal = "A", frequency = 4)
 #' # Simulate from each model and plot the results
-#' library(forecast)
-#' simulate(model1, 100) %>% plot()
-#' simulate(model2, 100) %>% plot()
-#' simulate(model3, 100) %>% plot()
+#' plot(simulate(model1, 100))
+#' plot(simulate(model2, 100))
+#' plot(simulate(model3, 100))
 #' @export
 ets_model <- function(frequency = 1, error = NULL, trend = NULL, seasonal = NULL,
                       alpha = NULL, beta = NULL, gamma = NULL, phi = NULL,

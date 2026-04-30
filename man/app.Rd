@@ -2,10 +2,20 @@
 % Please edit documentation in R/run_gratis_app.R
 \name{app_gratis}
 \alias{app_gratis}
-\title{Web Application to generate time series with controllable features.}
+\title{Launch the gratis Shiny application}
 \usage{
 app_gratis()
 }
+\value{
+Called for its side effect of launching a Shiny application. Returns
+  the value from \code{\link[shiny]{runApp}()}.
+}
 \description{
-Web Application to generate time series with controllable features.
+Launch a local Shiny application for generating time series with
+controllable features.
+}
+\examples{
+\dontrun{
+app_gratis()
+}
 }

@@ -2,32 +2,46 @@
 #' @export
 generics::generate
 
-#' Generate a tsibble of synthetic data from a Mixture Autoregressive model
+#' Generate a tsibble of synthetic time series
 #'
-#' This function simulates multiple random sample paths from a mixture of k Gaussian AR(p) processes.
-#' The model is of the form
-#' \deqn{y_t = \phi_{0,i} + \phi_{1,i}y_{t-1} + \dots + \phi_{p,i}y_{t-p} + \sigma_{i,t}\epsilon_t}
-#' with probability \eqn{\alpha_i}, where \eqn{\epsilon_t} is a N(0,1) variate.
-#' The index of the tsibble is guessed from the MAR model seasonal periods.
-#' @param x A `mar` object, usually the output of \code{\link{mar_model}()}.
-#' @param length length of series to generate
-#' @param nseries number of series to generate
-#' @param ... Other arguments, passed to \code{\link{simulate.mar}}.
-#' @return `tsibble` object with `length` rows and 3 columns.
+#' Generate one or more synthetic time series from a fitted or specified model.
+#' Methods are provided for \code{\link{mar_model}()} objects, ETS objects from
+#' \code{\link{ets_model}()}, and ARIMA objects from \code{\link{arima_model}()}.
+#' Each series is produced by repeatedly calling the corresponding
+#' \code{\link[stats]{simulate}()} method.
+#'
+#' The generated series are returned as a tsibble. The index is inferred from
+#' the model frequency or seasonal periods where possible, with special handling
+#' for common weekly, hourly, half-hourly, quarter-hourly, and minute data.
+#'
+#' @param x A model object of class \code{mar}, \code{ets}, or \code{Arima}.
+#' @param length Length of each series to generate.
+#' @param nseries Number of series to generate.
+#' @param ... Other arguments passed to the relevant \code{simulate()} method.
+#'   For \code{mar} objects these are passed to \code{\link{simulate.mar}()}.
+#' @return A tsibble containing the generated values. For multiple series the
+#'   output has \code{length * nseries} rows and includes a key column identifying
+#'   each series.
 #' @references Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
 #'     Conditional Distributions using Smooth Mixtures of Asymmetric Student T Densities,
 #'     Journal of Statistical Planning and Inference, 140(12), pp. 3638-3654.
 #' @author Rob J Hyndman
-#' @seealso \code{\link{mar_model}}, \code{\link{simulate.mar}}
+#' @seealso \code{\link{mar_model}}, \code{\link{arima_model}},
+#'   \code{\link{ets_model}}, \code{\link{simulate.mar}}
 #' @examples
 #' # MAR model with constant variances
-#' phi <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
+#' phi <- cbind(c(0.8, 0), c(0.6, 0.3))
 #' weights <- c(0.8, 0.2)
 #' model1 <- mar_model(phi = phi, sigmas = c(1, 2), weights = weights)
 #' generate(model1, nseries = 5)
+#'
 #' # MAR model for hourly data with daily and weekly periods
 #' hourly_model <- mar_model(seasonal_periods = c(24, 24*7))
-#' generate(hourly_model)
+#' generate(hourly_model, length = 24 * 7, nseries = 2)
+#'
+#' # ARIMA and ETS models also work
+#' generate(arima_model(p = 1, d = 0, q = 0, phi = 0.5), length = 20, nseries = 2)
+#' generate(ets_model(error = "A", trend = "N", seasonal = "N"), length = 20, nseries = 2)
 #' @export
 generate.mar <- function(x, length = 100, nseries = 10, ...) {
   generate_gratis(x, length, nseries, ...)

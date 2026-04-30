@@ -1,32 +1,32 @@
-#' Specify parameters for an ARIMA model
+#' Specify an ARIMA model
 #'
-#' This function allows the parameters of a Gaussian \eqn{ARIMA(p,d,q)(P,D,Q)[m]}
-#' process to be specified. The output can be used in \code{\link[forecast]{simulate.Arima}()}
-#' and \code{\link{generate.Arima}}.
-#' If any argument is \code{NULL}, the corresponding parameters are randomly selected.
-#' The AR and MA orders p and q are chosen from \{0,1,2,3\}, the seasonal AR and MA
-#' orders P and Q are from \{0,1,2\}, while the order of differencing,
-#' d is in \{0,1,2\}, and the order of seasonal differencing D is in \{0,1\}, with the
-#' restriction that \eqn{d+D \le 2}. If \code{constant} is \code{NULL}, it is set to
-#' 0 if \eqn{d+D = 2}, otherwise it is uniformly sampled on (-3,3).
-#' The model orders and the parameters are uniformly sampled. The AR and MA parameters are selected
-#' to give stationary and invertible processes when \eqn{d=D=0}. The noise variance sigma
-#' is uniformly sampled on (1,5). The parameterization is as specified in Hyndman & Athanasopoulos (2021).
+#' Construct a Gaussian ARIMA\eqn{(p,d,q)(P,D,Q)_m} model that can be used with
+#' \code{\link[forecast]{simulate.Arima}()} or \code{\link{generate.Arima}()}.
+#' Any omitted argument is randomly selected from the supported parameter space.
+#'
+#' When orders are omitted, \code{p} and \code{q} are sampled from
+#' \eqn{\{0,1,2,3\}}, \code{P} and \code{Q} from \eqn{\{0,1,2\}},
+#' \code{d} from \eqn{\{0,1,2\}}, and \code{D} from \eqn{\{0,1\}}, with the
+#' restriction \eqn{d + D \le 2}. If \code{constant} is omitted, it is sampled
+#' from \eqn{(-3,3)} unless \eqn{d + D = 2}, in which case it is set to zero.
+#' AR and MA parameters are sampled so the stationary and invertible parts of
+#' the process are valid, and \code{sigma} is sampled from \eqn{(1,5)}.
 #'
 #' @param frequency The length of the seasonal period (e.g., 12 for monthly data).
-#' @param p An integer equal to the non-seasonal autoregressive order
-#' @param d An integer equal to the non-seasonal order of differencing
-#' @param q An integer equal to the non-seasonal moving average order
-#' @param P An integer equal to the seasonal autoregressive order
-#' @param D An integer equal to the seasonal order of differencing
-#' @param Q An integer equal to the seasonal moving average order
-#' @param constant The intercept term
+#' @param p Non-seasonal autoregressive order.
+#' @param d Non-seasonal differencing order.
+#' @param q Non-seasonal moving-average order.
+#' @param P Seasonal autoregressive order.
+#' @param D Seasonal differencing order.
+#' @param Q Seasonal moving-average order.
+#' @param constant Intercept term.
 #' @param phi A numeric p-vector containing the AR parameters.
-#' @param theta A numeric p-vector containing the MA parameters.
-#' @param Phi A numeric p-vector containing the seasonal AR parameters.
-#' @param Theta A numeric p-vector containing the seasonal MA parameters.
+#' @param theta A numeric q-vector containing the MA parameters.
+#' @param Phi A numeric P-vector containing the seasonal AR parameters.
+#' @param Theta A numeric Q-vector containing the seasonal MA parameters.
 #' @param sigma The standard deviation of the noise.
-#' @return An `Arima` object as described in the \code{\link[stats]{arima}} function from the stats package.
+#' @return An \code{Arima} object compatible with the \pkg{forecast} package's
+#'   simulation methods.
 #' @author Rob J Hyndman
 #' @seealso \code{\link[forecast]{simulate.Arima}}
 #' @examples
@@ -37,10 +37,9 @@
 #' # Seasonal ARIMA model with randomly selected parameters
 #' model3 <- arima_model(frequency = 4)
 #' # Simulate from each model and plot the results
-#' library(forecast)
-#' simulate(model1, 100) %>% plot()
-#' simulate(model2, 100) %>% plot()
-#' simulate(model3, 100) %>% plot()
+#' plot(simulate(model1, 100))
+#' plot(simulate(model2, 100))
+#' plot(simulate(model3, 100))
 #' @export
 arima_model <- function(frequency = 1, p = NULL, d = NULL, q = NULL,
                         P = NULL, D = NULL, Q = NULL, constant = NULL,
@@ -168,19 +167,25 @@ stationary_ar <- function(p) {
   return(phi)
 }
 
-#' Compute pi coefficients of an AR process from SARIMA coefficients.
+#' Compute AR recursion coefficients from SARIMA coefficients
 #'
-#' Convert SARIMA coefficients to pi coefficients of an AR process.
-#' @param ar AR coefficients in the SARIMA model.
-#' @param d number of differences in the SARIMA model.
-#' @param ma MA coefficients in the SARIMA model.
-#' @param sar seasonal AR coefficients in the SARIMA model.
-#' @param D number of seasonal differences in the SARIMA model.
-#' @param sma seasonal MA coefficients in the SARIMA model.
-#' @param m seasonal period in the SARIMA model.
-#' @param tol tolerance value used. Only return up to last element greater than tolerance.
+#' Convert SARIMA coefficients into the equivalent infinite-order AR recursion
+#' coefficients, truncated after the last coefficient whose absolute value is
+#' greater than \code{tol}. These coefficients are used internally by
+#' \code{\link{mar_model}()} and are also exported for users who need the same
+#' conversion.
 #'
-#' @return A vector of AR coefficients.
+#' @param ar Non-seasonal AR coefficients.
+#' @param d Number of non-seasonal differences.
+#' @param ma Non-seasonal MA coefficients.
+#' @param sar Seasonal AR coefficients.
+#' @param D Number of seasonal differences.
+#' @param sma Seasonal MA coefficients.
+#' @param m Seasonal period.
+#' @param tol Tolerance used for truncation. Coefficients are returned through
+#'   the last position whose absolute value exceeds \code{tol}.
+#'
+#' @return A numeric vector of AR recursion coefficients.
 #' @author Rob J Hyndman
 #' @export
 #' @importFrom stats dist
@@ -191,7 +196,9 @@ stationary_ar <- function(p) {
 #' @importFrom stats loess
 #'
 #' @examples
-#' # Not Run
+#' pi_coefficients(ar = 0.8)
+#' pi_coefficients(ar = c(0.4, -0.2), d = 1)
+#' pi_coefficients(ar = 0.3, sar = 0.2, D = 1, m = 12)
 pi_coefficients <- function(ar = 0, d = 0L, ma = 0, sar = 0, D = 0L, sma = 0, m = 1L, tol = 1e-07) {
   # non-seasonal AR
   ar <- polynomial(c(1, -ar)) * polynomial(c(1, -1))^d

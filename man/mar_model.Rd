@@ -2,7 +2,7 @@
 % Please edit documentation in R/mar_model.R
 \name{mar_model}
 \alias{mar_model}
-\title{Specify parameters for a Mixture Autoregressive model}
+\title{Specify a mixture autoregressive model}
 \usage{
 mar_model(
   k = NULL,
@@ -19,82 +19,94 @@ mar_model(
 )
 }
 \arguments{
-\item{k}{Number of components.}
+\item{k}{Number of mixture components.}
 
-\item{p}{Non-negative integer vector giving the orders of non-seasonal AR polynomials \eqn{\phi_i(B)}.
-Ignored if \code{phi} provided.}
+\item{p}{Non-negative integer vector giving the non-seasonal AR orders
+\eqn{p_i}. Ignored when \code{phi} is supplied.}
 
-\item{d}{Non-negative integer vector giving the orders of non-seasonal differencing.}
+\item{d}{Non-negative integer vector giving the non-seasonal differencing
+orders \eqn{d_i}.}
 
-\item{phi}{A max(p) x k numeric matrix containing the non-seasonal AR parameters
-(\eqn{\phi_{1,i},\dots,\phi_{p,i}}), \eqn{i=1,\dots,k} for each component.}
+\item{phi}{Numeric matrix of non-seasonal AR parameters. Column \eqn{i}
+contains the parameters for component \eqn{i}.}
 
-\item{P}{Non-negative integer giving the orders of seasonal AR polynomiasl \eqn{\Phi_i(B)}.
-Ignored if \code{seasonal.periods==1} or \code{Phi} provided.}
+\item{P}{Non-negative integer vector giving the seasonal AR orders
+\eqn{P_i}. Ignored when all \code{seasonal_periods} are 1 or when
+\code{Phi} is supplied.}
 
-\item{D}{Non-negative integer giving the orders of seasonal differencing.
-Ignored if \code{seasonal.periods==1}.}
+\item{D}{Non-negative integer vector giving the seasonal differencing orders
+\eqn{D_i}. Ignored when all \code{seasonal_periods} are 1.}
 
-\item{Phi}{A max(P) x k numeric matrix containing the seasonal AR parameters
-(\eqn{\Phi_{1,i},\dots,\phi_{P,i}}), \eqn{i=1,\dots,k} for each component.
-Ignored if \code{seasonal.periods==1}.}
+\item{Phi}{Numeric matrix of seasonal AR parameters. Column \eqn{i}
+contains the parameters for component \eqn{i}. Ignored when all
+\code{seasonal_periods} are 1.}
 
-\item{constants}{A numeric vector of length k containing \eqn{c_1,\dots,c_k}.}
+\item{constants}{Numeric vector of length \code{k} containing the component
+constants \eqn{c_1,\dots,c_k}.}
 
-\item{sigmas}{A numeric vector of length k or a list of k GARCH specifications.
-If it is a vector, it is assumed \eqn{\sigma_{i,t} = \sigma_i} and
-\code{sigmas} = \eqn{\sigma_1,\dots,\sigma_k}.
-If it is a list, each element should be the output from \code{fGarch::\link[fGarch]{garchSpec}()}.}
+\item{sigmas}{Numeric vector of length \code{k}, or a list of \code{k}
+GARCH specifications created by \code{\link[fGarch]{garchSpec}()}.}
 
-\item{weights}{A numeric vector of length k containing the probability of
-each of the component processes, \eqn{\alpha_1,\dots,\alpha_k}.}
+\item{weights}{Positive numeric vector of length \code{k} containing the
+component probabilities \eqn{\alpha_1,\dots,\alpha_k}. Values are
+normalized to sum to 1.}
 
-\item{seasonal_periods}{Either a scalar or a numeric vector of length k containing
-the seasonal period of each component.}
+\item{seasonal_periods}{Scalar seasonal period applied to every component, or
+a numeric vector of length \code{k} giving the seasonal period for each
+component.}
 }
 \value{
-A `mar` object containing a list of \code{k}, \code{m},
-\code{p}, \code{d}, \code{P}, \code{D},
-\code{phi}, \code{Phi}, \code{sigmas} and \code{weights}.
+An object of class \code{mar}. The object stores the component orders,
+  coefficients, constants, sigmas, normalized weights, seasonal periods, and
+  the expanded AR recursion coefficients used by \code{\link{simulate.mar}()}.
 }
 \description{
-This function allows the parameters of a mixture of k Gaussian ARIMA(p,d,0)(P,D,0)[m] processes
-to be specified. The output is used in \code{\link{simulate.mar}()} and \code{\link{generate.mar}}.
-The model is of the form
-\deqn{(1-B)^{d_i}(1-B^{m_i})^{D_i} (1-\phi_i(B))(1-\Phi_i(B)) y_t = c_i + \sigma_{i,t}\epsilon_t}
-with probability \eqn{\alpha_i}, where \eqn{B} is the backshift operator,
-\eqn{m_i} is the seasonal period, \eqn{\epsilon_t} is a N(0,1) variate, and
-\eqn{\phi_i(B)} and \eqn{\Phi_i(B)} are polynomials in B of
-order \eqn{d_i} and \eqn{D_i} respectively.
-If any argument is \code{NULL}, the corresponding parameters are randomly selected.
-When randomly selected, the AR parameters are uniformly sampled from the stationary region,
-p is in \{0,1,2,3\}, d is in \{0,1,2\}, P is in \{0,1,2\} and D is in \{0,1\}.
-The model orders are uniformly sampled. The constants are uniformly sampled on (-3,3).
-The sigmas are uniformly sampled on (1,5) and the weights are uniformly sampled on (0,1).
-The number of components is uniformly sampled on \{1,2,3,4,5\}.
+Construct a mixture autoregressive (MAR) model made up of \eqn{k} Gaussian
+ARIMA\eqn{(p,d,0)(P,D,0)_m} components. The resulting \code{mar} object can
+be passed to \code{\link{simulate.mar}()} to simulate one series or to
+\code{\link{generate.mar}()} to generate a tsibble of several series.
+}
+\details{
+Component \eqn{i} has the form
+\deqn{
+(1-B)^{d_i}(1-B^{m_i})^{D_i}
+(1-\phi_i(B))(1-\Phi_i(B)) y_t =
+c_i + \sigma_{i,t}\epsilon_t
+}
+and is selected with probability \eqn{\alpha_i}. Here \eqn{B} is the
+backshift operator, \eqn{m_i} is the seasonal period, \eqn{\epsilon_t} is a
+standard normal variate, and \eqn{\phi_i(B)} and \eqn{\Phi_i(B)} are the
+non-seasonal and seasonal autoregressive polynomials.
+
+Any missing model argument is randomly selected. Randomly selected
+non-seasonal AR orders are sampled from \eqn{\{0,1,2,3\}},
+non-seasonal differences from \eqn{\{0,1,2\}}, seasonal AR orders from
+\eqn{\{0,1,2\}}, and seasonal differences from \eqn{\{0,1\}}. AR parameters
+are sampled from the stationary region, constants from \eqn{(-3,3)}, sigmas
+from \eqn{(1,5)}, and mixture weights from \eqn{(0,1)} before normalization.
+If \code{k} is omitted, the number of components is sampled from
+\eqn{\{1,2,3,4,5\}}, unless it can be inferred from another argument.
 }
 \examples{
-\dontshow{if (require("fGarch", quietly=TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-n <- 100
 # Quarterly MAR model with randomly selected parameters
 model1 <- mar_model(seasonal_periods = 4)
 
 # Daily MAR model with randomly selected parameters
 model2 <- mar_model(seasonal_periods = c(7, 365))
 
-# MAR model with constant variances
-# containing an AR(1) component and an AR(2) component
-phi <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
+# MAR model with constant variances and user-specified coefficients
+phi <- cbind(c(0.8, 0), c(0.6, 0.3))
 weights <- c(0.8, 0.2)
 model3 <- mar_model(phi = phi, d = 0, sigmas = c(1, 2), weights = weights)
 
 # MAR model with heteroskedastic errors
-sigmas.spec <- list(
-  fGarch::garchSpec(model = list(alpha = c(0.05, 0.06))),
-  fGarch::garchSpec(model = list(alpha = c(0.05, 0.05)))
-)
-model4 <- mar_model(phi = phi, sigmas = sigmas.spec, weights = weights)
-\dontshow{\}) # examplesIf}
+if (requireNamespace("fGarch", quietly = TRUE)) {
+  sigmas_spec <- list(
+    fGarch::garchSpec(model = list(alpha = c(0.05, 0.06))),
+    fGarch::garchSpec(model = list(alpha = c(0.05, 0.05)))
+  )
+  model4 <- mar_model(phi = phi, sigmas = sigmas_spec, weights = weights)
+}
 }
 \seealso{
 \code{\link{simulate.mar}}

@@ -2,29 +2,31 @@
 % Please edit documentation in R/generate_ts.R
 \name{generate_ts}
 \alias{generate_ts}
-\title{Generate time series from random parameter spaces of the mixture autoregressive (MAR) models.}
+\title{Generate random MAR time series}
 \usage{
 generate_ts(n.ts = 1, freq = 1, nComp = NULL, n = 120, output_format = "list")
 }
 \arguments{
-\item{n.ts}{number of time series to be generated.}
+\item{n.ts}{Number of time series to generate.}
 
-\item{freq}{seasonal period of the time series to be generated.}
+\item{freq}{Seasonal period of the generated series.}
 
-\item{nComp}{number of mixing components when simulating time series using MAR models.}
+\item{nComp}{Number of mixture components. If \code{NULL}, this is sampled
+randomly for each generated series.}
 
-\item{n}{length of the generated time series.}
+\item{n}{Length of each generated series.}
 
-\item{output_format}{An optional argument which allows to choose output format between "list" and "tsibble"}
+\item{output_format}{Output format: \code{"list"} for the historical list
+format or \code{"tsibble"} for a list of tsibbles.}
 }
 \value{
-A list of time series together with the SARIMA coefficients used in each mixing
-    component and the corresponding mixing weights.
+When \code{output_format = "list"}, a list containing generated time
+  series and the parameters used for each series. When
+  \code{output_format = "tsibble"}, a list of tsibbles.
 }
 \description{
-Deprecated function. Please use \code{\link{mar_model}()} and \code{\link{generate.mar}()} instead.
-Generate time series from random parameter spaces of the mixture autoregressive (MAR)
-models.
+This function is deprecated. Use \code{\link{mar_model}()} with
+\code{\link{generate.mar}()} or \code{\link{simulate.mar}()} instead.
 }
 \examples{
 x <- generate_ts(n.ts = 2, freq = 12, nComp = 2, n = 120)

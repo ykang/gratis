@@ -1,11 +1,18 @@
-#' Generate random variables from a mixture of multivariate normal distributions
+#' Generate random values from a mixture of multivariate normal distributions
 #'
-#' Random variables from a mixture of k multivariate normal distributions, each of dimension q.
-#' @param n an integer for the number of samples to be generated.
-#' @param means a q x k matrix (or a vector of length k if q=1) containing the means for each component.
-#' @param sigmas a q x q x k covariance array (or a vector of length k if q=1) for each component.
-#' @param weights a vector of length k containing the weights for each component.
-#' @return An n x q matrix (or a vector if q=1) containing the generated data.
+#' Draw random values from a finite mixture of \eqn{k} multivariate normal
+#' distributions, each with dimension \eqn{q}. For univariate mixtures,
+#' \code{means} and \code{sigmas} may be supplied as vectors.
+#'
+#' @param n Number of observations to generate.
+#' @param means A \eqn{q \times k} matrix of component means, or a vector of
+#'   length \eqn{k} for univariate mixtures.
+#' @param sigmas A \eqn{q \times q \times k} array of component covariance
+#'   matrices, or a vector of length \eqn{k} for univariate mixtures.
+#' @param weights Numeric vector of component probabilities. Values are used as
+#'   sampling probabilities for the mixture components.
+#' @return An \eqn{n \times q} matrix of generated data, or a numeric vector
+#'   when \eqn{q = 1}.
 #' @references Villani et al 2009.
 #' @author Feng Li, Central University of Finance and Economics.
 #' @examples
@@ -99,24 +106,28 @@ dmixnorm <- function(x, means, sigmas, weights, log = FALSE) {
 ## hist(out, breaks = 100, freq = FALSE)
 ## points(out, out.density)
 
-#' Simulate autoregressive random variables from mixture of normal
+#' Simulate a mixture-normal autoregressive process
 #'
-#' This function simulates random samples from a finite mixture of Gaussian distribution
-#'     where the mean from each components are AR(p) process.
-#' @param n number of samples.
-#' @param means.ar.par.list parameters in AR(p) within each mixing compoment.
-#' @param sigmas.list variance list.
-#' @param weights weight in each list.
-#' @param yinit initial values.
-#' @return vector of length n follows a mixture distribution.
+#' Simulate a univariate process whose conditional distribution is a finite
+#' mixture of Gaussian distributions. The conditional mean of each component is
+#' an autoregressive process with its own parameter vector.
+#'
+#' @param n Number of observations to generate.
+#' @param means.ar.par.list List of component AR parameter vectors. The first
+#'   element of each vector is the intercept, followed by lag coefficients.
+#' @param sigmas.list List of component variance or volatility vectors, each of
+#'   length \code{n}.
+#' @param weights Numeric vector of component probabilities.
+#' @param yinit Initial value used to seed the recursion.
+#' @return A \code{\link[stats]{ts}} object of length \code{n}.
 #' @references Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
 #'     Conditional Distributions using Smooth Mixtures of Asymmetric Student T Densities,
 #'     Journal of Statistical Planning and Inference, 140(12), pp. 3638-3654.
 #' @author Feng Li, Central University of Finance and Economics.
-#' @examplesIf require("fGarch", quietly=TRUE)
+#' @examples
+#' if (requireNamespace("fGarch", quietly = TRUE)) {
 #' n <- 1000
 #' means.ar.par.list <- list(c(0, 0.8), c(0, 0.6, 0.3))
-#' require("fGarch")
 #' sigmas.spec <- list(
 #'   fGarch::garchSpec(model = list(alpha = c(0.05, 0.06)), cond.dist = "norm"),
 #'   fGarch::garchSpec(model = list(alpha = c(0.05, 0.05)), cond.dist = "norm")
@@ -131,6 +142,7 @@ dmixnorm <- function(x, means, sigmas, weights, log = FALSE) {
 #'   weights = weights
 #' )
 #' plot(y)
+#' }
 #' @export
 rmixnorm_ts <- function(n, means.ar.par.list, sigmas.list, weights, yinit = 0) {
   y <- rep(yinit, n)

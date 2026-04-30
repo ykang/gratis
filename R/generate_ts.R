@@ -1,15 +1,18 @@
-#' Generate time series from random parameter spaces of the mixture autoregressive (MAR) models.
+#' Generate random MAR time series
 #'
-#' Deprecated function. Please use \code{\link{mar_model}()} and \code{\link{generate.mar}()} instead.
-#' Generate time series from random parameter spaces of the mixture autoregressive (MAR)
-#' models.
-#' @param n.ts number of time series to be generated.
-#' @param freq seasonal period of the time series to be generated.
-#' @param nComp number of mixing components when simulating time series using MAR models.
-#' @param n length of the generated time series.
-#' @param output_format An optional argument which allows to choose output format between "list" and "tsibble"
-#' @return A list of time series together with the SARIMA coefficients used in each mixing
-#'     component and the corresponding mixing weights.
+#' This function is deprecated. Use \code{\link{mar_model}()} with
+#' \code{\link{generate.mar}()} or \code{\link{simulate.mar}()} instead.
+#'
+#' @param n.ts Number of time series to generate.
+#' @param freq Seasonal period of the generated series.
+#' @param nComp Number of mixture components. If \code{NULL}, this is sampled
+#'   randomly for each generated series.
+#' @param n Length of each generated series.
+#' @param output_format Output format: \code{"list"} for the historical list
+#'   format or \code{"tsibble"} for a list of tsibbles.
+#' @return When \code{output_format = "list"}, a list containing generated time
+#'   series and the parameters used for each series. When
+#'   \code{output_format = "tsibble"}, a list of tsibbles.
 #' @author Yanfei Kang and Feng Li
 #' @examples
 #' x <- generate_ts(n.ts = 2, freq = 12, nComp = 2, n = 120)
@@ -18,7 +21,7 @@
 #' @references Wong, CS & WK Li (2000).
 #' @export
 generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120, output_format = "list") {
-  warning("This function is deprecated. It is recommended you use model_mar() and simulate.mar() or generate.mar() instead.")
+  warning("This function is deprecated. It is recommended you use mar_model() and simulate.mar() or generate.mar() instead.")
   count <- 1
   generated.mixture.data <- list()
   sigmas <- sample(c(1:5), 5, replace = TRUE)
@@ -120,21 +123,25 @@ generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120, output_format
 
 
 
-#' Generate multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
+#' Generate a random multiple-seasonal MAR time series
 #'
-#' Deprecated function. Please use \code{\link{mar_model}()} and \code{\link{generate.mar}()} instead.
-#' Generates multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
-#' @param seasonal.periods a vector of seasonal periods of the time series to be generated.
-#' @param n length of the generated time series.
-#' @param nComp number of mixing components when simulating time series using MAR models.
-#' @param output_format An optional argument which allows to choose output format between "list" and "tsibble"
-#' @return a time series with multiple seasonal periods.
+#' This function is deprecated. Use \code{\link{mar_model}()} with
+#' \code{\link{generate.mar}()} or \code{\link{simulate.mar}()} instead.
+#'
+#' @param seasonal.periods Numeric vector of seasonal periods.
+#' @param n Length of the generated series.
+#' @param nComp Number of mixture components. If \code{NULL}, this is sampled
+#'   randomly for each generated component series.
+#' @param output_format Output format: \code{"list"} for the historical
+#'   \code{msts} result or \code{"tsibble"} for a tsibble.
+#' @return A multiple-seasonal time series when \code{output_format = "list"},
+#'   or a tsibble when \code{output_format = "tsibble"}.
 #' @export
 #' @examples
 #' x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2, output_format = "list")
 #' forecast::autoplot(x)
 generate_msts <- function(seasonal.periods = c(7, 365), n = 800, nComp = NULL, output_format = "list") {
-  warning("This function is deprecated. It is recommended you use model_mar() and simulate.mar() or generate.mar() instead.")
+  warning("This function is deprecated. It is recommended you use mar_model() and simulate.mar() or generate.mar() instead.")
   x.list <- map(seasonal.periods, function(p) {
     suppressWarnings(generate_ts(n.ts = 1, freq = p, n = n, nComp = nComp)$N1$x)
   })

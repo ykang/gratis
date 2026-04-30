@@ -4,7 +4,7 @@
 \alias{generate.mar}
 \alias{generate.ets}
 \alias{generate.Arima}
-\title{Generate a tsibble of synthetic data from a Mixture Autoregressive model}
+\title{Generate a tsibble of synthetic time series}
 \usage{
 \method{generate}{mar}(x, length = 100, nseries = 10, ...)
 
@@ -13,33 +13,46 @@
 \method{generate}{Arima}(x, length = 100, nseries = 10, ...)
 }
 \arguments{
-\item{x}{A `mar` object, usually the output of \code{\link{mar_model}()}.}
+\item{x}{A model object of class \code{mar}, \code{ets}, or \code{Arima}.}
 
-\item{length}{length of series to generate}
+\item{length}{Length of each series to generate.}
 
-\item{nseries}{number of series to generate}
+\item{nseries}{Number of series to generate.}
 
-\item{...}{Other arguments, passed to \code{\link{simulate.mar}}.}
+\item{...}{Other arguments passed to the relevant \code{simulate()} method.
+For \code{mar} objects these are passed to \code{\link{simulate.mar}()}.}
 }
 \value{
-`tsibble` object with `length` rows and 3 columns.
+A tsibble containing the generated values. For multiple series the
+  output has \code{length * nseries} rows and includes a key column identifying
+  each series.
 }
 \description{
-This function simulates multiple random sample paths from a mixture of k Gaussian AR(p) processes.
-The model is of the form
-\deqn{y_t = \phi_{0,i} + \phi_{1,i}y_{t-1} + \dots + \phi_{p,i}y_{t-p} + \sigma_{i,t}\epsilon_t}
-with probability \eqn{\alpha_i}, where \eqn{\epsilon_t} is a N(0,1) variate.
-The index of the tsibble is guessed from the MAR model seasonal periods.
+Generate one or more synthetic time series from a fitted or specified model.
+Methods are provided for \code{\link{mar_model}()} objects, ETS objects from
+\code{\link{ets_model}()}, and ARIMA objects from \code{\link{arima_model}()}.
+Each series is produced by repeatedly calling the corresponding
+\code{\link[stats]{simulate}()} method.
+}
+\details{
+The generated series are returned as a tsibble. The index is inferred from
+the model frequency or seasonal periods where possible, with special handling
+for common weekly, hourly, half-hourly, quarter-hourly, and minute data.
 }
 \examples{
 # MAR model with constant variances
-phi <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
+phi <- cbind(c(0.8, 0), c(0.6, 0.3))
 weights <- c(0.8, 0.2)
 model1 <- mar_model(phi = phi, sigmas = c(1, 2), weights = weights)
 generate(model1, nseries = 5)
+
 # MAR model for hourly data with daily and weekly periods
 hourly_model <- mar_model(seasonal_periods = c(24, 24*7))
-generate(hourly_model)
+generate(hourly_model, length = 24 * 7, nseries = 2)
+
+# ARIMA and ETS models also work
+generate(arima_model(p = 1, d = 0, q = 0, phi = 0.5), length = 20, nseries = 2)
+generate(ets_model(error = "A", trend = "N", seasonal = "N"), length = 20, nseries = 2)
 }
 \references{
 Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
@@ -47,7 +60,8 @@ Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
     Journal of Statistical Planning and Inference, 140(12), pp. 3638-3654.
 }
 \seealso{
-\code{\link{mar_model}}, \code{\link{simulate.mar}}
+\code{\link{mar_model}}, \code{\link{arima_model}},
+  \code{\link{ets_model}}, \code{\link{simulate.mar}}
 }
 \author{
 Rob J Hyndman

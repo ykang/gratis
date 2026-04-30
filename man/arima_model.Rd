@@ -2,7 +2,7 @@
 % Please edit documentation in R/arima_model.R
 \name{arima_model}
 \alias{arima_model}
-\title{Specify parameters for an ARIMA model}
+\title{Specify an ARIMA model}
 \usage{
 arima_model(
   frequency = 1,
@@ -23,46 +23,47 @@ arima_model(
 \arguments{
 \item{frequency}{The length of the seasonal period (e.g., 12 for monthly data).}
 
-\item{p}{An integer equal to the non-seasonal autoregressive order}
+\item{p}{Non-seasonal autoregressive order.}
 
-\item{d}{An integer equal to the non-seasonal order of differencing}
+\item{d}{Non-seasonal differencing order.}
 
-\item{q}{An integer equal to the non-seasonal moving average order}
+\item{q}{Non-seasonal moving-average order.}
 
-\item{P}{An integer equal to the seasonal autoregressive order}
+\item{P}{Seasonal autoregressive order.}
 
-\item{D}{An integer equal to the seasonal order of differencing}
+\item{D}{Seasonal differencing order.}
 
-\item{Q}{An integer equal to the seasonal moving average order}
+\item{Q}{Seasonal moving-average order.}
 
-\item{constant}{The intercept term}
+\item{constant}{Intercept term.}
 
 \item{phi}{A numeric p-vector containing the AR parameters.}
 
-\item{theta}{A numeric p-vector containing the MA parameters.}
+\item{theta}{A numeric q-vector containing the MA parameters.}
 
-\item{Phi}{A numeric p-vector containing the seasonal AR parameters.}
+\item{Phi}{A numeric P-vector containing the seasonal AR parameters.}
 
-\item{Theta}{A numeric p-vector containing the seasonal MA parameters.}
+\item{Theta}{A numeric Q-vector containing the seasonal MA parameters.}
 
 \item{sigma}{The standard deviation of the noise.}
 }
 \value{
-An `Arima` object as described in the \code{\link[stats]{arima}} function from the stats package.
+An \code{Arima} object compatible with the \pkg{forecast} package's
+  simulation methods.
 }
 \description{
-This function allows the parameters of a Gaussian \eqn{ARIMA(p,d,q)(P,D,Q)[m]}
-process to be specified. The output can be used in \code{\link[forecast]{simulate.Arima}()}
-and \code{\link{generate.Arima}}.
-If any argument is \code{NULL}, the corresponding parameters are randomly selected.
-The AR and MA orders p and q are chosen from \{0,1,2,3\}, the seasonal AR and MA
-orders P and Q are from \{0,1,2\}, while the order of differencing,
-d is in \{0,1,2\}, and the order of seasonal differencing D is in \{0,1\}, with the
-restriction that \eqn{d+D \le 2}. If \code{constant} is \code{NULL}, it is set to
-0 if \eqn{d+D = 2}, otherwise it is uniformly sampled on (-3,3).
-The model orders and the parameters are uniformly sampled. The AR and MA parameters are selected
-to give stationary and invertible processes when \eqn{d=D=0}. The noise variance sigma
-is uniformly sampled on (1,5). The parameterization is as specified in Hyndman & Athanasopoulos (2021).
+Construct a Gaussian ARIMA\eqn{(p,d,q)(P,D,Q)_m} model that can be used with
+\code{\link[forecast]{simulate.Arima}()} or \code{\link{generate.Arima}()}.
+Any omitted argument is randomly selected from the supported parameter space.
+}
+\details{
+When orders are omitted, \code{p} and \code{q} are sampled from
+\eqn{\{0,1,2,3\}}, \code{P} and \code{Q} from \eqn{\{0,1,2\}},
+\code{d} from \eqn{\{0,1,2\}}, and \code{D} from \eqn{\{0,1\}}, with the
+restriction \eqn{d + D \le 2}. If \code{constant} is omitted, it is sampled
+from \eqn{(-3,3)} unless \eqn{d + D = 2}, in which case it is set to zero.
+AR and MA parameters are sampled so the stationary and invertible parts of
+the process are valid, and \code{sigma} is sampled from \eqn{(1,5)}.
 }
 \examples{
 # An AR(2) model with random parameters
@@ -72,10 +73,9 @@ model2 <- arima_model(p = 2, d = 0, q = 0, phi = c(1.34, -0.64), sigma = 15)
 # Seasonal ARIMA model with randomly selected parameters
 model3 <- arima_model(frequency = 4)
 # Simulate from each model and plot the results
-library(forecast)
-simulate(model1, 100) \%>\% plot()
-simulate(model2, 100) \%>\% plot()
-simulate(model3, 100) \%>\% plot()
+plot(simulate(model1, 100))
+plot(simulate(model2, 100))
+plot(simulate(model3, 100))
 }
 \seealso{
 \code{\link[forecast]{simulate.Arima}}

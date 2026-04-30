@@ -1,10 +1,15 @@
-#' Web Application to generate time series with controllable features.
+#' Launch the gratis Shiny application
 #'
-#' @return
-#' NULL
+#' Launch a local Shiny application for generating time series with
+#' controllable features.
+#'
+#' @return Called for its side effect of launching a Shiny application. Returns
+#'   the value from \code{\link[shiny]{runApp}()}.
 #
-# @examples
-# # Not Run
+#' @examples
+#' \dontrun{
+#' app_gratis()
+#' }
 # run_gratis_app <- function() {
 #   appDir <- system.file("shiny", "gratis", package = "gratis")
 #   if (appDir == "") {

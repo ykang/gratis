@@ -2,7 +2,7 @@
 % Please edit documentation in R/generate_ts.R
 \name{generate_msts}
 \alias{generate_msts}
-\title{Generate multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.}
+\title{Generate a random multiple-seasonal MAR time series}
 \usage{
 generate_msts(
   seasonal.periods = c(7, 365),
@@ -12,20 +12,23 @@ generate_msts(
 )
 }
 \arguments{
-\item{seasonal.periods}{a vector of seasonal periods of the time series to be generated.}
+\item{seasonal.periods}{Numeric vector of seasonal periods.}
 
-\item{n}{length of the generated time series.}
+\item{n}{Length of the generated series.}
 
-\item{nComp}{number of mixing components when simulating time series using MAR models.}
+\item{nComp}{Number of mixture components. If \code{NULL}, this is sampled
+randomly for each generated component series.}
 
-\item{output_format}{An optional argument which allows to choose output format between "list" and "tsibble"}
+\item{output_format}{Output format: \code{"list"} for the historical
+\code{msts} result or \code{"tsibble"} for a tsibble.}
 }
 \value{
-a time series with multiple seasonal periods.
+A multiple-seasonal time series when \code{output_format = "list"},
+  or a tsibble when \code{output_format = "tsibble"}.
 }
 \description{
-Deprecated function. Please use \code{\link{mar_model}()} and \code{\link{generate.mar}()} instead.
-Generates multiple seasonal time series from random parameter spaces of the mixture autoregressive (MAR) models.
+This function is deprecated. Use \code{\link{mar_model}()} with
+\code{\link{generate.mar}()} or \code{\link{simulate.mar}()} instead.
 }
 \examples{
 x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2, output_format = "list")

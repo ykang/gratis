@@ -1,7 +1,17 @@
-#' gratis: GeneRAting TIme Series with diverse and controllable characteristics
+#' gratis: Generate synthetic time series
 #'
-#' The gratis package generates synthetic time series data based on various
-#' univariate time series models including MAR, ARIMA and ETS processes.
+#' Generate synthetic univariate time series with diverse or controllable
+#' characteristics. The package supports mixture autoregressive (MAR), ARIMA,
+#' and ETS data-generating processes, and includes a genetic-algorithm workflow
+#' for searching MAR parameters that produce user-specified time-series
+#' features.
+#'
+#' The main workflow is to construct a model with \code{\link{mar_model}()},
+#' \code{\link{arima_model}()}, or \code{\link{ets_model}()}, then simulate one
+#' path with \code{\link[stats]{simulate}()} or many paths with
+#' \code{\link[generics]{generate}()}. To generate series with target feature
+#' values, use \code{\link{simulate_target}()} or
+#' \code{\link{generate_target}()}.
 #'
 #' @aliases gratis-package
 #' @importFrom stats as.ts coef dlnorm plnorm qlnorm rlnorm rmultinom rnorm runif stl ts

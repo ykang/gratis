@@ -2,7 +2,7 @@
 % Please edit documentation in R/arima_model.R
 \name{pi_coefficients}
 \alias{pi_coefficients}
-\title{Compute pi coefficients of an AR process from SARIMA coefficients.}
+\title{Compute AR recursion coefficients from SARIMA coefficients}
 \usage{
 pi_coefficients(
   ar = 0,
@@ -16,30 +16,37 @@ pi_coefficients(
 )
 }
 \arguments{
-\item{ar}{AR coefficients in the SARIMA model.}
+\item{ar}{Non-seasonal AR coefficients.}
 
-\item{d}{number of differences in the SARIMA model.}
+\item{d}{Number of non-seasonal differences.}
 
-\item{ma}{MA coefficients in the SARIMA model.}
+\item{ma}{Non-seasonal MA coefficients.}
 
-\item{sar}{seasonal AR coefficients in the SARIMA model.}
+\item{sar}{Seasonal AR coefficients.}
 
-\item{D}{number of seasonal differences in the SARIMA model.}
+\item{D}{Number of seasonal differences.}
 
-\item{sma}{seasonal MA coefficients in the SARIMA model.}
+\item{sma}{Seasonal MA coefficients.}
 
-\item{m}{seasonal period in the SARIMA model.}
+\item{m}{Seasonal period.}
 
-\item{tol}{tolerance value used. Only return up to last element greater than tolerance.}
+\item{tol}{Tolerance used for truncation. Coefficients are returned through
+the last position whose absolute value exceeds \code{tol}.}
 }
 \value{
-A vector of AR coefficients.
+A numeric vector of AR recursion coefficients.
 }
 \description{
-Convert SARIMA coefficients to pi coefficients of an AR process.
+Convert SARIMA coefficients into the equivalent infinite-order AR recursion
+coefficients, truncated after the last coefficient whose absolute value is
+greater than \code{tol}. These coefficients are used internally by
+\code{\link{mar_model}()} and are also exported for users who need the same
+conversion.
 }
 \examples{
-# Not Run
+pi_coefficients(ar = 0.8)
+pi_coefficients(ar = c(0.4, -0.2), d = 1)
+pi_coefficients(ar = 0.3, sar = 0.2, D = 1, m = 12)
 }
 \author{
 Rob J Hyndman

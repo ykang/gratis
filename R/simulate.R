@@ -1,17 +1,23 @@
-#' Generate synthetic data from a Mixture Autoregressive model
+#' Simulate from a mixture autoregressive model
 #'
-#' This function simulates one random sample path from a mixture of k Gaussian AR(p) processes.
-#' The model is of the form
-#' \deqn{y_t = \phi_{0,i} + \phi_{1,i}y_{t-1} + \dots + \phi_{p,i}y_{t-p} + \sigma_{i,t}\epsilon_t}
-#' with probability \eqn{\alpha_i}, where \eqn{\epsilon_t} is a N(0,1) variate.
-#' @param object A `mar` object, usually the output of \code{\link{mar_model}()}.
-#' @param nsim length of series to generate
+#' Simulate one random sample path from a mixture of Gaussian autoregressive
+#' components created by \code{\link{mar_model}()}. At each time point, a
+#' component is sampled according to the model weights, that component's
+#' conditional mean and innovation variance are used, and the resulting series
+#' is returned after discarding a burn-in period.
+#'
+#' @param object A \code{mar} object, usually created by
+#'   \code{\link{mar_model}()}.
+#' @param nsim Length of the generated series.
 #' @param seed Either \code{NULL} or an integer that will be used in a call to
-#' \code{\link[base]{set.seed}} before simulating the time series. The default,
-#' \code{NULL}, will not change the random generator state.
-#' @param n.start Length of 'burn-in' period.
+#'   \code{\link[base]{set.seed}()} before simulating the time series. The
+#'   default, \code{NULL}, leaves the random number generator state unchanged.
+#' @param n.start Length of the burn-in period discarded before returning the
+#'   simulated series.
 #' @param ... Other arguments, not currently used.
-#' @return `ts` object of length \code{nsim}.
+#' @return A \code{\link[forecast]{msts}} object of length \code{nsim}. For
+#'   single-seasonal or non-seasonal models this also behaves like a base
+#'   \code{\link[stats]{ts}} object.
 #' @references Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
 #'     Conditional Distributions using Smooth Mixtures of Asymmetric Student T Densities,
 #'     Journal of Statistical Planning and Inference, 140(12), pp. 3638-3654.
@@ -19,20 +25,22 @@
 #' @seealso \code{\link{mar_model}}
 #' @examples
 #' # MAR model with constant variances
-#' phi <- cbind(c(0, 0.8, 0), c(0, 0.6, 0.3))
+#' phi <- cbind(c(0.8, 0), c(0.6, 0.3))
 #' weights <- c(0.8, 0.2)
 #' model1 <- mar_model(phi = phi, sigmas = c(1, 2), weights = weights)
 #' y <- simulate(model1, 100)
 #' plot(y)
 #'
 #' # MAR model with heteroskedastic errors
-#' sigmas.spec <- list(
-#'   fGarch::garchSpec(model = list(alpha = c(0.05, 0.06))),
-#'   fGarch::garchSpec(model = list(alpha = c(0.05, 0.05)))
-#' )
-#' model2 <- mar_model(phi = phi, sigmas = sigmas.spec, weights = weights)
-#' y <- simulate(model2, 100)
-#' plot(y)
+#' if (requireNamespace("fGarch", quietly = TRUE)) {
+#'   sigmas_spec <- list(
+#'     fGarch::garchSpec(model = list(alpha = c(0.05, 0.06))),
+#'     fGarch::garchSpec(model = list(alpha = c(0.05, 0.05)))
+#'   )
+#'   model2 <- mar_model(phi = phi, sigmas = sigmas_spec, weights = weights)
+#'   y <- simulate(model2, 100)
+#'   plot(y)
+#' }
 #' @export
 simulate.mar <- function(object, nsim = 100, seed = NULL, n.start = 100, ...) {
   # Set seed
