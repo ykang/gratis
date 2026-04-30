@@ -52,9 +52,9 @@ simulation. The Python source is intentionally excluded from
 `R CMD build`; see `python/README.md` for Python-specific usage and
 testing notes.
 
-## Usage
+## R Usage
 
-### Tutorial video
+### Tutorial video for R users
 
 Watch [this YouTube video](https://www.youtube.com/watch?v=F3lWECtFa44)
 provided by [Prof. Rob Hyndman](https://robjhyndman.com/).
