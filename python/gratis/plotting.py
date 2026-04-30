@@ -46,8 +46,8 @@ def _get_axes(ax: Any | None):
         import matplotlib.pyplot as plt
     except ImportError as exc:
         raise ImportError(
-            "plotting requires matplotlib. Install it with "
-            "`python -m pip install -e './python[plot]'`."
+            "plotting requires matplotlib. Install the Python package with its "
+            "declared dependencies, for example `python -m pip install -e ./python`."
         ) from exc
     _, ax = plt.subplots()
     return ax

@@ -40,12 +40,6 @@ For development and tests:
 python -m pip install -e "./python[dev]"
 ```
 
-For plotting:
-
-```sh
-python -m pip install -e "./python[plot]"
-```
-
 You can also work directly from the repository without installing:
 
 ```sh

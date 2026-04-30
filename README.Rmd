@@ -55,14 +55,8 @@ Install the Python development dependencies when running the Python tests:
 python -m pip install -e "./python[dev]"
 ```
 
-The Python package depends on `statsmodels` for ARIMA and ETS simulation. The Python source is intentionally excluded from
+The Python package depends on `statsmodels` for ARIMA and ETS simulation and `matplotlib` for plotting. The Python source is intentionally excluded from
 `R CMD build`; see `python/README.md` for Python-specific usage and testing notes.
-
-Install plotting support when using the Python plotting helpers:
-
-``` sh
-python -m pip install -e "./python[plot]"
-```
 
 ## Usage
 
