@@ -12,7 +12,8 @@ status](https://github.com/ykang/gratis/workflows/R-CMD-check/badge.svg)](https:
 
 The R package `gratis` (previously known as `tsgeneration`) provides
 efficient algorithms for generating time series with diverse and
-controllable characteristics.
+controllable characteristics. This repository also contains a Python
+implementation under `python/`, with source code in `python/gratis`.
 
 ## Installation
 
@@ -30,6 +31,24 @@ You can install the **development** version of `gratis` package from
 ``` r
 devtools::install_github("ykang/gratis")
 ```
+
+### Python package
+
+The Python package is developed from the `python/` subdirectory:
+
+``` sh
+python -m pip install -e ./python
+```
+
+Install the Python development dependencies when running the Python
+tests:
+
+``` sh
+python -m pip install -e "./python[dev]"
+```
+
+The Python source is intentionally excluded from `R CMD build`; see
+`python/README.md` for Python-specific usage and testing notes.
 
 ## Usage
 
@@ -114,6 +133,26 @@ app_gratis()
 
 Or visit our [online Shiny
 APP](https://ebsmonash.shinyapps.io/tsgeneration/)
+
+## Python usage
+
+The Python API mirrors the main model constructors from the R package
+and returns NumPy arrays.
+
+``` python
+import numpy as np
+import gratis
+
+model = gratis.mar_model(
+    phi=np.array([[0.8, 0.6], [0.0, 0.3]]),
+    d=0,
+    sigmas=[1.0, 2.0],
+    weights=[0.8, 0.2],
+)
+
+series = gratis.simulate(model, n=100, rng=1)
+many = gratis.generate(model, length=100, nseries=5, rng=1)
+```
 
 ## See also
 

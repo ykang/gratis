@@ -10,6 +10,8 @@ vignettes/*_files*
 ^doc$
 ^Meta$
 ^\.codex$
+^\.envrc$
 ^Rd2\.pdf$
 ^gratis_.*\.tar\.gz$
 ^.*\.Rcheck$
+^python$
