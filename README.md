@@ -23,7 +23,7 @@ implementation under `python/`, with source code in `python/gratis`.
 install.packages("gratis")
 ```
 
-### Development version
+### R Development version
 
 You can install the **development** version of `gratis` package from
 [GitHub Repository](https://github.com/ykang/gratis) with:
