@@ -26,8 +26,6 @@ Depends:
 Imports:
     doRNG,
     dplyr,
-    feasts,
-    fGarch,
     foreach,
     forecast (>= 8.16),
     GA,
@@ -37,18 +35,21 @@ Imports:
     mvtnorm,
     polynom,
     purrr,
-    shiny,
     stats,
     tibble,
-    tsfeatures,
     tsibble,
     utils
 Suggests:
+    feasts,
+    fGarch,
+    ggplot2,
     knitr,
     rlang,
     rmarkdown,
+    shiny,
     shinydashboard,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tsfeatures
 VignetteBuilder:
     knitr
 Config/testthat/edition: 3

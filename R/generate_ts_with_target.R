@@ -31,6 +31,10 @@
 #' }
 #' @export
 generate_ts_with_target <- function(n, ts.length, freq, seasonal, features, selected.features, target, parallel = TRUE, output_format = "list") {
+  if (!requireNamespace("tsfeatures", quietly = TRUE)) {
+    stop("Package 'tsfeatures' is required to generate time series with target features.", call. = FALSE)
+  }
+
   ga_min <-
     if (seasonal == 0) {
       c(rep(0, 10))

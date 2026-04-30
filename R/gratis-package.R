@@ -31,11 +31,7 @@
 #' @importFrom foreach foreach "%dopar%" "%do%"
 #' @importFrom GA ga gaControl gaMonitor
 #' @importFrom GA startParallel garun
-#' @importFrom tsfeatures tsfeatures
 #' @importFrom doRNG "%dorng%"
-#' @importFrom fGarch garchSpec garchSim
-#' @import shiny
-#' @import feasts
 #' @keywords internal
 
 "_PACKAGE"

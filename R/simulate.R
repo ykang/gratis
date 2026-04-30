@@ -67,6 +67,9 @@ simulate.mar <- function(object, nsim = 100, seed = NULL, n.start = 100, ...) {
   sigmatrix <- matrix(0, ncol = k, nrow = n)
   sigmas <- numeric(n)
   if (is.list(object$sigmas)) {
+    if (!requireNamespace("fGarch", quietly = TRUE)) {
+      stop("Package 'fGarch' is required to simulate MAR models with GARCH specifications.", call. = FALSE)
+    }
     # GARCH components
     for (i in seq(k)) {
       sigmatrix[, i] <- fGarch::garchSim(object$sigmas[[i]],

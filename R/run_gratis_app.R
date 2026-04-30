@@ -22,6 +22,22 @@
 #' @rdname app
 #' @export
 app_gratis <- function() {
+  if (!requireNamespace("shiny", quietly = TRUE)) {
+    stop("Package 'shiny' is required to run the gratis app.", call. = FALSE)
+  }
+  if (!requireNamespace("shinydashboard", quietly = TRUE)) {
+    stop("Package 'shinydashboard' is required to run the gratis app.", call. = FALSE)
+  }
+  if (!requireNamespace("rlang", quietly = TRUE)) {
+    stop("Package 'rlang' is required to run the gratis app.", call. = FALSE)
+  }
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("Package 'ggplot2' is required to run the gratis app.", call. = FALSE)
+  }
+  if (!requireNamespace("tsfeatures", quietly = TRUE)) {
+    stop("Package 'tsfeatures' is required to run the gratis app.", call. = FALSE)
+  }
+
   appDir <- system.file("shiny", "app", package = "gratis")
   if (appDir == "") {
     stop("Could not find example directory. Try re-installing `gratis`.", call. = FALSE)

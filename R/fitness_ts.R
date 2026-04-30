@@ -21,7 +21,7 @@ fitness_ts <- function(pars, features, seasonal, n = 120, freq = 12, target, nCo
     }
     return(list(
       # value = -sqrt(sum((tsfeatures(x, features = features) %>% select(selected.features) - target)^2)) / sqrt(sum(target^2)),
-      value = -sqrt(sum((tsfeatures(x, features = features) %>% select(selected.features) - target)^2)),
+      value = -sqrt(sum((tsfeatures::tsfeatures(x, features = features) %>% select(selected.features) - target)^2)),
       x = x
     ))
   } else {
