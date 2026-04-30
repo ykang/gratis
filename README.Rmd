@@ -55,7 +55,8 @@ Install the Python development dependencies when running the Python tests:
 python -m pip install -e "./python[dev]"
 ```
 
-The Python source is intentionally excluded from `R CMD build`; see `python/README.md` for Python-specific usage and testing notes.
+The Python package depends on `statsmodels` for ARIMA and ETS simulation. The Python source is intentionally excluded from
+`R CMD build`; see `python/README.md` for Python-specific usage and testing notes.
 
 ## Usage
 
@@ -137,6 +138,8 @@ model = gratis.mar_model(
 series = gratis.simulate(model, n=100, rng=1)
 many = gratis.generate(model, length=100, nseries=5, rng=1)
 ```
+
+Python ARIMA and ETS models use `statsmodels` by default. Local NumPy simulators remain available with `backend = "numpy"`.
 
 ## See also
 

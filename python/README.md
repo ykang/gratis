@@ -10,20 +10,20 @@ Python package without shipping Python sources in the R package tarball.
 
 ## Status
 
-The Python implementation currently provides NumPy-based versions of the main
-simulation workflows:
+The Python implementation currently provides the main simulation workflows:
 
 - `gratis.mixture`: mixture-normal random generation and densities.
 - `gratis.arima`: SARIMA coefficient utilities, ARIMA model construction, and
-  ARIMA simulation.
+  ARIMA simulation backed by `statsmodels`.
 - `gratis.mar`: mixture autoregressive model construction and simulation.
-- `gratis.ets`: ETS model construction and simulation.
+- `gratis.ets`: ETS model construction and simulation backed by `statsmodels`.
 - `gratis.generate`: common `simulate()` and `generate()` helpers.
 - `gratis.target`: target-feature generation using an evolutionary search over
   MAR parameters.
 
 Python outputs are NumPy arrays. They do not carry R `ts`, `msts`, or `tsibble`
-metadata.
+metadata. ARIMA and ETS have local NumPy fallback simulators available through
+`backend="numpy"` when useful for debugging.
 
 ## Installation
 
@@ -80,6 +80,23 @@ model = gratis.arima_model(
 series = model.simulate(n=100, rng=1)
 ```
 
+`arima_model()` uses `backend="auto"` by default. Because `statsmodels` is a
+package dependency, that normally means `statsmodels.tsa.statespace.sarimax.SARIMAX`.
+To require the maintained backend and fail if it is unavailable:
+
+```python
+model = gratis.arima_model(
+    p=1,
+    d=0,
+    q=1,
+    phi=[0.4],
+    theta=[0.2],
+    constant=0.0,
+    sigma=1.0,
+    backend="statsmodels",
+)
+```
+
 ETS:
 
 ```python
@@ -93,6 +110,23 @@ model = gratis.ets_model(
 )
 
 series = gratis.simulate(model, n=100, rng=1)
+```
+
+`ets_model()` uses `backend="auto"` by default. Because `statsmodels` is a
+package dependency, that normally means
+`statsmodels.tsa.exponential_smoothing.ets.ETSModel`. To require the maintained
+backend and fail if it is unavailable:
+
+```python
+model = gratis.ets_model(
+    error="A",
+    trend="N",
+    seasonal="N",
+    alpha=0.2,
+    level=1.0,
+    sigma=1.0,
+    backend="statsmodels",
+)
 ```
 
 Target-feature generation:

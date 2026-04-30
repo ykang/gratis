@@ -4,10 +4,19 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 
 from ._random import SeedLike, get_rng
+
+
+def _load_statsmodels_sarimax() -> tuple[type[Any] | None, Exception | None]:
+    try:
+        from statsmodels.tsa.statespace.sarimax import SARIMAX
+    except Exception as exc:
+        return None, exc
+    return SARIMAX, None
 
 
 def _as_1d(values: float | Sequence[float]) -> np.ndarray:
@@ -144,7 +153,7 @@ def pi_coefficients(
     pie = np.zeros(q + int(n_terms) + 1)
     pie[q] = 1.0
     for j in range(int(n_terms)):
-        lagged = pie[j:j + q][::-1]
+        lagged = pie[j + 1:j + q + 1][::-1]
         pie[j + q + 1] = -phi[j] - float(np.dot(theta, lagged))
 
     coeffs = -pie[q + 1:q + int(n_terms) + 1]
@@ -169,12 +178,17 @@ class ARIMAModel:
     Phi: np.ndarray | None = None
     Theta: np.ndarray | None = None
     sigma: float = 1.0
+    backend: str = "auto"
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "phi", np.asarray([] if self.phi is None else self.phi, dtype=float))
         object.__setattr__(self, "theta", np.asarray([] if self.theta is None else self.theta, dtype=float))
         object.__setattr__(self, "Phi", np.asarray([] if self.Phi is None else self.Phi, dtype=float))
         object.__setattr__(self, "Theta", np.asarray([] if self.Theta is None else self.Theta, dtype=float))
+        backend = self.backend.lower()
+        if backend not in {"auto", "statsmodels", "numpy"}:
+            raise ValueError("backend must be one of 'auto', 'statsmodels', or 'numpy'")
+        object.__setattr__(self, "backend", backend)
 
     @property
     def p(self) -> int:
@@ -241,6 +255,72 @@ class ARIMAModel:
         if self.sigma <= 0:
             raise ValueError("sigma must be positive")
 
+        if self.backend in {"auto", "statsmodels"}:
+            model_class, error = _load_statsmodels_sarimax()
+            if model_class is not None:
+                return self._simulate_statsmodels(
+                    model_class,
+                    n=n,
+                    n_start=n_start,
+                    rng=rng,
+                )
+            if self.backend == "statsmodels":
+                raise ImportError(
+                    "statsmodels could not be imported for ARIMA simulation. "
+                    "Install the Python statsmodels extra with "
+                    "`python -m pip install -e './python[statsmodels]'`."
+                ) from error
+
+        return self._simulate_numpy(n=n, n_start=n_start, rng=rng)
+
+    def _simulate_statsmodels(
+        self,
+        model_class: type[Any],
+        *,
+        n: int,
+        n_start: int = 100,
+        rng: SeedLike = None,
+    ) -> np.ndarray:
+        """Simulate with statsmodels' SARIMAX backend."""
+        generator = get_rng(rng)
+        seasonal_period = self.frequency if any(self.seasonal_order) else 0
+        trend = "c" if self.constant != 0 else "n"
+        endog_length = max(10, self.frequency * 2)
+        model = model_class(
+            np.zeros(endog_length, dtype=float),
+            order=self.order,
+            seasonal_order=(*self.seasonal_order, seasonal_period),
+            trend=trend,
+            enforce_stationarity=False,
+            enforce_invertibility=False,
+        )
+
+        params: list[float] = []
+        if self.constant != 0:
+            params.append(float(self.constant))
+        params.extend(np.asarray(self.phi, dtype=float).tolist())
+        params.extend(np.asarray(self.theta, dtype=float).tolist())
+        params.extend(np.asarray(self.Phi, dtype=float).tolist())
+        params.extend(np.asarray(self.Theta, dtype=float).tolist())
+        params.append(float(self.sigma) ** 2)
+
+        total = n + n_start
+        simulated = model.simulate(
+            np.asarray(params, dtype=float),
+            nsimulations=total,
+            initial_state=np.zeros(model.k_states, dtype=float),
+            random_state=generator,
+        )
+        return np.asarray(simulated, dtype=float).reshape(-1)[-n:]
+
+    def _simulate_numpy(
+        self,
+        n: int = 100,
+        *,
+        n_start: int = 100,
+        rng: SeedLike = None,
+    ) -> np.ndarray:
+        """Fallback SARIMA simulation used when statsmodels is unavailable."""
         generator = get_rng(rng)
         ar_poly = self.ar_polynomial(include_differences=True)
         ma_poly = self.ma_polynomial()
@@ -277,6 +357,7 @@ def arima_model(
     Phi: Sequence[float] | np.ndarray | None = None,
     Theta: Sequence[float] | np.ndarray | None = None,
     sigma: float | None = None,
+    backend: str = "auto",
     *,
     rng: SeedLike = None,
 ) -> ARIMAModel:
@@ -352,4 +433,5 @@ def arima_model(
         Phi=Phi_values,
         Theta=Theta_values,
         sigma=float(sigma),
+        backend=backend,
     )

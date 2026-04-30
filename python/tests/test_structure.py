@@ -1,6 +1,14 @@
 import numpy as np
+import pytest
 
 import gratis
+
+
+def _require_statsmodels():
+    try:
+        return pytest.importorskip("statsmodels")
+    except Exception as exc:
+        pytest.skip(f"statsmodels is not importable: {exc}")
 
 
 def test_public_imports():
@@ -99,6 +107,24 @@ def test_arima_model_constructs_and_simulates():
     assert np.isfinite(draws).all()
 
 
+def test_arima_model_can_require_statsmodels_backend():
+    _require_statsmodels()
+    model = gratis.arima_model(
+        p=1,
+        d=0,
+        q=1,
+        phi=[0.4],
+        theta=[0.2],
+        constant=0,
+        sigma=1,
+        backend="statsmodels",
+    )
+
+    draws = model.simulate(n=20, rng=1)
+    assert draws.shape == (20,)
+    assert np.isfinite(draws).all()
+
+
 def test_ets_model_constructs_and_simulates():
     model = gratis.ets_model(
         error="A",
@@ -112,6 +138,23 @@ def test_ets_model_constructs_and_simulates():
     assert model.method == "ETS(A,N,N)"
     draws = model.simulate(n=40, rng=1)
     assert draws.shape == (40,)
+    assert np.isfinite(draws).all()
+
+
+def test_ets_model_can_require_statsmodels_backend():
+    _require_statsmodels()
+    model = gratis.ets_model(
+        error="A",
+        trend="N",
+        seasonal="N",
+        alpha=0.2,
+        level=1.0,
+        sigma=1.0,
+        backend="statsmodels",
+    )
+
+    draws = model.simulate(n=20, rng=1)
+    assert draws.shape == (20,)
     assert np.isfinite(draws).all()
 
 

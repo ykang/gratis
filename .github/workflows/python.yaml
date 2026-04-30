@@ -1,0 +1,50 @@
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+name: Python
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Python package
+        run: python -m pip install -e "./python[dev]"
+
+      - name: Run Python tests
+        working-directory: python
+        run: python -m pytest -q
+
+      - name: Compile Python sources
+        working-directory: python
+        run: python -m compileall -q gratis tests
+
+  r-build-excludes-python:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Build R source package
+        run: R CMD build --no-build-vignettes .
+
+      - name: Check R source package excludes Python sources
+        run: |
+          if tar -tzf gratis_*.tar.gz | grep -E '^gratis/python|python/|^gratis/\.envrc'; then
+            echo "R source package unexpectedly includes Python files"
+            exit 1
+          fi

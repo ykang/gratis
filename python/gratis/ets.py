@@ -4,10 +4,20 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Any
+import warnings
 
 import numpy as np
 
 from ._random import SeedLike, get_rng
+
+
+def _load_statsmodels_ets() -> tuple[type[Any] | None, Exception | None]:
+    try:
+        from statsmodels.tsa.exponential_smoothing.ets import ETSModel as StatsmodelsETSModel
+    except Exception as exc:
+        return None, exc
+    return StatsmodelsETSModel, None
 
 
 def _component(value: str, allowed: set[str], name: str) -> str:
@@ -85,6 +95,7 @@ class ETSModel:
     slope: float = 0.0
     season: np.ndarray | None = None
     sigma: float = 1.0
+    backend: str = "auto"
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "error", _component(self.error, {"A", "M"}, "error"))
@@ -92,6 +103,10 @@ class ETSModel:
         object.__setattr__(self, "seasonal", _component(self.seasonal, {"N", "A", "M"}, "seasonal"))
         season = np.array([], dtype=float) if self.season is None else np.asarray(self.season, dtype=float).reshape(-1)
         object.__setattr__(self, "season", season)
+        backend = self.backend.lower()
+        if backend not in {"auto", "statsmodels", "numpy"}:
+            raise ValueError("backend must be one of 'auto', 'statsmodels', or 'numpy'")
+        object.__setattr__(self, "backend", backend)
 
     @property
     def method(self) -> str:
@@ -110,6 +125,72 @@ class ETSModel:
         if self.seasonal != "N" and self.frequency <= 1:
             raise ValueError("seasonal models must have frequency greater than 1")
 
+        if self.backend in {"auto", "statsmodels"}:
+            model_class, error = _load_statsmodels_ets()
+            if model_class is not None:
+                return self._simulate_statsmodels(model_class, n=n, rng=rng)
+            if self.backend == "statsmodels":
+                raise ImportError(
+                    "statsmodels could not be imported for ETS simulation. "
+                    "Install the Python ETS extra with `python -m pip install -e './python[ets]'`."
+                ) from error
+
+        return self._simulate_numpy(n=n, rng=rng)
+
+    def _simulate_statsmodels(
+        self,
+        model_class: type[Any],
+        *,
+        n: int,
+        rng: SeedLike = None,
+    ) -> np.ndarray:
+        """Simulate with statsmodels' ETSModel backend."""
+        generator = get_rng(rng)
+        error = "add" if self.error == "A" else "mul"
+        trend = None if self.trend == "N" else "add"
+        seasonal = None if self.seasonal == "N" else ("add" if self.seasonal == "A" else "mul")
+        endog_value = max(float(self.level), 1.0) if "mul" in {error, seasonal} else float(self.level)
+        endog = np.repeat(endog_value, max(2, self.frequency)).astype(float)
+
+        kwargs: dict[str, Any] = {
+            "error": error,
+            "trend": trend,
+            "damped_trend": bool(self.damped),
+            "seasonal": seasonal,
+            "initialization_method": "known",
+            "initial_level": float(self.level),
+        }
+        if self.trend != "N":
+            kwargs["initial_trend"] = float(self.slope)
+        if self.seasonal != "N":
+            kwargs["seasonal_periods"] = int(self.frequency)
+            kwargs["initial_seasonal"] = np.asarray(self.season, dtype=float)
+
+        model = model_class(endog, **kwargs)
+        params = [float(self.alpha)]
+        if self.trend != "N":
+            params.append(0.0 if self.beta is None else float(self.beta))
+        if self.seasonal != "N":
+            params.append(0.0 if self.gamma is None else float(self.gamma))
+        if self.damped:
+            params.append(1.0 if self.phi is None else float(self.phi))
+
+        # The statsmodels object requires an endogenous sample even when we
+        # simulate from known states. That synthetic sample can produce
+        # meaningless likelihood warnings while the result wrapper is built.
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RuntimeWarning, module="statsmodels")
+            results = model.smooth(np.asarray(params, dtype=float))
+        errors = generator.normal(loc=0.0, scale=float(self.sigma), size=(n, 1))
+        simulated = results.simulate(
+            nsimulations=n,
+            anchor="start",
+            random_errors=errors,
+        )
+        return np.asarray(simulated, dtype=float).reshape(-1)
+
+    def _simulate_numpy(self, n: int = 100, *, rng: SeedLike = None) -> np.ndarray:
+        """Fallback ETS simulation used when statsmodels is unavailable."""
         generator = get_rng(rng)
         level = float(self.level)
         slope = float(self.slope if self.trend != "N" else 0.0)
@@ -183,6 +264,7 @@ def ets_model(
     season: Sequence[float] | np.ndarray | None = None,
     damped: bool | None = None,
     sigma: float | None = None,
+    backend: str = "auto",
     *,
     rng: SeedLike = None,
 ) -> ETSModel:
@@ -275,4 +357,5 @@ def ets_model(
         slope=float(slope),
         season=np.asarray(season, dtype=float),
         sigma=float(sigma),
+        backend=backend,
     )
