@@ -120,7 +120,7 @@ mar_model <- function(k = NULL,
     # Choose k constants in [-3,3]
     constants <- runif(k, -3, 3)
   } else if (length(constants) != k) {
-    stop("Dimension of sigmas does not match other components")
+    stop("Dimension of constants does not match other components")
   }
 
   # sigmas
@@ -139,6 +139,8 @@ mar_model <- function(k = NULL,
   # one seasonal period for each component
   if (length(seasonal_periods) == 1L) {
     seasonal_periods <- rep(seasonal_periods, k)
+  } else if (length(seasonal_periods) != k) {
+    stop("Dimension of seasonal_periods does not match other components")
   }
   # Non-seasonal AR parameters
   if (is.null(p) & is.null(phi)) {
@@ -173,7 +175,7 @@ mar_model <- function(k = NULL,
       if (NCOL(Phi) != k) {
         stop("Dimension of Phi does not match other components")
       }
-      P <- rep(NROW(phi), k)
+      P <- rep(NROW(Phi), k)
     }
     if (is.null(Phi)) {
       if (length(P) == 1L) {
@@ -210,7 +212,11 @@ mar_model <- function(k = NULL,
   }
   # Trim redundant zeros
   nonzero <- which(rowSums(abs(ar)) > 0)
-  ar <- ar[seq(max(nonzero)), , drop = FALSE]
+  if (length(nonzero) > 0) {
+    ar <- ar[seq(max(nonzero)), , drop = FALSE]
+  } else {
+    ar <- ar[1L, , drop = FALSE]
+  }
 
   # Return mar object
   structure(list(

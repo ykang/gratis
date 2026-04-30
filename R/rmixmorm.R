@@ -39,7 +39,7 @@ rmixnorm <- function(n, means, sigmas, weights) {
 
   # Random draws for which component to use for each observation
   idx <- sample(seq(k), size = n, prob = weights, replace = TRUE)
-  idx <- factor(idx, levels = seq(5))
+  idx <- factor(idx, levels = seq(k))
   nsamp <- table(idx)
   data <- matrix(NA_real_, nrow = n, ncol = q)
   # Generate draws from each component
@@ -187,7 +187,7 @@ dmixnorm_ts <- function(y, means.ar.par.list, sigmas.list, weights, log = FALSE)
   out.log <- y
   out.log[] <- 0 # Set the density be zero for the first maxlags.
 
-  sigmas.ary <- matrix(do.call(cbind, sigmas.list), n, nComp, byrow = TRUE)
+  sigmas.ary <- do.call(cbind, sigmas.list)
 
   for (i in (maxLag + 1):n)
   {
@@ -208,7 +208,7 @@ dmixnorm_ts <- function(y, means.ar.par.list, sigmas.list, weights, log = FALSE)
   if (log == TRUE) {
     out <- out.log
   } else {
-    out <- exp(log)
+    out <- exp(out.log)
   }
   return(out)
 }

@@ -76,7 +76,9 @@ simulate_target <- function(length=100, seasonal_periods = 1, feature_function, 
                             k = ifelse(length(seasonal_periods) == 1, 3, length(seasonal_periods)),
                             tolerance = 0.05, trace = FALSE, parallel = FALSE) {
   # How many components to use?
-  k <- ifelse(length(seasonal_periods) == 1L, 3, length(seasonal_periods))
+  if (is.null(k)) {
+    k <- ifelse(length(seasonal_periods) == 1L, 3, length(seasonal_periods))
+  }
   # Set AR orders
   p <- 3
   P <- ifelse(max(seasonal_periods) > 1, 2, 0)
