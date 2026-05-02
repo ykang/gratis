@@ -10,14 +10,13 @@ status](https://github.com/ykang/gratis/workflows/R-CMD-check/badge.svg)](https:
 [![](https://cranlogs.r-pkg.org/badges/gratis)](https://CRAN.R-project.org/package=gratis)
 <!-- badges: end -->
 
-The R package `gratis` (previously known as `tsgeneration`) provides
-efficient algorithms for generating time series with diverse and
+The package `gratis` provides efficient algorithms for generating time series with diverse and
 controllable characteristics. This repository also contains a Python
 implementation under `python/`, with source code in `python/gratis`.
 
 ## Installation
 
-### [CRAN version](https://CRAN.R-project.org/package=gratis)
+### [R CRAN version](https://CRAN.R-project.org/package=gratis)
 
 ``` r
 install.packages("gratis")
@@ -59,7 +58,7 @@ Python-specific usage and testing notes.
 Watch [this YouTube video](https://www.youtube.com/watch?v=F3lWECtFa44)
 provided by [Prof. Rob Hyndman](https://robjhyndman.com/).
 
-### Load the package
+### Load the package in R
 
 ``` r
 library(gratis)
