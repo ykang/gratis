@@ -11,8 +11,9 @@ status](https://github.com/ykang/gratis/workflows/R-CMD-check/badge.svg)](https:
 <!-- badges: end -->
 
 The package `gratis` provides efficient algorithms for generating time series with diverse and
-controllable characteristics. This repository also contains a Python
-implementation under `python/`, with source code in `python/gratis`.
+controllable characteristics. 
+
+This repository also contains a Python implementation under `python/`, with source code in `python/gratis`.
 
 ## Installation
 
