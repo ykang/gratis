@@ -8,16 +8,24 @@
 #'
 #' @param object A \code{mar} object, usually created by
 #'   \code{\link{mar_model}()}.
-#' @param nsim Length of the generated series.
-#' @param seed Either \code{NULL} or an integer that will be used in a call to
-#'   \code{\link[base]{set.seed}()} before simulating the time series. The
-#'   default, \code{NULL}, leaves the random number generator state unchanged.
-#' @param n.start Length of the burn-in period discarded before returning the
-#'   simulated series.
+#' All components condition on the same generated past; the result is not a
+#' weighted average of independently simulated component paths. Numeric
+#' \code{object$sigmas} are innovation variances, not standard deviations.
+#'
+#' @param nsim Non-negative integer output length, excluding burn-in.
+#' @param seed Optional integer passed to \code{\link[base]{set.seed}()} before
+#'   simulation. \code{NULL} uses and advances the current random stream without
+#'   resetting it. Use the \code{seed} argument to \code{\link{generate.mar}()}
+#'   to seed a batch once rather than restarting the stream for each path.
+#' @param n.start Non-negative integer burn-in length, discarded before returning the
+#'   simulated series. The default of 100 does not guarantee convergence to a
+#'   stationary distribution, particularly for near-unit-root models. Stationary
+#'   components do not by themselves guarantee mixture stability.
 #' @param ... Other arguments, not currently used.
 #' @return A \code{\link[forecast]{msts}} object of length \code{nsim}. For
 #'   single-seasonal or non-seasonal models this also behaves like a base
-#'   \code{\link[stats]{ts}} object.
+#'   \code{\link[stats]{ts}} object. Zero output length returns \code{numeric(0)}.
+#'   Values are not centered or standardized.
 #' @references Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
 #'     Conditional Distributions using Smooth Mixtures of Asymmetric Student T Densities,
 #'     Journal of Statistical Planning and Inference, 140(12), pp. 3638-3654.
@@ -43,6 +51,12 @@
 #' }
 #' @export
 simulate.mar <- function(object, nsim = 100, seed = NULL, n.start = 100, ...) {
+  for (value in list(nsim, n.start)) {
+    if (length(value) != 1L || !is.finite(value) || value < 0 || value != as.integer(value)) {
+      stop("nsim and n.start must be non-negative integers")
+    }
+  }
+  if (nsim == 0L) return(numeric(0))
   # Set seed
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
@@ -63,10 +77,8 @@ simulate.mar <- function(object, nsim = 100, seed = NULL, n.start = 100, ...) {
   # Randomly select components for each time
   components <- sample(seq(k), size = n, replace = TRUE, prob = object$weights)
 
-  # Convert sigmas to n x k matrix of variances
-  sigmatrix <- matrix(0, ncol = k, nrow = n)
-  sigmas <- numeric(n)
   if (is.list(object$sigmas)) {
+    sigmatrix <- matrix(0, ncol = k, nrow = n)
     if (!requireNamespace("fGarch", quietly = TRUE)) {
       stop("Package 'fGarch' is required to simulate MAR models with GARCH specifications.", call. = FALSE)
     }
@@ -74,23 +86,31 @@ simulate.mar <- function(object, nsim = 100, seed = NULL, n.start = 100, ...) {
     for (i in seq(k)) {
       sigmatrix[, i] <- fGarch::garchSim(object$sigmas[[i]],
         extended = TRUE, n = n, n.start = 10
-      )$sigma
+      )$sigma^2
     }
+    sigmas <- sigmatrix[cbind(seq_len(n), components)]
   } else {
     # Homoskedastic errors
-    sigmatrix <- matrix(rep(object$sigmas, n), byrow = TRUE, ncol = k)
-  }
-  # Select variance for each observation
-  for (i in seq(k)) {
-    sigmas[components == i] <- sigmatrix[components == i, i]
+    sigmas <- object$sigmas[components]
   }
   # Generate noise
   epsilon <- rnorm(n, sd = sqrt(sigmas))
 
   # Generate series
-  y <- rep(0, n)
-  for (i in (p + 1L):n) {
-    y[i] <- sum(object$ar[, components[i]] * c(1, y[i - seq(p)])) + epsilon[i]
+  if (p == 0L) {
+    y <- object$ar[1L, components] + epsilon
+  } else if (k == 1L) {
+    y <- stats::filter(c(rep(0, p), object$ar[1L, 1L] + epsilon[seq.int(p + 1L, n)]),
+                       object$ar[-1L, 1L], method = "recursive")
+  } else {
+    y <- rep(0, n)
+    lags <- lapply(seq_len(k), function(j) which(object$ar[-1L, j] != 0))
+    coefficients <- lapply(seq_len(k), function(j) object$ar[lags[[j]] + 1L, j])
+    for (i in (p + 1L):n) {
+      component <- components[i]
+      y[i] <- object$ar[1L, component] +
+        sum(coefficients[[component]] * y[i - lags[[component]]]) + epsilon[i]
+    }
   }
-  return(forecast::msts(y[-seq(n.start + p)], seasonal.periods = unique(object$m)))
+  return(forecast::msts(as.numeric(utils::tail(y, nsim)), seasonal.periods = unique(object$m)))
 }

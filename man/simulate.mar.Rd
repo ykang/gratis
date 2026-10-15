@@ -8,23 +8,30 @@
 }
 \arguments{
 \item{object}{A \code{mar} object, usually created by
-\code{\link{mar_model}()}.}
+  \code{\link{mar_model}()}.
+All components condition on the same generated past; the result is not a
+weighted average of independently simulated component paths. Numeric
+\code{object$sigmas} are innovation variances, not standard deviations.}
 
-\item{nsim}{Length of the generated series.}
+\item{nsim}{Non-negative integer output length, excluding burn-in.}
 
-\item{seed}{Either \code{NULL} or an integer that will be used in a call to
-\code{\link[base]{set.seed}()} before simulating the time series. The
-default, \code{NULL}, leaves the random number generator state unchanged.}
+\item{seed}{Optional integer passed to \code{\link[base]{set.seed}()} before
+simulation. \code{NULL} uses and advances the current random stream without
+resetting it. Use the \code{seed} argument to \code{\link{generate.mar}()}
+to seed a batch once rather than restarting the stream for each path.}
 
-\item{n.start}{Length of the burn-in period discarded before returning the
-simulated series.}
+\item{n.start}{Non-negative integer burn-in length, discarded before returning the
+simulated series. The default of 100 does not guarantee convergence to a
+stationary distribution, particularly for near-unit-root models. Stationary
+components do not by themselves guarantee mixture stability.}
 
 \item{...}{Other arguments, not currently used.}
 }
 \value{
 A \code{\link[forecast]{msts}} object of length \code{nsim}. For
   single-seasonal or non-seasonal models this also behaves like a base
-  \code{\link[stats]{ts}} object.
+  \code{\link[stats]{ts}} object. Zero output length returns \code{numeric(0)}.
+  Values are not centered or standardized.
 }
 \description{
 Simulate one random sample path from a mixture of Gaussian autoregressive

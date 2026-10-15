@@ -19,6 +19,15 @@ path with \code{\link[stats]{simulate}()} or many paths with
 \code{\link[generics]{generate}()}. To generate series with target feature
 values, use \code{\link{simulate_target}()} or
 \code{\link{generate_target}()}.
+
+ARIMA and ETS \code{sigma} parameters are innovation standard deviations;
+numeric MAR \code{sigmas} are innovation variances. Specifying a stationary
+component AR polynomial alone does not ensure a stable MAR mixture or an
+adequate burn-in period. See each model's help for initialization controls.
+
+The Python implementation in this repository follows the same statistical
+conventions, but returns NumPy arrays instead of R time-series objects.
+Equal numeric seeds do not imply identical random draws across languages.
 }
 \seealso{
 Useful links:

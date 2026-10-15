@@ -12,29 +12,35 @@ pi_coefficients(
   D = 0L,
   sma = 0,
   m = 1L,
-  tol = 1e-07
+  tol = 1e-07,
+  n_terms = 500L
 )
 }
 \arguments{
-\item{ar}{Non-seasonal AR coefficients.}
+\item{ar, ma}{Finite numeric vectors of non-seasonal AR and MA coefficients,
+excluding the leading 1 of each lag polynomial.}
 
-\item{d}{Number of non-seasonal differences.}
+\item{d, D}{Non-negative integer ordinary and seasonal difference orders.
+Seasonal differencing is ignored when \code{m = 1}.}
 
-\item{ma}{Non-seasonal MA coefficients.}
+\item{sar, sma}{Finite numeric vectors of seasonal AR and MA coefficients.
+Ignored when \code{m = 1}.}
 
-\item{sar}{Seasonal AR coefficients.}
+\item{m}{Positive integer seasonal period. A value of 1 is non-seasonal.}
 
-\item{D}{Number of seasonal differences.}
-
-\item{sma}{Seasonal MA coefficients.}
-
-\item{m}{Seasonal period.}
-
-\item{tol}{Tolerance used for truncation. Coefficients are returned through
+\item{tol}{Non-negative finite truncation tolerance. Coefficients are returned through
 the last position whose absolute value exceeds \code{tol}.}
+
+\item{n_terms}{Lag limit for an infinite AR approximation with MA terms.
+The limit is increased to include the full AR and MA polynomial degrees.
+A warning is issued if the tail has not decayed below \code{tol}.
+Without MA terms the complete finite AR polynomial is returned.}
 }
 \value{
-A numeric vector of AR recursion coefficients.
+A numeric vector of AR recursion coefficients in increasing lag
+  order, without an intercept or leading 1. Complete cancellation returns
+  \code{numeric(0)}. An unconverged MA approximation issues a warning;
+  increase \code{n_terms}, noting that noninvertible MA terms may not converge.
 }
 \description{
 Convert SARIMA coefficients into the equivalent infinite-order AR recursion
@@ -43,10 +49,18 @@ greater than \code{tol}. These coefficients are used internally by
 \code{\link{mar_model}()} and are also exported for users who need the same
 conversion.
 }
+\details{
+AR lag polynomials use negative coefficient signs, while MA lag polynomials
+use positive signs. The result expands the ratio of the AR/differencing
+polynomial to the MA polynomial; no stationarity or invertibility is imposed.
+}
 \examples{
 pi_coefficients(ar = 0.8)
 pi_coefficients(ar = c(0.4, -0.2), d = 1)
 pi_coefficients(ar = 0.3, sar = 0.2, D = 1, m = 12)
+}
+\seealso{
+\code{\link{mar_model}}
 }
 \author{
 Rob J Hyndman

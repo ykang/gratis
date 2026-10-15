@@ -22,7 +22,8 @@ ga_lrSelection <- function(object,
   )
   out <- list(
     population = object@population[sel, , drop = FALSE],
-    fitness = object@fitness[sel]
+    fitness = object@fitness[sel],
+    popTs = object@popTs[, sel, drop = FALSE]
   )
   return(out)
 }
@@ -39,14 +40,21 @@ ga_nlrSelection <- function(object, q = 0.25, ...) {
   )
   out <- list(
     population = object@population[sel, , drop = FALSE],
-    fitness = object@fitness[sel]
+    fitness = object@fitness[sel],
+    popTs = object@popTs[, sel, drop = FALSE]
   )
   return(out)
 }
 
 ga_rwSelection <- function(object, ...) {
   # Proportional (roulette wheel) selection
-  prob <- abs(object@fitness) / sum(abs(object@fitness))
+  finite <- is.finite(object@fitness)
+  if (!any(finite)) stop("fitness did not produce a finite value")
+  f <- object@fitness[finite]
+  f <- f / max(c(1, abs(f)))
+  prob <- numeric(object@popSize)
+  prob[finite] <- if (max(f) == min(f)) 1 else f - min(f)
+  prob <- prob / sum(prob)
   sel <- sample(1:object@popSize,
     size = object@popSize,
     prob = pmin(pmax(0, prob), 1, na.rm = TRUE),
@@ -54,7 +62,8 @@ ga_rwSelection <- function(object, ...) {
   )
   out <- list(
     population = object@population[sel, , drop = FALSE],
-    fitness = object@fitness[sel]
+    fitness = object@fitness[sel],
+    popTs = object@popTs[, sel, drop = FALSE]
   )
   return(out)
 }
@@ -69,7 +78,8 @@ ga_tourSelection <- function(object, k = 3, ...) {
   }
   out <- list(
     population = object@population[sel, , drop = FALSE],
-    fitness = object@fitness[sel]
+    fitness = object@fitness[sel],
+    popTs = object@popTs[, sel, drop = FALSE]
   )
   return(out)
 }
@@ -178,7 +188,10 @@ gareal_tourSelection <- ga_tourSelection
 gareal_lsSelection <- function(object, ...) {
   # Fitness proportional selection with fitness linear scaling
   popSize <- object@popSize
-  f <- object@fitness
+  finite <- is.finite(object@fitness)
+  if (!any(finite)) stop("fitness did not produce a finite value")
+  f <- object@fitness[finite]
+  f <- f / max(c(1, abs(f)))
   fmin <- min(f, na.rm = TRUE)
   if (fmin < 0) {
     f <- f - fmin
@@ -188,7 +201,10 @@ gareal_lsSelection <- function(object, ...) {
   fmax <- max(f, na.rm = TRUE)
   sfactor <- 2 # scaling factor
   # transform f -> f' = a*f + b such that
-  if (fmin > (sfactor * fave - fmax) / (sfactor - 1)) { # ave(f) = ave(f')
+  if (fmin == fmax) {
+    a <- 0
+    b <- 1
+  } else if (fmin > (sfactor * fave - fmax) / (sfactor - 1)) { # ave(f) = ave(f')
     # 2*ave(f') = max(f')
     delta <- fmax - fave
     a <- (sfactor - 1.0) * fave / delta
@@ -200,7 +216,8 @@ gareal_lsSelection <- function(object, ...) {
     b <- -1 * fmin * fave / delta
   }
   fscaled <- a * f + b
-  prob <- abs(fscaled) / sum(abs(fscaled))
+  prob <- numeric(popSize)
+  prob[finite] <- abs(fscaled) / sum(abs(fscaled))
   sel <- sample(1:object@popSize,
     size = object@popSize,
     prob = pmin(pmax(0, prob), 1, na.rm = TRUE),
@@ -217,10 +234,15 @@ gareal_lsSelection <- function(object, ...) {
 gareal_sigmaSelection <- function(object, ...) {
   # Fitness proportional selection with Goldberg's Sigma Truncation Scaling
   popSize <- object@popSize
-  mf <- mean(object@fitness, na.rm = TRUE)
-  sf <- sd(object@fitness, na.rm = TRUE)
-  fscaled <- pmax(object@fitness - (mf - 2 * sf), 0, na.rm = TRUE)
-  prob <- abs(fscaled) / sum(abs(fscaled))
+  finite <- is.finite(object@fitness)
+  if (!any(finite)) stop("fitness did not produce a finite value")
+  f <- object@fitness[finite]
+  f <- f / max(c(1, abs(f)))
+  mf <- mean(f)
+  sf <- if (length(f) > 1L) sd(f) else 0
+  fscaled <- if (sf == 0) rep(1, length(f)) else pmax(f - (mf - 2 * sf), 0)
+  prob <- numeric(popSize)
+  prob[finite] <- fscaled / sum(fscaled)
   sel <- sample(1:object@popSize,
     size = object@popSize,
     prob = pmin(pmax(0, prob), 1, na.rm = TRUE),
@@ -228,7 +250,8 @@ gareal_sigmaSelection <- function(object, ...) {
   )
   out <- list(
     population = object@population[sel, , drop = FALSE],
-    fitness = object@fitness[sel]
+    fitness = object@fitness[sel],
+    popTs = object@popTs[, sel, drop = FALSE]
   )
   return(out)
 }
@@ -332,7 +355,7 @@ gareal_nraMutation <- function(object, parent, ...) {
   j <- sample(1:n, 1)
   u <- runif(1)
   if (u < 0.5) {
-    mutate[j] <- parent[j] - sa(parent[j] - object@max[j])
+    mutate[j] <- parent[j] - sa(parent[j] - object@min[j])
   } else {
     mutate[j] <- parent[j] + sa(object@max[j] - parent[j])
   }
@@ -395,9 +418,10 @@ gaperm_Population <- function(object, ...) {
   # Generate a random permutation of size popSize in the range [min, max]
   min <- object@min
   max <- object@max
-  population <- matrix(as.double(NA), nrow = object@popSize, ncol = max)
+  values <- seq(min, max)
+  population <- matrix(as.double(NA), nrow = object@popSize, ncol = length(values))
   for (i in 1:object@popSize) {
-    population[i, ] <- sample(min:max, size = max, replace = FALSE)
+    population[i, ] <- values[sample.int(length(values))]
   }
   return(population)
 }
@@ -594,7 +618,7 @@ optimProbsel <- function(x, q = 0.25) {
   rank <- (n + 1) - rank(x, ties.method = "random", na.last = FALSE)
   # prob <- q*(1-q)^(rank-1) * 1/(1-(1-q)^n)
   prob <- q * (1 - q)^(rank - 1)
-  prob[is.na(x)] <- 0
+  prob[!is.finite(x)] <- 0
   prob <- prob / sum(prob)
   return(prob)
 }

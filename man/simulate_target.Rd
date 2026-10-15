@@ -29,13 +29,16 @@ generate_target(
 )
 }
 \arguments{
-\item{length}{Length of each generated time series.}
+\item{length}{Positive integer output length of each generated series.}
 
-\item{seasonal_periods}{Scalar seasonal period, or a numeric vector of
-seasonal periods for multiple-seasonal data.}
+\item{seasonal_periods}{Positive integer seasonal period, applied to every
+component, or a vector of length \code{k} specifying one period per component.}
 
-\item{feature_function}{Function that accepts a time series and returns a
-numeric vector of features.}
+\item{feature_function}{Function that accepts a candidate time series and
+returns one numeric value per target feature. It should be deterministic
+for reproducible scores. Nonfinite values reject a candidate; errors raised
+by the function propagate. Callbacks used in parallel must be available
+to the workers along with their dependencies.}
 
 \item{target}{Numeric vector of target feature values. It must have the same
 length and order as the vector returned by \code{feature_function()}.}
@@ -44,21 +47,30 @@ length and order as the vector returned by \code{feature_function()}.}
 or non-seasonal data, and the number of seasonal periods for
 multiple-seasonal data.}
 
-\item{tolerance}{Average absolute feature tolerance. Larger values usually
-return faster but less precise results.}
+\item{tolerance}{Non-negative finite mean absolute feature-error tolerance.
+Reaching this value stops the search. Success is not guaranteed; a miss
+returns the best series with a warning reporting its error.}
 
 \item{trace}{Logical value indicating whether to show genetic algorithm
 progress.}
 
 \item{parallel}{Logical value or parallel backend specification passed to the
-genetic algorithm. Use \code{TRUE} to run fitness evaluations in parallel.}
+genetic algorithm. Use \code{TRUE} to run fitness evaluations in parallel.
+A supplied cluster requires \pkg{doParallel} and remains caller-owned;
+stop it explicitly when it is no longer needed. Internally created clusters
+are stopped automatically.}
 
-\item{nseries}{Number of series to generate}
+\item{nseries}{Positive integer number of separate target searches. Searches
+are repeated sequentially, with successive draws from the current RNG
+stream; \code{parallel} controls candidate evaluations within each search.}
 }
 \value{
 \code{simulate_target()} returns a \code{\link[forecast]{msts}}
   object of length \code{length}. \code{generate_target()} returns a tsibble
-  containing \code{nseries} generated series.
+  containing \code{nseries} generated series. Returned values are on the
+  standardized scale used for feature evaluation, except that exactly constant
+  candidates are unchanged. Neither function returns fitted MAR parameters.
+  A search with no finite valid candidate stops with an error.
 }
 \description{
 Search for MAR model parameters that produce time series with feature values
@@ -72,6 +84,16 @@ series, scaling it, computing \code{feature_function()}, and comparing those
 features to \code{target}. Because each candidate series is scaled before
 feature evaluation, the target features should not depend on the absolute
 scale of the series.
+Finite nonconstant series are centered and sample-standardized using
+overflow-safe scaling; exactly constant series are left unchanged.
+
+Mixture weights are the spacings between sorted breakpoints in \eqn{[0,1]},
+allowing the full simplex, including zero-weight components. If tolerance
+is not reached, the best series is returned with a warning giving its mean
+absolute feature error. Callback errors and incompatible feature lengths
+are reported as errors; nonfinite candidate paths or features are rejected.
+The best final population member is selected using its cached fitness and
+series; generation histories are not retained or callbacks reevaluated.
 }
 \examples{
 \dontrun{
@@ -112,6 +134,9 @@ tsp(y) <- tsp(USAccDeaths)
 plot(cbind(USAccDeaths, y))
 cbind(my_features(USAccDeaths), my_features(y))
 }
+}
+\seealso{
+\code{\link{mar_model}}, \code{\link{generate.mar}}
 }
 \author{
 Yanfei Kang and Rob J Hyndman

@@ -42,7 +42,9 @@ whether the genetic algorithm should evaluate candidates in parallel.}
 \code{msts} object, or \code{"tsibble"} for a tsibble.}
 }
 \value{
-Generated time series in the requested \code{output_format}.
+A \code{ts} or \code{msts} object containing the generated series,
+  or a tsibble when \code{output_format = "tsibble"}. The historical
+  \code{"list"} option returns a time-series object, not an R list.
 }
 \description{
 This function is deprecated. Use \code{\link{generate_target}()} instead.
@@ -57,6 +59,9 @@ x <- generate_ts_with_target(
 )
 forecast::autoplot(x)
 }
+}
+\seealso{
+\code{\link{generate_target}}, \code{\link{simulate_target}}
 }
 \author{
 Yanfei Kang

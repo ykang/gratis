@@ -1,4 +1,15 @@
-"""Python implementation of the gratis time-series generation package."""
+"""Generate synthetic time series from MAR, ARIMA and ETS models.
+
+Construct a model with ``mar_model``, ``arima_model`` or ``ets_model``, then use
+``simulate`` for one path or ``generate`` for a matrix of paths. ``plot_series``
+and ``plot_generated`` return Matplotlib axes. Target-feature searches use
+``simulate_target`` and ``generate_target``.
+
+Outputs are NumPy arrays: observations occupy rows and separate series occupy
+columns. Randomized entry points accept an integer seed or NumPy generator via
+``rng``. R-compatible statistical conventions do not imply identical seeded
+draws or identical optimization results across languages.
+"""
 
 from ._version import __version__
 from .arima import ARIMAModel, arima_model, pi_coefficients, stationary_ar

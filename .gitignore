@@ -10,3 +10,7 @@ inst/doc
 /doc/
 /Meta/
 .DS_Store
+!/tests/
+!/tests/**
+!/python/tests/
+!/python/tests/**

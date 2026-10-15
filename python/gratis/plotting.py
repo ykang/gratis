@@ -70,29 +70,48 @@ def plot_series(
 
     Parameters
     ----------
-    data
+    data : array_like
         A one-dimensional series or a two-dimensional array shaped
         ``length x nseries``.
-    ax
+    ax : matplotlib.axes.Axes, optional
         Optional matplotlib-like axes. When omitted, matplotlib is imported
         lazily and a new axes is created.
-    index
+    index : array_like, optional
         Optional x-axis values with one entry per observation.
-    labels
-        Optional labels with one entry per plotted series.
-    title
+    labels : sequence of str, optional
+        Labels with one entry per plotted series, after any ``max_series``
+        limit. Defaults to ``Series 1``, ``Series 2``, and so on.
+    title : str, optional
         Optional axes title.
-    max_series
-        Plot at most this many columns from a multi-series matrix.
-    legend
+    max_series : int, optional
+        Plot at most this many leading columns; must be positive.
+    legend : bool, default True
         Whether to draw a legend for multi-series data.
-    alpha, linewidth, **plot_kwargs
-        Passed to ``ax.plot``.
+    alpha : float, default 0.9
+        Line opacity, passed to ``ax.plot``.
+    linewidth : float, default 1.5
+        Line width, passed to ``ax.plot``.
+    **plot_kwargs
+        Other line options passed to ``ax.plot``, such as ``linestyle``.
 
     Returns
     -------
     matplotlib.axes.Axes
-        The axes used for plotting.
+        The supplied or newly created axes. This function neither calls
+        ``show()`` nor saves the figure; use ``ax.figure`` to access it.
+
+    Raises
+    ------
+    ValueError
+        If data dimensions, index length, labels or ``max_series`` are invalid.
+
+    Examples
+    --------
+    >>> ax = plot_series([0, 1, 0], title="Example")
+    >>> len(ax.lines)
+    1
+    >>> import matplotlib.pyplot as plt
+    >>> plt.close(ax.figure)
     """
     values = _series_matrix(data)
     if max_series is not None:
@@ -133,7 +152,39 @@ def plot_generated(
     rng=None,
     **kwargs: Any,
 ):
-    """Generate series from a model and plot them."""
+    """Generate paths from a model and plot them on a shared axes.
+
+    Parameters
+    ----------
+    model : MARModel, ARIMAModel, ETSModel or compatible object
+        Model accepted by ``generate``.
+    length : int, default 100
+        Positive number of observations per path for a nonempty plot.
+    nseries : int, default 1
+        Positive number of paths to generate.
+    ax : matplotlib.axes.Axes, optional
+        Axes to reuse; otherwise a new axes is created.
+    rng : int or numpy.random.Generator, optional
+        Seed or generator passed to ``generate``. A batch uses one generator
+        for successive paths; ``None`` creates a new one.
+    **kwargs
+        ``index``, ``labels``, ``title``, ``max_series``, ``legend``, ``alpha``
+        and ``linewidth`` are passed to ``plot_series``. All other keywords go
+        to model simulation, for example MAR ``n_start``. Arbitrary Matplotlib
+        line options are not forwarded here; call ``plot_series`` separately
+        when those options are needed.
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        Axes containing the generated paths. The generated array is not returned.
+        Access ``ax.figure`` to save or display the figure.
+
+    See Also
+    --------
+    plot_series : Plot an existing array with additional line options.
+    gratis.generate : Generate paths without plotting them.
+    """
     plot_options = {
         key: kwargs.pop(key)
         for key in list(kwargs)

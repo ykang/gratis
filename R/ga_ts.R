@@ -4,8 +4,8 @@
 # @param type the type of genetic algorithm to be run depending on the nature of decision
 #     variables.
 # @param fitness the fitness function, any allowable R function which takes as input an
-#     individual string representing a potential solution, and returns a numerical value
-#     describing its ``fitness``
+#     individual string representing a potential solution, and returns a list
+#     containing scalar fitness `value` and the corresponding time series `x`.
 # @param ... additional arguments to be passed to the fitness function.
 # @param n Length of the time series to be generated.
 # @param min a vector of length equal to the decision variables providing the lower
@@ -201,14 +201,20 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
   }
 
   # Start parallel computing (if needed)
+  supplied_cluster <- inherits(parallel, "cluster")
+  if (supplied_cluster) {
+    if (!requireNamespace("doParallel", quietly = TRUE)) stop("doParallel is required for a cluster")
+    doParallel::registerDoParallel(parallel)
+  }
   parallel <- if (is.logical(parallel)) {
     if (parallel) startParallel(parallel) else FALSE
   } else {
     startParallel(parallel)
   }
-  on.exit(if (parallel) {
+  on.exit(if (parallel && !supplied_cluster) {
     parallel::stopCluster(attr(parallel, "cluster"))
-  })
+    foreach::registerDoSEQ()
+  }, add = TRUE)
   # define operator to use depending on parallel being TRUE or FALSE
   `%DO%` <- if (parallel && requireNamespace("doRNG", quietly = TRUE)) {
     doRNG::`%dorng%`
@@ -254,7 +260,7 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
   ng <- min(nrow(suggestions), popSize)
   if (ng > 0) # use suggestion if provided
     {
-      Pop[1:ng, ] <- suggestions
+      Pop[seq_len(ng), ] <- suggestions[seq_len(ng), , drop = FALSE]
     }
   # fill the rest with a random population
   if (popSize > ng) {
@@ -280,6 +286,7 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
         }
       }
     } else {
+      evaluated <- is.na(Fitness)
       Fitness0 <- foreach(i = seq_len(popSize)) %DO% {
         if (is.na(Fitness[i])) {
           fitness(Pop[i, ], ...)
@@ -287,14 +294,18 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
           list(value = Fitness[i], x = popTs[, i])
         }
       }
+      if (updatePop) {
+        for (i in which(evaluated)) {
+          Pop[i, ] <- attributes(Fitness0[[i]]$value)[[1L]]
+        }
+      }
       Fitness <- sapply(Fitness0, function(x) {
         x$value
       })
-      popTs <- sapply(Fitness0, function(x) {
-        x$x
-      })
+      popTs <- matrix(unlist(lapply(Fitness0, function(x) x$x)), nrow = n, ncol = popSize)
     }
 
+    if (!any(is.finite(Fitness))) stop("fitness did not produce a finite value")
     # update object
     object@population <- Pop
     object@fitness <- Fitness
@@ -318,7 +329,7 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
         # run local search
         opt <- try(suppressWarnings(
           optim(
-            fn = fitness, ...,
+            fn = function(par, ...) fitness(par, ...)$value, ...,
             par = Pop[i, ],
             method = optimArgs$method,
             lower = optimArgs$lower,
@@ -328,6 +339,7 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
         ),
         silent = TRUE
         )
+        if (inherits(opt, "try-error")) warning("local optimization failed: ", opt[1])
         if (is.function(monitor)) {
           if (!inherits(opt, "try-error")) {
             message(
@@ -340,21 +352,23 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
           message("\n")
         }
         if (!inherits(opt, "try-error")) {
-          Pop[i, ] <- opt$par
-          Fitness[i] <- opt$value
+          fit <- fitness(opt$par, ...)
+          if (is.finite(fit$value) && fit$value >= Fitness[i]) {
+            Pop[i, ] <- if (updatePop) attributes(fit$value)[[1L]] else opt$par
+            Fitness[i] <- fit$value
+            popTs[, i] <- fit$x
+          }
         }
         # update object
         object@population <- Pop
         object@fitness <- Fitness
+        object@popTs <- popTs
         # update iterations summary
         fitnessSummary[iter, ] <- gaSummary(object@fitness)
         object@summary <- fitnessSummary
       }
     }
 
-    if (keepBest) {
-      object@bestSol[[iter]] <- unique(popTs[, which(abs(Fitness - max(Fitness, na.rm = TRUE)) < 0.03)], MARGIN = 2)
-    }
     # { object@bestSol[[iter]] <- popTs[, which(Fitness == max(Fitness, na.rm = TRUE))[1]] }
     # { object@bestSol[[iter]] <- Pop[which(Fitness == max(Fitness, na.rm = TRUE))[1],] }
 
@@ -363,6 +377,13 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
       object <- postFitness(object, ...)
       Fitness <- object@fitness
       Pop <- object@population
+      popTs <- object@popTs
+      if (!any(is.finite(Fitness))) stop("fitness did not produce a finite value")
+      fitnessSummary[iter, ] <- gaSummary(Fitness)
+      object@summary <- fitnessSummary
+    }
+    if (keepBest) {
+      object@bestSol[[iter]] <- unique(popTs[, which(abs(Fitness - max(Fitness, na.rm = TRUE)) < 0.03), drop = FALSE], MARGIN = 2)
     }
 
     # check stopping criteria
@@ -385,8 +406,9 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
       popTs <- sel$popTs
     } else {
       sel <- sample(1:popSize, size = popSize, replace = TRUE)
-      Pop <- object@population[sel, ]
+      Pop <- object@population[sel, , drop = FALSE]
       Fitness <- object@fitness[sel]
+      popTs <- object@popTs[, sel, drop = FALSE]
     }
     object@population <- Pop
     object@fitness <- Fitness
@@ -401,7 +423,7 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
           parents <- mating[i, ]
           Crossover <- crossover(object, parents)
           Pop[parents, ] <- Crossover$children
-          Fitness[parents] <- Crossover$fitness
+          Fitness[parents] <- NA_real_
           popTs[, parents] <- NA
         }
       }
@@ -432,9 +454,10 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
       {
         ord <- order(object@fitness, na.last = TRUE)
         u <- which(!duplicated(PopSorted, MARGIN = 1))
-        Pop[ord[1:elitism], ] <- PopSorted[u[1:elitism], ]
-        Fitness[ord[1:elitism]] <- FitnessSorted[u[1:elitism]]
-        popTs[, ord[1:elitism]] <- popTsSorted[, u[1:elitism]]
+        elite <- seq_len(min(elitism, length(u)))
+        Pop[ord[elite], ] <- PopSorted[u[elite], , drop = FALSE]
+        Fitness[ord[elite]] <- FitnessSorted[u[elite]]
+        popTs[, ord[elite]] <- popTsSorted[, u[elite], drop = FALSE]
         object@population <- Pop
         object@fitness <- Fitness
         object@popTs <- popTs
@@ -452,7 +475,7 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
     # run local search
     opt <- try(suppressWarnings(
       optim(
-        fn = fitness, ...,
+        fn = function(par, ...) fitness(par, ...)$value, ...,
         par = object@population[i, ],
         method = optimArgs$method,
         lower = optimArgs$lower,
@@ -462,6 +485,7 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
     ),
     silent = TRUE
     )
+    if (inherits(opt, "try-error")) warning("local optimization failed: ", opt[1])
     if (is.function(monitor)) {
       if (!inherits(opt, "try-error")) {
         message(
@@ -473,8 +497,16 @@ ga_ts <- function(type = c("binary", "real-valued", "permutation"),
       }
     }
     if (!inherits(opt, "try-error")) {
-      object@population[i, ] <- opt$par
-      object@fitness[i] <- opt$value
+      fit <- fitness(opt$par, ...)
+      if (is.finite(fit$value) && fit$value >= object@fitness[i]) {
+        object@population[i, ] <- if (updatePop) attributes(fit$value)[[1L]] else opt$par
+        object@fitness[i] <- fit$value
+        object@popTs[, i] <- fit$x
+        object@summary[object@iter, ] <- gaSummary(object@fitness)
+        if (keepBest) {
+          object@bestSol[[object@iter]] <- unique(object@popTs[, which(abs(object@fitness - max(object@fitness, na.rm = TRUE)) < 0.03), drop = FALSE], MARGIN = 2)
+        }
+      }
     }
   }
 

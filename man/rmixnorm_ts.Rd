@@ -7,25 +7,32 @@
 rmixnorm_ts(n, means.ar.par.list, sigmas.list, weights, yinit = 0)
 }
 \arguments{
-\item{n}{Number of observations to generate.}
+\item{n}{Non-negative integer total path length, including initial observations.}
 
 \item{means.ar.par.list}{List of component AR parameter vectors. The first
-element of each vector is the intercept, followed by lag coefficients.}
+element of each vector is the intercept, followed by at least one lag
+coefficient. Orders may differ between components; values must be finite.}
 
-\item{sigmas.list}{List of component variance or volatility vectors, each of
-length \code{n}.}
+\item{sigmas.list}{List of positive, finite component variance vectors, each of
+length \code{n}. Values are variances, not standard deviations.}
 
-\item{weights}{Numeric vector of component probabilities.}
+\item{weights}{Finite, non-negative component weights. At least one must be
+positive; weights are normalized to sum to one.}
 
-\item{yinit}{Initial value used to seed the recursion.}
+\item{yinit}{Finite scalar assigned to the initial observations.}
 }
 \value{
-A \code{\link[stats]{ts}} object of length \code{n}.
+A \code{\link[stats]{ts}} object of length \code{n}, or
+  \code{numeric(0)} for zero length. Stationarity is not enforced.
 }
 \description{
 Simulate a univariate process whose conditional distribution is a finite
 mixture of Gaussian distributions. The conditional mean of each component is
 an autoregressive process with its own parameter vector.
+All components use the common observed past, rather than independent latent
+component paths. No burn-in is removed: the first \code{min(n, max_order)}
+observations are fixed at \code{yinit}, where \code{max_order} is the largest
+component AR order. A shorter series consists entirely of these initial values.
 }
 \examples{
 if (requireNamespace("fGarch", quietly = TRUE)) {
@@ -37,7 +44,7 @@ sigmas.spec <- list(
 )
 sigmas.list <- lapply(
   lapply(sigmas.spec, fGarch::garchSim, extended = TRUE, n = n),
-  function(x) x$sigma
+  function(x) x$sigma^2
 )
 weights <- c(0.8, 0.2)
 y <- rmixnorm_ts(
@@ -51,6 +58,9 @@ plot(y)
 Feng Li, Mattias Villani, and Robert Kohn. (2010). Flexible Modeling of
     Conditional Distributions using Smooth Mixtures of Asymmetric Student T Densities,
     Journal of Statistical Planning and Inference, 140(12), pp. 3638-3654.
+}
+\seealso{
+\code{\link{rmixnorm}}, \code{\link{mar_model}}, \code{\link{simulate.mar}}
 }
 \author{
 Feng Li, Central University of Finance and Economics.

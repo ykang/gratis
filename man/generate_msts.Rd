@@ -34,3 +34,6 @@ This function is deprecated. Use \code{\link{mar_model}()} with
 x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2, output_format = "list")
 forecast::autoplot(x)
 }
+\seealso{
+\code{\link{mar_model}}, \code{\link{generate.mar}}
+}

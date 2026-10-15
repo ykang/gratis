@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gratis"
-version = "0.0.0"
+version = "1.9"
 description = "Python implementation of gratis time-series generation algorithms."
 readme = "README.md"
 requires-python = ">=3.10"

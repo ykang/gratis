@@ -2,7 +2,7 @@ Type: Package
 Package: gratis
 Title: Generating Time Series with Diverse and Controllable
     Characteristics
-Version: 1.0.8
+Version: 1.9
 Authors@R: c(
     person("Yanfei", "Kang", , "yanfeikang@buaa.edu.cn", role = "aut",
            comment = c(ORCID = "0000-0001-8769-6650")),
@@ -40,14 +40,12 @@ Imports:
     tsibble,
     utils
 Suggests:
+    doParallel,
     feasts,
     fGarch,
     ggplot2,
     knitr,
-    rlang,
     rmarkdown,
-    shiny,
-    shinydashboard,
     testthat (>= 3.0.0),
     tsfeatures
 VignetteBuilder:
@@ -57,4 +55,4 @@ Encoding: UTF-8
 LazyLoad: yes
 NeedsCompilation: no
 Repository: CRAN
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3

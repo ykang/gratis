@@ -6,13 +6,14 @@
 #' @param n.ts Number of time series to generate.
 #' @param freq Seasonal period of the generated series.
 #' @param nComp Number of mixture components. If \code{NULL}, this is sampled
-#'   randomly for each generated series.
+#'   once and reused for the generated series in this call.
 #' @param n Length of each generated series.
 #' @param output_format Output format: \code{"list"} for the historical list
 #'   format or \code{"tsibble"} for a list of tsibbles.
 #' @return When \code{output_format = "list"}, a list containing generated time
 #'   series and the parameters used for each series. When
 #'   \code{output_format = "tsibble"}, a list of tsibbles.
+#' @seealso \code{\link{mar_model}}, \code{\link{generate.mar}}
 #' @author Yanfei Kang and Feng Li
 #' @examples
 #' x <- generate_ts(n.ts = 2, freq = 12, nComp = 2, n = 120)
@@ -136,6 +137,7 @@ generate_ts <- function(n.ts = 1, freq = 1, nComp = NULL, n = 120, output_format
 #'   \code{msts} result or \code{"tsibble"} for a tsibble.
 #' @return A multiple-seasonal time series when \code{output_format = "list"},
 #'   or a tsibble when \code{output_format = "tsibble"}.
+#' @seealso \code{\link{mar_model}}, \code{\link{generate.mar}}
 #' @export
 #' @examples
 #' x <- generate_msts(seasonal.periods = c(7, 365), n = 800, nComp = 2, output_format = "list")

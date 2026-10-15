@@ -21,40 +21,49 @@ arima_model(
 )
 }
 \arguments{
-\item{frequency}{The length of the seasonal period (e.g., 12 for monthly data).}
+\item{frequency}{Positive integer seasonal period, for example 12 for monthly
+data. A value of 1 denotes a non-seasonal model.}
 
-\item{p}{Non-seasonal autoregressive order.}
+\item{p, q}{Non-negative integer non-seasonal AR and MA orders. If omitted,
+inferred from supplied \code{phi} and \code{theta}, respectively, or sampled.}
 
-\item{d}{Non-seasonal differencing order.}
+\item{d}{Non-negative integer ordinary difference order, with \code{d + D <= 2}.}
 
-\item{q}{Non-seasonal moving-average order.}
+\item{P, Q}{Non-negative integer seasonal AR and MA orders. If omitted,
+inferred from supplied \code{Phi} and \code{Theta}, respectively, or sampled.}
 
-\item{P}{Seasonal autoregressive order.}
+\item{D}{Non-negative integer seasonal difference order. Seasonal arguments
+require \code{frequency > 1}.}
 
-\item{D}{Seasonal differencing order.}
+\item{constant}{Mean when \code{d + D = 0}, or slope of a linear drift
+when \code{d + D = 1}. Must be zero when \code{d + D > 1}.}
 
-\item{Q}{Seasonal moving-average order.}
+\item{phi}{Finite numeric vector of length \code{p} containing AR parameters.}
 
-\item{constant}{Intercept term.}
+\item{theta}{Finite numeric vector of length \code{q} containing MA parameters.
+MA lag polynomials use positive signs: \eqn{1 + \theta(B)}.}
 
-\item{phi}{A numeric p-vector containing the AR parameters.}
+\item{Phi}{Finite numeric vector of length \code{P} containing seasonal AR
+parameters, at lags \code{frequency}, \code{2 * frequency}, and so on.}
 
-\item{theta}{A numeric q-vector containing the MA parameters.}
+\item{Theta}{Finite numeric vector of length \code{Q} containing seasonal MA
+parameters, using the same positive-sign convention as \code{theta}.}
 
-\item{Phi}{A numeric P-vector containing the seasonal AR parameters.}
-
-\item{Theta}{A numeric Q-vector containing the seasonal MA parameters.}
-
-\item{sigma}{The standard deviation of the noise.}
+\item{sigma}{The standard deviation of the noise. Its squared variance must
+lie in the positive normal floating-point range, in both R and Python.}
 }
 \value{
-An \code{Arima} object compatible with the \pkg{forecast} package's
-  simulation methods.
+A \code{gratis_arima} object inheriting from \code{Arima}. Its
+  simulation method uses scaled innovations and preserves all seasonal
+  coefficients, including coefficients whose sum is zero. Models fitted
+  separately with \pkg{forecast} retain their own simulation method.
 }
 \description{
 Construct a Gaussian ARIMA\eqn{(p,d,q)(P,D,Q)_m} model that can be used with
-\code{\link[forecast]{simulate.Arima}()} or \code{\link{generate.Arima}()}.
-Any omitted argument is randomly selected from the supported parameter space.
+\code{\link{simulate.gratis_arima}()} or \code{\link{generate.Arima}()}.
+Omitted orders and coefficients are inferred where possible or randomly
+selected from the supported parameter space. Construction does not simulate
+observations or store a seed for later simulations.
 }
 \details{
 When orders are omitted, \code{p} and \code{q} are sampled from
@@ -64,6 +73,8 @@ restriction \eqn{d + D \le 2}. If \code{constant} is omitted, it is sampled
 from \eqn{(-3,3)} unless \eqn{d + D = 2}, in which case it is set to zero.
 AR and MA parameters are sampled so the stationary and invertible parts of
 the process are valid, and \code{sigma} is sampled from \eqn{(1,5)}.
+Above order two, random AR polynomials allow every possible count of real
+roots. This has full support, but is not uniform over coefficient space.
 }
 \examples{
 # An AR(2) model with random parameters
@@ -78,7 +89,8 @@ plot(simulate(model2, 100))
 plot(simulate(model3, 100))
 }
 \seealso{
-\code{\link[forecast]{simulate.Arima}}
+\code{\link{simulate.gratis_arima}} for initialization and controlled
+  innovations; \code{\link{generate.Arima}} for batches of paths.
 }
 \author{
 Rob J Hyndman

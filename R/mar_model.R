@@ -9,12 +9,15 @@
 #' \deqn{
 #' (1-B)^{d_i}(1-B^{m_i})^{D_i}
 #' (1-\phi_i(B))(1-\Phi_i(B)) y_t =
-#' c_i + \sigma_{i,t}\epsilon_t
+#' c_i + \sqrt{v_{i,t}}\epsilon_t
 #' }
-#' and is selected with probability \eqn{\alpha_i}. Here \eqn{B} is the
+#' and is selected independently at each time with probability \eqn{\alpha_i}.
+#' Every component conditions on the same generated past; components are not
+#' independently generated paths that are subsequently averaged. Here \eqn{B} is the
 #' backshift operator, \eqn{m_i} is the seasonal period, \eqn{\epsilon_t} is a
 #' standard normal variate, and \eqn{\phi_i(B)} and \eqn{\Phi_i(B)} are the
-#' non-seasonal and seasonal autoregressive polynomials.
+#' non-seasonal and seasonal AR coefficient sums, with seasonal coefficients
+#' multiplying lags \eqn{B^{m_i},B^{2m_i},\dots}.
 #'
 #' Any missing model argument is randomly selected. Randomly selected
 #' non-seasonal AR orders are sampled from \eqn{\{0,1,2,3\}},
@@ -25,36 +28,54 @@
 #' If \code{k} is omitted, the number of components is sampled from
 #' \eqn{\{1,2,3,4,5\}}, unless it can be inferred from another argument.
 #'
-#' @param k Number of mixture components.
-#' @param p Non-negative integer vector giving the non-seasonal AR orders
+#' Stationary component AR polynomials do not guarantee a stationary mixture.
+#' Integrated components are also allowed. Simulation uses zero initial states
+#' and a fixed burn-in by default; near-unit-root models may need a substantially
+#' longer \code{n.start} in \code{\link{simulate.mar}()}.
+#'
+#' @param k Positive integer number of mixture components.
+#' @param p Non-negative integer scalar or vector of length \code{k} giving
+#'   the non-seasonal AR orders
 #'   \eqn{p_i}. Ignored when \code{phi} is supplied.
-#' @param d Non-negative integer vector giving the non-seasonal differencing
+#' @param d Non-negative integer scalar or vector of length \code{k} giving
+#'   the ordinary differencing
 #'   orders \eqn{d_i}.
 #' @param phi Numeric matrix of non-seasonal AR parameters. Column \eqn{i}
-#'   contains the parameters for component \eqn{i}.
-#' @param P Non-negative integer vector giving the seasonal AR orders
+#'   contains the parameters for component \eqn{i}. Use zero padding for
+#'   components of different orders. The row count determines \code{p}.
+#' @param P Non-negative integer scalar or vector of length \code{k} giving
+#'   the seasonal AR orders
 #'   \eqn{P_i}. Ignored when all \code{seasonal_periods} are 1 or when
 #'   \code{Phi} is supplied.
-#' @param D Non-negative integer vector giving the seasonal differencing orders
-#'   \eqn{D_i}. Ignored when all \code{seasonal_periods} are 1.
+#' @param D Non-negative integer scalar or vector of length \code{k} giving
+#'   seasonal difference orders
+#'   \eqn{D_i}. Forced to zero where \code{d = 2} or the seasonal period is 1.
 #' @param Phi Numeric matrix of seasonal AR parameters. Column \eqn{i}
 #'   contains the parameters for component \eqn{i}. Ignored when all
-#'   \code{seasonal_periods} are 1.
+#'   \code{seasonal_periods} are 1. Use zero padding for components of different
+#'   orders. The row count determines \code{P}.
 #' @param constants Numeric vector of length \code{k} containing the component
-#'   constants \eqn{c_1,\dots,c_k}.
-#' @param sigmas Numeric vector of length \code{k}, or a list of \code{k}
-#'   GARCH specifications created by \code{\link[fGarch]{garchSpec}()}.
-#' @param weights Positive numeric vector of length \code{k} containing the
+#'   constants \eqn{c_1,\dots,c_k}. These are recursion intercepts, not
+#'   unconditional means. Forced to zero for components with \code{d + D > 1}.
+#' @param sigmas Positive innovation variances of length \code{k}, or a list
+#'   of \code{k} GARCH specifications created by
+#'   \code{\link[fGarch]{garchSpec}()}. GARCH standard deviations are squared
+#'   internally to obtain innovation variances. These are externally simulated
+#'   volatility paths: their recursion uses the latent GARCH shocks, not the
+#'   subsequently generated MAR residuals. This is not a coupled MAR-GARCH model.
+#' @param weights Non-negative finite numeric vector of length \code{k} containing the
 #'   component probabilities \eqn{\alpha_1,\dots,\alpha_k}. Values are
-#'   normalized to sum to 1.
-#' @param seasonal_periods Scalar seasonal period applied to every component, or
+#'   normalized to sum to 1; at least one must be positive.
+#' @param seasonal_periods Positive integer seasonal period applied to every
+#'   component, or
 #'   a numeric vector of length \code{k} giving the seasonal period for each
-#'   component.
+#'   component. A value of 1 denotes a non-seasonal component.
 #' @return An object of class \code{mar}. The object stores the component orders,
 #'   coefficients, constants, sigmas, normalized weights, seasonal periods, and
 #'   the expanded AR recursion coefficients used by \code{\link{simulate.mar}()}.
 #' @author Rob J Hyndman
-#' @seealso \code{\link{simulate.mar}}
+#' @seealso \code{\link{simulate.mar}}, \code{\link{generate.mar}},
+#'   \code{\link{pi_coefficients}}
 #' @examples
 #' # Quarterly MAR model with randomly selected parameters
 #' model1 <- mar_model(seasonal_periods = 4)
@@ -81,6 +102,10 @@ mar_model <- function(k = NULL,
                       P = NULL, D = NULL, Phi = NULL,
                       constants = NULL, sigmas = NULL, weights = NULL,
                       seasonal_periods = 1L) {
+  if (!length(seasonal_periods) || any(!is.finite(seasonal_periods)) ||
+      any(seasonal_periods < 1 | seasonal_periods != floor(seasonal_periods))) {
+    stop("seasonal_periods must contain positive integers")
+  }
   # How many components?
   if (is.null(k)) {
     if (!is.null(weights)) {
@@ -101,6 +126,17 @@ mar_model <- function(k = NULL,
     }
   }
 
+  if (length(k) != 1L || !is.finite(k) || k < 1 || k != floor(k)) stop("k must be a positive integer")
+  for (value in list(p, d, P, D)) {
+    if (!is.null(value) && (!(length(value) %in% c(1L, k)) ||
+        any(!is.finite(value)) || any(value < 0 | value != floor(value)))) {
+      stop("orders must contain non-negative integers of length one or k")
+    }
+  }
+  if (any(!is.finite(c(phi, Phi, constants)))) stop("coefficients and constants must be finite")
+  if (!is.null(phi)) phi <- as.matrix(phi)
+  if (!is.null(Phi)) Phi <- as.matrix(Phi)
+
   # weights
   if (is.null(weights)) {
     # Choose a random set of weights in (0,1)
@@ -108,11 +144,12 @@ mar_model <- function(k = NULL,
   } else {
     if (length(weights) != k) {
       stop("Dimension of weights does not match other components")
-    } else if (any(weights <= 0)) {
-      stop("weights must be positive")
+    } else if (any(!is.finite(weights)) || any(weights < 0) || !any(weights > 0)) {
+      stop("weights must be finite and non-negative, with at least one positive")
     }
   }
   # Rescale weights so they sum to 1
+  weights <- weights / max(weights)
   weights <- weights / sum(weights)
 
   # constants
@@ -131,8 +168,8 @@ mar_model <- function(k = NULL,
     if (length(sigmas) != k) {
       stop("Dimension of sigmas does not match other components")
     } else if (is.numeric(sigmas)) {
-      if (any(sigmas <= 0)) {
-        stop("sigmas must be positive")
+      if (any(!is.finite(sigmas)) || any(sigmas <= 0)) {
+        stop("sigmas must be positive and finite")
       }
     }
   }

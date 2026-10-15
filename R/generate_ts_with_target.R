@@ -17,7 +17,10 @@
 #'   whether the genetic algorithm should evaluate candidates in parallel.
 #' @param output_format Output format: \code{"list"} for a \code{ts} or
 #'   \code{msts} object, or \code{"tsibble"} for a tsibble.
-#' @return Generated time series in the requested \code{output_format}.
+#' @return A \code{ts} or \code{msts} object containing the generated series,
+#'   or a tsibble when \code{output_format = "tsibble"}. The historical
+#'   \code{"list"} option returns a time-series object, not an R list.
+#' @seealso \code{\link{generate_target}}, \code{\link{simulate_target}}
 #' @author Yanfei Kang
 #' @examples
 #' \dontrun{

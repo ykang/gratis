@@ -19,41 +19,53 @@ mar_model(
 )
 }
 \arguments{
-\item{k}{Number of mixture components.}
+\item{k}{Positive integer number of mixture components.}
 
-\item{p}{Non-negative integer vector giving the non-seasonal AR orders
+\item{p}{Non-negative integer scalar or vector of length \code{k} giving
+the non-seasonal AR orders
 \eqn{p_i}. Ignored when \code{phi} is supplied.}
 
-\item{d}{Non-negative integer vector giving the non-seasonal differencing
+\item{d}{Non-negative integer scalar or vector of length \code{k} giving
+the ordinary differencing
 orders \eqn{d_i}.}
 
 \item{phi}{Numeric matrix of non-seasonal AR parameters. Column \eqn{i}
-contains the parameters for component \eqn{i}.}
+contains the parameters for component \eqn{i}. Use zero padding for
+components of different orders. The row count determines \code{p}.}
 
-\item{P}{Non-negative integer vector giving the seasonal AR orders
+\item{P}{Non-negative integer scalar or vector of length \code{k} giving
+the seasonal AR orders
 \eqn{P_i}. Ignored when all \code{seasonal_periods} are 1 or when
 \code{Phi} is supplied.}
 
-\item{D}{Non-negative integer vector giving the seasonal differencing orders
-\eqn{D_i}. Ignored when all \code{seasonal_periods} are 1.}
+\item{D}{Non-negative integer scalar or vector of length \code{k} giving
+seasonal difference orders
+\eqn{D_i}. Forced to zero where \code{d = 2} or the seasonal period is 1.}
 
 \item{Phi}{Numeric matrix of seasonal AR parameters. Column \eqn{i}
 contains the parameters for component \eqn{i}. Ignored when all
-\code{seasonal_periods} are 1.}
+\code{seasonal_periods} are 1. Use zero padding for components of different
+orders. The row count determines \code{P}.}
 
 \item{constants}{Numeric vector of length \code{k} containing the component
-constants \eqn{c_1,\dots,c_k}.}
+constants \eqn{c_1,\dots,c_k}. These are recursion intercepts, not
+unconditional means. Forced to zero for components with \code{d + D > 1}.}
 
-\item{sigmas}{Numeric vector of length \code{k}, or a list of \code{k}
-GARCH specifications created by \code{\link[fGarch]{garchSpec}()}.}
+\item{sigmas}{Positive innovation variances of length \code{k}, or a list
+of \code{k} GARCH specifications created by
+\code{\link[fGarch]{garchSpec}()}. GARCH standard deviations are squared
+internally to obtain innovation variances. These are externally simulated
+volatility paths: their recursion uses the latent GARCH shocks, not the
+subsequently generated MAR residuals. This is not a coupled MAR-GARCH model.}
 
-\item{weights}{Positive numeric vector of length \code{k} containing the
+\item{weights}{Non-negative finite numeric vector of length \code{k} containing the
 component probabilities \eqn{\alpha_1,\dots,\alpha_k}. Values are
-normalized to sum to 1.}
+normalized to sum to 1; at least one must be positive.}
 
-\item{seasonal_periods}{Scalar seasonal period applied to every component, or
+\item{seasonal_periods}{Positive integer seasonal period applied to every
+component, or
 a numeric vector of length \code{k} giving the seasonal period for each
-component.}
+component. A value of 1 denotes a non-seasonal component.}
 }
 \value{
 An object of class \code{mar}. The object stores the component orders,
@@ -71,12 +83,15 @@ Component \eqn{i} has the form
 \deqn{
 (1-B)^{d_i}(1-B^{m_i})^{D_i}
 (1-\phi_i(B))(1-\Phi_i(B)) y_t =
-c_i + \sigma_{i,t}\epsilon_t
+c_i + \sqrt{v_{i,t}}\epsilon_t
 }
-and is selected with probability \eqn{\alpha_i}. Here \eqn{B} is the
+and is selected independently at each time with probability \eqn{\alpha_i}.
+Every component conditions on the same generated past; components are not
+independently generated paths that are subsequently averaged. Here \eqn{B} is the
 backshift operator, \eqn{m_i} is the seasonal period, \eqn{\epsilon_t} is a
 standard normal variate, and \eqn{\phi_i(B)} and \eqn{\Phi_i(B)} are the
-non-seasonal and seasonal autoregressive polynomials.
+non-seasonal and seasonal AR coefficient sums, with seasonal coefficients
+multiplying lags \eqn{B^{m_i},B^{2m_i},\dots}.
 
 Any missing model argument is randomly selected. Randomly selected
 non-seasonal AR orders are sampled from \eqn{\{0,1,2,3\}},
@@ -86,6 +101,11 @@ are sampled from the stationary region, constants from \eqn{(-3,3)}, sigmas
 from \eqn{(1,5)}, and mixture weights from \eqn{(0,1)} before normalization.
 If \code{k} is omitted, the number of components is sampled from
 \eqn{\{1,2,3,4,5\}}, unless it can be inferred from another argument.
+
+Stationary component AR polynomials do not guarantee a stationary mixture.
+Integrated components are also allowed. Simulation uses zero initial states
+and a fixed burn-in by default; near-unit-root models may need a substantially
+longer \code{n.start} in \code{\link{simulate.mar}()}.
 }
 \examples{
 # Quarterly MAR model with randomly selected parameters
@@ -109,7 +129,8 @@ if (requireNamespace("fGarch", quietly = TRUE)) {
 }
 }
 \seealso{
-\code{\link{simulate.mar}}
+\code{\link{simulate.mar}}, \code{\link{generate.mar}},
+  \code{\link{pi_coefficients}}
 }
 \author{
 Rob J Hyndman

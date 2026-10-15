@@ -12,7 +12,7 @@ generate_ts(n.ts = 1, freq = 1, nComp = NULL, n = 120, output_format = "list")
 \item{freq}{Seasonal period of the generated series.}
 
 \item{nComp}{Number of mixture components. If \code{NULL}, this is sampled
-randomly for each generated series.}
+once and reused for the generated series in this call.}
 
 \item{n}{Length of each generated series.}
 
@@ -35,6 +35,9 @@ forecast::autoplot(x$N1$x)
 }
 \references{
 Wong, CS & WK Li (2000).
+}
+\seealso{
+\code{\link{mar_model}}, \code{\link{generate.mar}}
 }
 \author{
 Yanfei Kang and Feng Li

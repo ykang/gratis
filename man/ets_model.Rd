@@ -21,7 +21,8 @@ ets_model(
 )
 }
 \arguments{
-\item{frequency}{The length of the seasonal period (e.g., 12 for monthly data).}
+\item{frequency}{Positive integer seasonal period, for example 12 for monthly
+data. Seasonal models require a value greater than 1.}
 
 \item{error}{Character string specifying the error component: \code{"A"} for
 additive or \code{"M"} for multiplicative.}
@@ -33,24 +34,29 @@ none or \code{"A"} for additive.}
 \code{"N"} for none, \code{"A"} for additive, or \code{"M"} for
 multiplicative.}
 
-\item{alpha}{Smoothing parameter for the level.}
+\item{alpha}{Level smoothing parameter, strictly between 0 and 1.}
 
-\item{beta}{Smoothing parameter for the trend.}
+\item{beta}{Trend smoothing parameter in \eqn{[0,\alpha]}. Ignored without a trend.}
 
-\item{gamma}{Smoothing parameter for seasonality.}
+\item{gamma}{Seasonal smoothing parameter in \eqn{[0,1-\alpha]}. Ignored without seasonality.}
 
-\item{phi}{Damping parameter.}
+\item{phi}{Damping parameter in \eqn{(0,1]}. Ignored without a damped trend.}
 
-\item{level}{Initial level \eqn{\ell_0}.}
+\item{level}{Finite initial level \eqn{\ell_0}. Must be positive for
+multiplicative errors or seasonality.}
 
-\item{slope}{Initial slope \eqn{b_0}.}
+\item{slope}{Finite initial additive trend state \eqn{b_0}. Ignored without a trend.}
 
-\item{season}{Numeric vector of initial seasonal states
-\eqn{s_{1-m},\dots,s_0}.}
+\item{season}{Finite numeric vector of initial seasonal states
+\eqn{s_{1-m},\dots,s_0}, ordered oldest to newest, of length \code{frequency}.
+Multiplicative factors must be positive. Supplied states are not normalized.}
 
 \item{damped}{Logical value indicating whether an additive trend is damped.}
 
-\item{sigma}{The standard deviation of the noise.}
+\item{sigma}{The standard deviation of the noise. Its squared variance must
+lie in the positive normal floating-point range, in both R and Python.
+It is measured on the observation scale for additive errors and is
+dimensionless for multiplicative errors.}
 }
 \value{
 An \code{ets} object compatible with the \pkg{forecast} package's
@@ -69,6 +75,18 @@ parameters are sampled until they satisfy the ETS admissibility conditions.
 The innovation variance is sampled from \eqn{(1,5)} for additive errors and
 from \eqn{(0.0001,0.05)} for multiplicative errors. Initial states are sampled
 from ranges appropriate to the selected components.
+Omitted smoothing parameters are resampled after rejection, with a maximum
+of 10000 attempts. Fixed parameters must satisfy the usual smoothing bounds:
+\eqn{0 < \alpha < 1}, \eqn{0 \le \beta \le \alpha},
+\eqn{0 \le \gamma \le 1-\alpha}, and \eqn{0 < \phi \le 1}.
+Multiplicative seasonal factors are positive and sampled factors are
+normalized to have mean one.
+
+Simulation starts from the supplied initial states without an automatic
+burn-in. Multiplicative innovations are clipped below at -1 by the
+\pkg{forecast} simulator, matching Python's convention. Admissibility and
+positive initial states do not guarantee positive or finite values for every
+simulated path.
 }
 \examples{
 # An ETS(A,A,N) model with random parameters
@@ -86,7 +104,7 @@ plot(simulate(model2, 100))
 plot(simulate(model3, 100))
 }
 \seealso{
-\code{\link[forecast]{simulate.ets}}
+\code{\link[forecast]{simulate.ets}}, \code{\link{generate.ets}}
 }
 \author{
 Rob J Hyndman

@@ -12,7 +12,7 @@ def _require_statsmodels():
 
 
 def test_public_imports():
-    assert gratis.__version__ == "0.0.0"
+    assert gratis.__version__ == "1.9"
     assert callable(gratis.rmixnorm)
     assert callable(gratis.dmixnorm)
     assert callable(gratis.pi_coefficients)

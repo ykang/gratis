@@ -110,16 +110,6 @@ df %>%
 autoplot(df)
 ```
 
-### Web application
-
-You can also run the time series generation procedure in a shiny app
-
-``` r
-app_gratis()
-```
-
-Or visit our [online Shiny APP](https://ebsmonash.shinyapps.io/tsgeneration/)
-
 ## Python usage
 
 The Python API mirrors the main model constructors from the R package and returns NumPy arrays.
@@ -140,7 +130,28 @@ many = gratis.generate(model, length=100, nseries=5, rng=1)
 gratis.plot_series(many, title="Generated MAR series")
 ```
 
-Python ARIMA and ETS models use `statsmodels` by default. Local NumPy simulators remain available with `backend = "numpy"`.
+Python ARIMA and ETS models use `statsmodels`. ARIMA also supports an explicit `backend="numpy"`; ETS uses one implementation. Statistical conventions and cross-language tests are described in [the Python README](python/README.md).
+
+Both implementations use sparse MAR lag evaluation and direct scalar mixture
+simulation. Python `generate()` reuses statsmodels preparation within each batch,
+and Python target searches support threads with reproducible candidate streams.
+Serial target search remains the default; threads are useful only for suitable
+feature callbacks. Conditional mixture densities are evaluated in vectorized
+form, and Python ARIMA uses statsmodels' ARMA filter rather than dense state-space
+simulation. Direct Python model classes validate their parameters too.
+R `generate(..., seed=1)` seeds the whole batch once, producing distinct,
+reproducible series while restoring the previous RNG state.
+Zero-order MAR mixtures are vectorized, and one-component MAR models use compiled
+AR filtering without changing random draws. R target search retains only the
+final population, not every generation's series history.
+Both languages use an adaptive impulse-energy burn-in estimate for ARIMA,
+including repeated poles. Random AR models allow all possible real-pole counts
+(not uniform coefficient sampling). ARIMA and ETS reject noise scales whose
+squared variance cannot be represented as a positive normal floating-point value.
+Python MAR arrays are owned and read-only; construct a new model to change them.
+MAR component stationarity does not ensure mixture stability, and the default
+100-step MAR burn-in may be too short for persistent models. R GARCH specifications
+provide external volatility paths, not residual-coupled MAR-GARCH dynamics.
 
 ## See also
 

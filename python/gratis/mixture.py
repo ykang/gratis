@@ -6,18 +6,19 @@ from collections.abc import Sequence
 import numpy as np
 
 from ._random import SeedLike, get_rng
+from .arima import _validate_order
 
 
 def _normalise_weights(weights: np.ndarray, k: int) -> np.ndarray:
     weights = np.asarray(weights, dtype=float)
     if weights.ndim != 1 or weights.size != k:
         raise ValueError("weights must be a one-dimensional vector of length k")
-    if np.any(weights < 0):
-        raise ValueError("weights must be non-negative")
-    total = weights.sum()
-    if total <= 0:
+    if np.any(~np.isfinite(weights)) or np.any(weights < 0):
+        raise ValueError("weights must be finite and non-negative")
+    if not np.any(weights > 0):
         raise ValueError("at least one mixture weight must be positive")
-    return weights / total
+    weights = weights / np.max(weights)
+    return weights / weights.sum()
 
 
 def _coerce_mixture_inputs(
@@ -37,8 +38,19 @@ def _coerce_mixture_inputs(
     q, k = means.shape
     if sigmas.shape != (q, q, k):
         raise ValueError("sigmas must be a q x q x k array")
+    if q == 0 or k == 0 or np.any(~np.isfinite(means)):
+        raise ValueError("means must be nonempty and finite")
+    covariances = np.moveaxis(sigmas, 2, 0)
+    if np.any(~np.isfinite(covariances)) or not np.allclose(
+        covariances, covariances.swapaxes(1, 2), rtol=1e-12, atol=0.0
+    ):
+        raise ValueError("sigma matrices must be finite, symmetric and positive definite")
+    try:
+        factors = np.linalg.cholesky(covariances)
+    except np.linalg.LinAlgError as exc:
+        raise ValueError("sigma matrices must be positive definite") from exc
 
-    return means, sigmas, univariate
+    return means, factors, univariate
 
 
 def rmixnorm(
@@ -51,13 +63,47 @@ def rmixnorm(
 ) -> np.ndarray:
     """Draw samples from a finite mixture of multivariate normal distributions.
 
-    Parameters mirror the R function: `means` is a q x k matrix and `sigmas` is
-    a q x q x k covariance array. For univariate mixtures, vectors are accepted.
-    """
-    if n < 0:
-        raise ValueError("n must be non-negative")
+    Parameters
+    ----------
+    n : int
+        Non-negative number of observations.
+    means : array_like, shape (k,) or (q, k)
+        Finite component means. Columns identify components; vector input
+        specifies a univariate mixture.
+    sigmas : array_like, shape (k,) or (q, q, k)
+        Component variances for vector ``means``, otherwise covariance matrices.
+        These are variances, not standard deviations. Every covariance must be
+        finite, symmetric and positive definite, even for zero-weight components.
+    weights : array_like, shape (k,)
+        Finite, non-negative weights, normalized internally. At least one must
+        be positive.
+    rng : int or numpy.random.Generator, optional
+        Seed or generator; existing generators advance in place. ``None``
+        creates a new independently seeded generator.
 
-    means, sigmas, univariate = _coerce_mixture_inputs(means, sigmas)
+    Returns
+    -------
+    numpy.ndarray
+        Shape ``(n,)`` when ``means`` is a vector, otherwise ``(n, q)``.
+        Matrix-shaped univariate means therefore retain a single output column.
+
+    Raises
+    ------
+    ValueError
+        If dimensions, means, covariances, weights or sample size are invalid.
+
+    See Also
+    --------
+    dmixnorm : Evaluate the corresponding mixture density.
+
+    Examples
+    --------
+    >>> rmixnorm(5, means=[-1, 1], sigmas=[1, 2], weights=[2, 3], rng=1).shape
+    (5,)
+    """
+    n = _validate_order("n", n)
+
+    means, factors, univariate = _coerce_mixture_inputs(means, sigmas)
     q, k = means.shape
     weights = _normalise_weights(np.asarray(weights, dtype=float), k)
     generator = get_rng(rng)
@@ -68,12 +114,8 @@ def rmixnorm(
         rows = components == component
         count = int(rows.sum())
         if count:
-            out[rows, :] = generator.multivariate_normal(
-                mean=means[:, component],
-                cov=sigmas[:, :, component],
-                size=count,
-                check_valid="ignore",
-            )
+            out[rows, :] = (generator.standard_normal((count, q))
+                            @ factors[component].T + means[:, component])
 
     return out[:, 0] if univariate else out
 
@@ -89,20 +131,17 @@ def _coerce_observations(x: np.ndarray | Sequence[float], q: int) -> np.ndarray:
     raise ValueError("x must be a vector of length q or an n x q matrix")
 
 
-def _log_multivariate_normal_density(x: np.ndarray, mean: np.ndarray, sigma: np.ndarray) -> np.ndarray:
-    sign, logdet = np.linalg.slogdet(sigma)
-    if sign <= 0:
-        raise ValueError("sigma matrices must be positive definite")
+def _log_multivariate_normal_density(x: np.ndarray, mean: np.ndarray, factor: np.ndarray) -> np.ndarray:
+    logdet = 2 * np.sum(np.log(np.diag(factor)))
     centered = x - mean
-    solved = np.linalg.solve(sigma, centered.T).T
-    quadratic = np.sum(centered * solved, axis=1)
+    solved = np.linalg.solve(factor, centered.T)
+    quadratic = np.sum(solved * solved, axis=0)
     q = x.shape[1]
     return -0.5 * (q * np.log(2.0 * np.pi) + logdet + quadratic)
 
 
 def _logsumexp(values: np.ndarray, axis: int) -> np.ndarray:
-    maximum = np.max(values, axis=axis, keepdims=True)
-    return (maximum + np.log(np.sum(np.exp(values - maximum), axis=axis, keepdims=True))).squeeze(axis)
+    return np.logaddexp.reduce(values, axis=axis)
 
 
 def dmixnorm(
@@ -113,8 +152,46 @@ def dmixnorm(
     *,
     log: bool = False,
 ) -> np.ndarray:
-    """Evaluate the density of a finite mixture of multivariate normals."""
-    means, sigmas, univariate = _coerce_mixture_inputs(means, sigmas)
+    """Evaluate a Gaussian mixture density or log density.
+
+    Parameters
+    ----------
+    x : array_like
+        Univariate observations, one vector of length ``q``, or an ``(n, q)``
+        matrix with one multivariate observation per row.
+    means : array_like, shape (k,) or (q, k)
+        Finite component means, using the layout accepted by ``rmixnorm``.
+    sigmas : array_like, shape (k,) or (q, q, k)
+        Positive variances or symmetric positive-definite covariance matrices,
+        not standard deviations. Zero-weight components are also validated.
+    weights : array_like, shape (k,)
+        Finite, non-negative weights with at least one positive value.
+        Weights are normalized internally.
+    log : bool, default False
+        Return log densities. Component log densities are combined stably,
+        avoiding premature underflow in distribution tails.
+
+    Returns
+    -------
+    numpy.ndarray
+        One value per observation, normally shape ``(n,)``. A scalar ``x``
+        with vector-shaped ``means`` returns a zero-dimensional array.
+
+    Raises
+    ------
+    ValueError
+        If observation dimensions or mixture parameters are invalid.
+
+    See Also
+    --------
+    rmixnorm : Sample from the corresponding mixture.
+
+    Examples
+    --------
+    >>> dmixnorm([0, 1], means=[0], sigmas=[1], weights=[1]).shape
+    (2,)
+    """
+    means, factors, univariate = _coerce_mixture_inputs(means, sigmas)
     q, k = means.shape
     weights = _normalise_weights(np.asarray(weights, dtype=float), k)
     observations = _coerce_observations(x, q)
@@ -126,13 +203,30 @@ def dmixnorm(
         else:
             component_log_density[:, component] = (
                 np.log(weights[component])
-                + _log_multivariate_normal_density(observations, means[:, component], sigmas[:, :, component])
+                + _log_multivariate_normal_density(observations, means[:, component], factors[component])
             )
     log_density = _logsumexp(component_log_density, axis=1)
     density = log_density if log else np.exp(log_density)
     if univariate and np.asarray(x).ndim == 0:
         return np.asarray(density[0])
     return density
+
+
+def _prepare_ts_mixture(n, means_ar_par_list, sigmas_list, weights):
+    if not len(means_ar_par_list) or len(sigmas_list) != len(means_ar_par_list):
+        raise ValueError("sigmas_list must match a nonempty means_ar_par_list")
+    params = [np.asarray(values, dtype=float).reshape(-1) for values in means_ar_par_list]
+    if any(values.size < 2 for values in params):
+        raise ValueError("each AR parameter vector must include an intercept and at least one lag")
+    if any(np.any(~np.isfinite(values)) for values in params):
+        raise ValueError("AR parameters must be finite")
+    sigmas = np.column_stack([np.asarray(values, dtype=float).reshape(-1) for values in sigmas_list])
+    if sigmas.shape != (n, len(params)):
+        raise ValueError("each sigma vector must have length n")
+    if np.any(~np.isfinite(sigmas)) or np.any(sigmas <= 0):
+        raise ValueError("sigmas must be positive and finite")
+    lags = [np.arange(1, values.size) for values in params]
+    return params, lags, np.sqrt(sigmas), _normalise_weights(np.asarray(weights), len(params))
 
 
 def rmixnorm_ts(
@@ -144,41 +238,65 @@ def rmixnorm_ts(
     yinit: float = 0.0,
     rng: SeedLike = None,
 ) -> np.ndarray:
-    """Simulate an autoregressive process with mixture-normal innovations."""
-    if n < 0:
-        raise ValueError("n must be non-negative")
-    if len(means_ar_par_list) == 0:
-        raise ValueError("means_ar_par_list must contain at least one component")
-    if len(sigmas_list) != len(means_ar_par_list):
-        raise ValueError("sigmas_list must match means_ar_par_list")
+    """Simulate a process with Gaussian-mixture conditional distributions.
 
-    ar_params = [np.asarray(params, dtype=float) for params in means_ar_par_list]
-    n_lags = np.asarray([params.size - 1 for params in ar_params], dtype=int)
-    if np.any(n_lags < 1):
-        raise ValueError("each AR parameter vector must include an intercept and at least one lag")
+    Parameters
+    ----------
+    n : int
+        Non-negative total path length, including the initial observations.
+    means_ar_par_list : sequence of array_like
+        Component vectors ``[intercept, lag_1, ..., lag_p]``. Each component
+        must have at least one lag; orders may differ between components.
+    sigmas_list : sequence of array_like
+        One positive, finite variance vector of length ``n`` per component.
+        Values are variances, not standard deviations.
+    weights : array_like
+        Finite, non-negative component weights, normalized internally, with
+        at least one positive value.
+    yinit : float, default 0
+        Value assigned to the first ``min(n, max_order)`` observations. These
+        are returned as part of the path; no burn-in is discarded.
+    rng : int or numpy.random.Generator, optional
+        Seed or generator; existing generators advance in place. ``None``
+        creates a new independently seeded generator.
 
+    Returns
+    -------
+    numpy.ndarray
+        Floating-point path of shape ``(n,)``. At each simulated time a
+        component is selected, then its mean is computed from the common past.
+
+    Raises
+    ------
+    ValueError
+        If parameter dimensions, variances, weights, length or ``yinit`` are
+        invalid. Parameters are validated even when the path is too short to
+        enter the recursion. Stationarity is not enforced.
+
+    See Also
+    --------
+    dmixnorm_ts : Evaluate conditional densities along an observed path.
+    mar_model : Construct a MAR model with a separate burn-in control.
+
+    Examples
+    --------
+    >>> rmixnorm_ts(5, [[0, 0.5]], [[1] * 5], [1], rng=1).shape
+    (5,)
+    """
+    n = _validate_order("n", n)
+    ar_params, lags, scales, weights = _prepare_ts_mixture(
+        n, means_ar_par_list, sigmas_list, weights)
+    if not np.isfinite(yinit):
+        raise ValueError("yinit must be finite")
     k = len(ar_params)
-    weights = _normalise_weights(np.asarray(weights, dtype=float), k)
-    sigmas = np.column_stack([np.asarray(values, dtype=float) for values in sigmas_list])
-    if sigmas.shape != (n, k):
-        raise ValueError("each sigma vector must have length n")
 
     generator = get_rng(rng)
     y = np.full(n, yinit, dtype=float)
-    max_lag = int(n_lags.max())
+    max_lag = max(len(indices) for indices in lags)
     for index in range(max_lag, n):
-        means = np.empty(k, dtype=float)
-        for component, params in enumerate(ar_params):
-            lag_count = n_lags[component]
-            previous = y[index - np.arange(1, lag_count + 1)]
-            means[component] = np.dot(params, np.concatenate(([1.0], previous)))
-        y[index] = rmixnorm(
-            1,
-            means=means,
-            sigmas=sigmas[index, :],
-            weights=weights,
-            rng=generator,
-        )[0]
+        component = generator.choice(k, p=weights)
+        mean = np.dot(ar_params[component], np.r_[1.0, y[index - lags[component]]])
+        y[index] = generator.normal(mean, scales[index, component])
 
     return y
 
@@ -191,41 +309,59 @@ def dmixnorm_ts(
     *,
     log: bool = False,
 ) -> np.ndarray:
-    """Evaluate conditional mixture-normal densities for an AR mixture series."""
+    """Evaluate conditional Gaussian-mixture densities along an observed path.
+
+    Parameters
+    ----------
+    y : array_like
+        Univariate observations, flattened to a one-dimensional array.
+    means_ar_par_list : sequence of array_like
+        Component vectors ``[intercept, lag_1, ..., lag_p]`` with at least one
+        lag per component, as in ``rmixnorm_ts``.
+    sigmas_list : sequence of array_like
+        Positive, finite variance vectors, one per component, each of length
+        ``len(y)``. These are variances, not standard deviations.
+    weights : array_like
+        Finite, non-negative weights, normalized internally. At least one must
+        be positive; zero-weight component parameters are still validated.
+    log : bool, default False
+        Return conditional log densities instead of densities.
+
+    Returns
+    -------
+    numpy.ndarray
+        Shape ``(len(y),)``. The first ``min(len(y), max_order)`` entries are
+        placeholders: one for densities, zero for log densities. Only later
+        entries are evaluated conditional on the observed past. Exclude these
+        placeholders when constructing a conditional likelihood.
+
+    Raises
+    ------
+    ValueError
+        If parameter dimensions, variances or weights are invalid.
+
+    See Also
+    --------
+    rmixnorm_ts : Simulate using the same conditional-distribution convention.
+    """
     y = np.asarray(y, dtype=float).reshape(-1)
     n = y.size
-    if len(means_ar_par_list) == 0:
-        raise ValueError("means_ar_par_list must contain at least one component")
-    if len(sigmas_list) != len(means_ar_par_list):
-        raise ValueError("sigmas_list must match means_ar_par_list")
-
-    ar_params = [np.asarray(params, dtype=float) for params in means_ar_par_list]
-    n_lags = np.asarray([params.size - 1 for params in ar_params], dtype=int)
-    if np.any(n_lags < 1):
-        raise ValueError("each AR parameter vector must include an intercept and at least one lag")
-
-    k = len(ar_params)
-    weights = _normalise_weights(np.asarray(weights, dtype=float), k)
-    sigmas = np.column_stack([np.asarray(values, dtype=float) for values in sigmas_list])
-    if sigmas.shape != (n, k):
-        raise ValueError("each sigma vector must have length len(y)")
-
-    max_lag = int(n_lags.max())
+    ar_params, lags, scales, weights = _prepare_ts_mixture(
+        n, means_ar_par_list, sigmas_list, weights)
+    max_lag = max(len(indices) for indices in lags)
     out_log = np.zeros(n, dtype=float)
-    for index in range(max_lag, n):
-        means = np.empty(k, dtype=float)
-        for component, params in enumerate(ar_params):
-            lag_count = n_lags[component]
-            previous = y[index - np.arange(1, lag_count + 1)]
-            means[component] = np.dot(params, np.concatenate(([1.0], previous)))
-        out_log[index] = float(
-            dmixnorm(
-                y[index],
-                means=means,
-                sigmas=sigmas[index, :],
-                weights=weights,
-                log=True,
-            )
-        )
+    if n > max_lag:
+        past = np.r_[0.0, y[:-1]]
+        component_logs = []
+        # Observed lags are fixed, unlike simulation's recursive state.
+        for component in np.flatnonzero(weights):
+            params = ar_params[component]
+            means = params[0] + np.convolve(past, params[1:])[:n]
+            scale = scales[max_lag:, component]
+            z = (y[max_lag:] - means[max_lag:]) / scale
+            component_logs.append(
+                np.log(weights[component]) - np.log(scale)
+                - 0.5 * (np.log(2 * np.pi) + z * z))
+        out_log[max_lag:] = np.logaddexp.reduce(component_logs, axis=0)
 
     return out_log if log else np.exp(out_log)

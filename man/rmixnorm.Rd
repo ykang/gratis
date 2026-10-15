@@ -7,16 +7,17 @@
 rmixnorm(n, means, sigmas, weights)
 }
 \arguments{
-\item{n}{Number of observations to generate.}
+\item{n}{Non-negative integer number of observations to generate.}
 
 \item{means}{A \eqn{q \times k} matrix of component means, or a vector of
 length \eqn{k} for univariate mixtures.}
 
 \item{sigmas}{A \eqn{q \times q \times k} array of component covariance
-matrices, or a vector of length \eqn{k} for univariate mixtures.}
+matrices, or a vector of length \eqn{k} for univariate mixtures. These are
+variances or covariances, not standard deviations.}
 
-\item{weights}{Numeric vector of component probabilities. Values are used as
-sampling probabilities for the mixture components.}
+\item{weights}{Finite, non-negative component weights, with at least one
+positive value. Weights are normalized to sum to one.}
 }
 \value{
 An \eqn{n \times q} matrix of generated data, or a numeric vector
@@ -26,6 +27,8 @@ An \eqn{n \times q} matrix of generated data, or a numeric vector
 Draw random values from a finite mixture of \eqn{k} multivariate normal
 distributions, each with dimension \eqn{q}. For univariate mixtures,
 \code{means} and \code{sigmas} may be supplied as vectors.
+Covariance matrices must be finite, symmetric and positive definite,
+including those of zero-weight components.
 }
 \examples{
 out <- rmixnorm(
@@ -36,6 +39,9 @@ hist(out, breaks = 100, freq = FALSE)
 }
 \references{
 Villani et al 2009.
+}
+\seealso{
+\code{\link{rmixnorm_ts}} for autoregressive conditional means.
 }
 \author{
 Feng Li, Central University of Finance and Economics.

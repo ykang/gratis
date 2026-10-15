@@ -21,7 +21,9 @@ def test_pi_coefficients_matches_r_for_differenced_seasonal_ar():
 
 
 def test_pi_coefficients_matches_r_for_arima_with_ma():
-    expected = np.array([1.30, -0.47, 0.153, 0.0153, 0.00153, 0.000153, 0.0000153, 0.00000153, 0.000000153])
+    # Divide (1 - .4 B + .2 B^2)(1 - B) by (1 + .1 B).
+    expected = np.array([1.5, -.75, .275, -.0275, .00275, -.000275,
+                         .0000275, -.00000275, .000000275])
 
     result = gratis.pi_coefficients(ar=[0.4, -0.2], ma=[0.1], d=1)
 
@@ -67,7 +69,7 @@ def test_arima_model_validation_matches_r_style(kwargs, message):
     "kwargs, message",
     [
         ({"k": 2, "weights": [1]}, "dimension of weights"),
-        ({"k": 2, "weights": [1, 0]}, "weights must be positive"),
+        ({"k": 2, "weights": [1, -1]}, "weights must be finite and non-negative"),
         ({"k": 2, "seasonal_periods": [12, 24, 168]}, "dimension of seasonal_periods"),
     ],
 )

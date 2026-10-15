@@ -205,18 +205,18 @@ pars2list <- function(pars, seasonal, nComp) {
 #  tsfeatures: Time Series Feature Extraction. R package version 1.0.2.
 #  https://CRAN.R-project.org/package=tsfeatures
 scalets <- function(x) {
-  n <- length(x)
-  if (forecast::is.constant(x)) {
-    return(x)
+  if (!is.numeric(x) || any(!is.finite(x))) stop("x must contain only finite values")
+  if (length(x) == 0L || all(x == x[1L])) return(x)
+  # Shift before rescaling to retain small variations around large offsets.
+  shifted <- as.numeric(x) - x[1L]
+  if (any(!is.finite(shifted))) {
+    bounded <- as.numeric(x) / max(abs(x))
+    shifted <- bounded - bounded[1L]
   }
-  scaledx <- as.numeric(scale(x, center = TRUE, scale = TRUE))
-  if ("msts" %in% class(x)) {
-    msts <- attributes(x)$msts
-    y <- forecast::msts(scaledx, seasonal.periods = msts)
-  } else {
-    y <- as.ts(scaledx)
-  }
-  tsp(y) <- tsp(x)
+  shifted <- shifted / max(abs(shifted))
+  centered <- shifted - mean(shifted)
+  y <- x
+  y[] <- centered / sqrt(sum(centered * centered) / (length(x) - 1L))
   return(y)
 }
 

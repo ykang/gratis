@@ -6,26 +6,33 @@
 \alias{generate.Arima}
 \title{Generate a tsibble of synthetic time series}
 \usage{
-\method{generate}{mar}(x, length = 100, nseries = 10, ...)
+\method{generate}{mar}(x, length = 100, nseries = 10, ..., seed = NULL)
 
-\method{generate}{ets}(x, length = 100, nseries = 10, ...)
+\method{generate}{ets}(x, length = 100, nseries = 10, ..., seed = NULL)
 
-\method{generate}{Arima}(x, length = 100, nseries = 10, ...)
+\method{generate}{Arima}(x, length = 100, nseries = 10, ..., seed = NULL)
 }
 \arguments{
 \item{x}{A model object of class \code{mar}, \code{ets}, or \code{Arima}.}
 
-\item{length}{Length of each series to generate.}
+\item{length}{Positive integer output length of each series, excluding burn-in.}
 
-\item{nseries}{Number of series to generate.}
+\item{nseries}{Positive integer number of series to generate.}
 
 \item{...}{Other arguments passed to the relevant \code{simulate()} method.
-For \code{mar} objects these are passed to \code{\link{simulate.mar}()}.}
+See \code{\link{simulate.mar}()} and \code{\link{simulate.gratis_arima}()}
+for initialization controls. Supplied innovations must produce exactly
+\code{length} observations. Not every model accepts the same arguments.}
+
+\item{seed}{Optional seed set once for the whole batch. Successive series
+use successive random draws, and the previous RNG state is restored after
+generation. The default, \code{NULL}, advances the current RNG normally.}
 }
 \value{
 A tsibble containing the generated values. For multiple series the
   output has \code{length * nseries} rows and includes a key column identifying
-  each series.
+  each series. Unlike the Python API, the result contains calendar or seasonal
+  index information rather than being an unlabelled numeric matrix.
 }
 \description{
 Generate one or more synthetic time series from a fitted or specified model.
@@ -33,6 +40,9 @@ Methods are provided for \code{\link{mar_model}()} objects, ETS objects from
 \code{\link{ets_model}()}, and ARIMA objects from \code{\link{arima_model}()}.
 Each series is produced by repeatedly calling the corresponding
 \code{\link[stats]{simulate}()} method.
+Automatic burn-in for models created by \code{\link{arima_model}()} is
+calculated once per batch. This does not change the simulation behavior of
+separately fitted \pkg{forecast} models.
 }
 \details{
 The generated series are returned as a tsibble. The index is inferred from
