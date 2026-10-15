@@ -20,7 +20,7 @@ openpyxl==3.1.5
 packaging==26.2
 pandas==2.3.3
 patsy==1.0.2
-pillow==12.2.0
+pillow==12.3.0
 pluggy==1.6.0
 pyarrow==24.0.0
 Pygments==2.20.0
