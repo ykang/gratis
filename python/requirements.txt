@@ -5,7 +5,7 @@ coreforecast==0.0.17
 cycler==0.12.1
 et_xmlfile==2.0.0
 fonttools==4.62.1
-fsspec==2026.4.0
+fsspec==2026.6.0
 fugue==0.9.7
 -e git+ssh://git@github.com/ykang/gratis.git@357fc41c169323ef1afa6945357ee7befd6d884c#egg=gratis&subdirectory=python
 iniconfig==2.3.0
